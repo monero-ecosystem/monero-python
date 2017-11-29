@@ -56,22 +56,58 @@ class JSONRPC(object):
     def get_payments_in(self, account=0):
         _payments = self.raw_request('get_transfers',
                 {'account_index': account, 'in': True, 'out': False, 'pool': False})
-        return map(self._pythonify_tx, _payments.get('in', []))
+        return map(self._pythonify_payment, _payments.get('in', []))
 
     def get_payments_out(self, account=0):
         _payments = self.raw_request('get_transfers',
                 {'account_index': account, 'in': False, 'out': True, 'pool': False})
-        return map(self._pythonify_tx, _payments.get('out', ''))
+        return map(self._pythonify_payment, _payments.get('out', ''))
+
+    def _pythonify_payment(self, pm):
+        return {
+            'id': pm['txid'],
+            'when': datetime.fromtimestamp(pm['timestamp']),
+            'amount': from_atomic(pm['amount']),
+            'fee': from_atomic(pm['fee']),
+            'height': pm['height'],
+            'payment_id': pm['payment_id'],
+            'note': pm['note']
+        }
+
+    def transfer(self, destinations, priority, mixin, unlock_time, account=0):
+        print(destinations)
+        data = {
+            'account_index': account,
+            'destinations': list(map(
+                lambda dst: {'address': str(Address(dst[0])), 'amount': to_atomic(dst[1])},
+                destinations)),
+            'mixin': mixin,
+            'priority': priority,
+            'unlock_time': 0,
+            'get_tx_keys': True,
+            'get_tx_hex': True,
+            'new_algorithm': True,
+        }
+        _transfers = self.raw_request('transfer_split', data)
+        keys = ('hash', 'amount', 'fee', 'key', 'blob')
+        return list(map(
+            self._pythonify_tx,
+            [ dict(_tx) for _tx in map(
+                lambda vs: zip(keys,vs),
+                zip(
+                    *[_transfers[k] for k in (
+                        'tx_hash_list', 'amount_list', 'fee_list', 'tx_key_list', 'tx_blob_list')
+                    ]
+                ))
+            ]))
 
     def _pythonify_tx(self, tx):
         return {
-            'id': tx['txid'],
-            'when': datetime.fromtimestamp(tx['timestamp']),
+            'id': tx['hash'],
             'amount': from_atomic(tx['amount']),
             'fee': from_atomic(tx['fee']),
-            'height': tx['height'],
-            'payment_id': tx['payment_id'],
-            'note': tx['note']
+            'key': tx['key'],
+            'blob': tx.get('blob', None),
         }
 
     def raw_request(self, method, params=None):
@@ -97,7 +133,7 @@ class JSONRPC(object):
             # TODO: resolve code, raise exception
             _log.error(u"JSON RPC error:\n{result}".format(result=_ppresult))
             if err['code'] in _err2exc:
-                raise _err2exc[err['code']](err['message'], method=method, data=data, result=result)
+                raise _err2exc[err['code']](err['message'])
             else:
                 raise RPCError(
                     "Method '{method}' failed with RPC Error of unknown code {code}, "
@@ -105,17 +141,8 @@ class JSONRPC(object):
         return result['result']
 
 
-class RPCError(exceptions.MoneroException):
-    def __init__(self, message, method=None, data=None, result=None):
-        self.method = method
-        self.data = data
-        self.result = result
-        super().__init__(message)
-
-    def __str__(self):
-        return "'{method}': {error}".format(
-            method=self.method,
-            error=super().__str__())
+class RPCError(exceptions.BackendException):
+    pass
 
 
 class Unauthorized(RPCError):
@@ -127,5 +154,8 @@ class MethodNotFound(RPCError):
 
 
 _err2exc = {
+    -2: exceptions.WrongAddress,
+    -4: exceptions.NotEnoughUnlockedMoney,
+    -20: exceptions.AmountIsZero,
     -32601: MethodNotFound,
 }

@@ -7,5 +7,14 @@ class BackendException(MoneroException):
 class AccountException(MoneroException):
     pass
 
+class WrongAddress(AccountException):
+    pass
+
 class NotEnoughMoney(AccountException):
+    pass
+
+class NotEnoughUnlockedMoney(NotEnoughMoney):
+    pass
+
+class AmountIsZero(AccountException):
     pass

@@ -27,11 +27,21 @@ class Account(object):
     def get_payments_out(self):
         return self._backend.get_payments_out(account=self.index)
 
-    def transfer(self, address, amount, priority=prio.NORMAL, mixin=5):
-        pass
+    def transfer(self, address, amount, priority=prio.NORMAL, mixin=5, unlock_time=0):
+        return self._backend.transfer(
+            [(address, amount)],
+            priority,
+            mixin,
+            unlock_time,
+            account=self.index)
 
-    def transfer_multi(self, destinations, priority=prio.NORMAL, mixin=5):
+    def transfer_multiple(self, destinations, priority=prio.NORMAL, mixin=5, unlock_time=0):
         """
         destinations = [(address, amount), ...]
         """
-        pass
+        return self._backend.transfer(
+            destinations,
+            priority,
+            mixin,
+            unlock_time,
+            account=self.index)

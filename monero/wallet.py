@@ -34,11 +34,20 @@ class Wallet(object):
     def get_payments_out(self):
         return self.accounts[0].get_payments_out()
 
-    def transfer(self, address, amount, priority=prio.NORMAL, mixin=5):
-        self.accounts[0].transfer(address, amount, priority=priority, mixin=mixin)
+    def transfer(self, address, amount, priority=prio.NORMAL, mixin=5, unlock_time=0):
+        return self.accounts[0].transfer(
+                address,
+                amount,
+                priority=priority,
+                mixin=mixin,
+                unlock_time=unlock_time)
 
-    def transfer_multi(self, destinations, priority=prio.NORMAL, mixin=5):
+    def transfer_multiple(self, destinations, priority=prio.NORMAL, mixin=5, unlock_time=0):
         """
         destinations = [(address, amount), ...]
         """
-        return self.accounts[0].transfer_multi(destinations, priority=priority, mixin=mixin)
+        return self.accounts[0].transfer_multiple(
+                destinations,
+                priority=priority,
+                mixin=mixin,
+                unlock_time=unlock_time)
