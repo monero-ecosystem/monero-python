@@ -43,6 +43,22 @@ class Tests(object):
         self.assertEqual(ia2.is_testnet(), self.testnet)
         self.assertEqual(ia2.get_base_address(), a)
 
+    def test_idempotence(self):
+        a = Address(self.addr)
+        a_idem = Address(a)
+        self.assertEqual(a, a_idem)
+        a_idem = Address(str(a))
+        self.assertEqual(a, a_idem)
+        a_idem = address(a)
+        self.assertEqual(a, a_idem)
+
+        ia = IntegratedAddress(self.iaddr)
+        ia_idem = IntegratedAddress(ia)
+        self.assertEqual(ia, ia_idem)
+        ia_idem = IntegratedAddress(str(ia))
+        self.assertEqual(ia, ia_idem)
+        ia_idem = address(ia)
+        self.assertEqual(ia, ia_idem)
 
 class AddressTestCase(unittest.TestCase, Tests):
     addr = '43aeKax1ts4BoEbSyzKVbbDRmc8nsnpZLUpQBYvhUxs3KVrodnaFaBEQMDp69u4VaiEG3LSQXA6M61mXPrztCLuh7PFUAmd'

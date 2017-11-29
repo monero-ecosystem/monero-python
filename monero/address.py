@@ -5,6 +5,7 @@ from . import base58
 
 class Address(object):
     def __init__(self, address):
+        address = str(address)
         if len(address) != 95:
             raise ValueError("Address must be 95 characters long, is %d" % len(address))
         self._decode(address)
@@ -47,6 +48,7 @@ class Address(object):
 
 class IntegratedAddress(Address):
     def __init__(self, address):
+        address = str(address)
         if len(address) != 106:
             raise ValueError("Integrated address must be 106 characters long, is %d" % len(address))
         self._decode(address)
@@ -62,6 +64,7 @@ class IntegratedAddress(Address):
 
 
 def address(addr):
+    addr = str(addr)
     if len(addr) == 95:
         return Address(addr)
     elif len(addr) == 106:
