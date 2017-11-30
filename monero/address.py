@@ -1,4 +1,5 @@
 from binascii import hexlify, unhexlify
+import struct
 from sha3 import keccak_256
 
 from . import base58
@@ -14,7 +15,7 @@ class Address(object):
         self._decode(address)
 
     def _decode(self, address):
-        self._decoded = unhexlify(base58.decode(address))
+        self._decoded = bytearray(unhexlify(base58.decode(address)))
         checksum = self._decoded[-4:]
         if checksum != keccak_256(self._decoded[:-4]).digest()[:4]:
             raise ValueError("Invalid checksum")
@@ -38,8 +39,8 @@ class Address(object):
         elif not isinstance(payment_id, int):
             raise TypeError("payment_id must be either int or hexadecimal str or bytes")
         prefix = 54 if self.is_testnet() else 19
-        data = bytes([prefix]) + self._decoded[1:65] + payment_id.to_bytes(8, byteorder='big')
-        checksum = keccak_256(data).digest()[:4]
+        data = bytearray([prefix]) + self._decoded[1:65] + struct.pack('>Q', payment_id)
+        checksum = bytearray(keccak_256(data).digest()[:4])
         return IntegratedAddress(base58.encode(hexlify(data + checksum)))
 
     def __repr__(self):
@@ -74,7 +75,7 @@ class IntegratedAddress(Address):
 
     def get_base_address(self):
         prefix = 53 if self.is_testnet() else 18
-        data = bytes([prefix]) + self._decoded[1:65]
+        data = bytearray([prefix]) + self._decoded[1:65]
         checksum = keccak_256(data).digest()[:4]
         return Address(base58.encode(hexlify(data + checksum)))
 
@@ -82,13 +83,13 @@ class IntegratedAddress(Address):
 def address(addr):
     addr = str(addr)
     if len(addr) == 95:
-        netbyte = unhexlify(base58.decode(addr))[0]
+        netbyte = bytearray(unhexlify(base58.decode(addr)))[0]
         if netbyte in Address._valid_netbytes:
             return Address(addr)
         elif netbyte in SubAddress._valid_netbytes:
             return SubAddress(addr)
         raise ValueError("Invalid address netbyte {nb}. Allowed values are: {allowed}".format(
-            nb=hexlify(self._decoded[0]),
+            nb=hexlify(chr(netbyte)),
             allowed=", ".join(map(
                 lambda b: '%02x' % b,
                 sorted(Address._valid_netbytes + SubAddress._valid_netbytes)))))
