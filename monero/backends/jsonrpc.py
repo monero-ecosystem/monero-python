@@ -7,7 +7,7 @@ import requests
 
 from .. import exceptions
 from ..account import Account
-from ..address import address
+from ..address import address, Address
 from ..numbers import from_atomic, to_atomic
 
 _log = logging.getLogger(__name__)
@@ -46,7 +46,7 @@ class JSONRPC(object):
             return [Address(_addresses['address'])]
         addresses = [None] * (max(map(operator.itemgetter('address_index'), _addresses['addresses'])) + 1)
         for _addr in _addresses['addresses']:
-            addresses[_addr['address_index']] = Address(_addr['address'])
+            addresses[_addr['address_index']] = address(_addr['address'])
         return addresses
 
     def get_balance(self, account=0):
@@ -75,7 +75,6 @@ class JSONRPC(object):
         }
 
     def transfer(self, destinations, priority, mixin, unlock_time, account=0):
-        print(destinations)
         data = {
             'account_index': account,
             'destinations': list(map(
@@ -130,7 +129,6 @@ class JSONRPC(object):
 
         if 'error' in result:
             err = result['error']
-            # TODO: resolve code, raise exception
             _log.error(u"JSON RPC error:\n{result}".format(result=_ppresult))
             if err['code'] in _err2exc:
                 raise _err2exc[err['code']](err['message'])

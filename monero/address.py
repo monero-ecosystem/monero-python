@@ -21,7 +21,7 @@ class Address(object):
             raise ValueError("Invalid checksum")
         if self._decoded[0] not in self._valid_netbytes:
             raise ValueError("Invalid address netbyte {nb}. Allowed values are: {allowed}".format(
-                nb=hexlify(bytes(self._decoded[0])),
+                nb=self._decoded[0],
                 allowed=", ".join(map(lambda b: '%02x' % b, self._valid_netbytes))))
 
     def is_testnet(self):
