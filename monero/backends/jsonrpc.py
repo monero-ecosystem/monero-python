@@ -7,7 +7,7 @@ import requests
 
 from .. import exceptions
 from ..account import Account
-from ..address import Address
+from ..address import address
 from ..numbers import from_atomic, to_atomic
 
 _log = logging.getLogger(__name__)
@@ -79,7 +79,7 @@ class JSONRPC(object):
         data = {
             'account_index': account,
             'destinations': list(map(
-                lambda dst: {'address': str(Address(dst[0])), 'amount': to_atomic(dst[1])},
+                lambda dst: {'address': str(address(dst[0])), 'amount': to_atomic(dst[1])},
                 destinations)),
             'mixin': mixin,
             'priority': priority,

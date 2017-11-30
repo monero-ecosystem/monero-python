@@ -4,6 +4,9 @@ from sha3 import keccak_256
 from . import base58
 
 class Address(object):
+    _valid_netbytes = (18, 53)
+    # NOTE: _valid_netbytes order is (real, testnet)
+
     def __init__(self, address):
         address = str(address)
         if len(address) != 95:
@@ -15,9 +18,13 @@ class Address(object):
         checksum = self._decoded[-4:]
         if checksum != keccak_256(self._decoded[:-4]).digest()[:4]:
             raise ValueError("Invalid checksum")
+        if self._decoded[0] not in self._valid_netbytes:
+            raise ValueError("Invalid address netbyte {nb}. Allowed values are: {allowed}".format(
+                nb=hexlify(bytes(self._decoded[0])),
+                allowed=", ".join(map(lambda b: '%02x' % b, self._valid_netbytes))))
 
     def is_testnet(self):
-        return self._decoded[0] in bytes([53, 54])
+        return self._decoded[0] == self._valid_netbytes[1]
 
     def get_view_key(self):
         return hexlify(self._decoded[33:65]).decode()
@@ -46,7 +53,16 @@ class Address(object):
         return super()
 
 
+class SubAddress(Address):
+    _valid_netbytes = (42, 63)
+
+    def with_payment_id(self):
+        raise TypeError("SubAddress cannot be merged with payment ID into IntegratedAddress")
+
+
 class IntegratedAddress(Address):
+    _valid_netbytes = (19, 54)
+
     def __init__(self, address):
         address = str(address)
         if len(address) != 106:
@@ -66,7 +82,16 @@ class IntegratedAddress(Address):
 def address(addr):
     addr = str(addr)
     if len(addr) == 95:
-        return Address(addr)
+        netbyte = unhexlify(base58.decode(addr))[0]
+        if netbyte in Address._valid_netbytes:
+            return Address(addr)
+        elif netbyte in SubAddress._valid_netbytes:
+            return SubAddress(addr)
+        raise ValueError("Invalid address netbyte {nb}. Allowed values are: {allowed}".format(
+            nb=hexlify(self._decoded[0]),
+            allowed=", ".join(map(
+                lambda b: '%02x' % b,
+                sorted(Address._valid_netbytes + SubAddress._valid_netbytes)))))
     elif len(addr) == 106:
         return IntegratedAddress(addr)
     raise ValueError("Address must be either 95 or 106 characters long")
