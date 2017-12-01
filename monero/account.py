@@ -9,14 +9,17 @@ class Account(object):
         self.index = index
         self._backend = backend
 
-    def get_balance(self):
-        return self._backend.get_balance(account=self.index)
+    def get_balances(self):
+        return self._backend.get_balances(account=self.index)
+
+    def get_balance(self, unlocked=False):
+        return self._backend.get_balances(account=self.index)[1 if unlocked else 0]
 
     def get_address(self):
         """
         Return account's main address.
         """
-        return self._backend.get_address(account=self.index)[0]
+        return self._backend.get_addresses(account=self.index)[0]
 
     def get_addresses(self):
         return self._backend.get_addresses(account=self.index)

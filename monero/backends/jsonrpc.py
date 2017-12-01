@@ -49,7 +49,7 @@ class JSONRPC(object):
             addresses[_addr['address_index']] = address(_addr['address'])
         return addresses
 
-    def get_balance(self, account=0):
+    def get_balances(self, account=0):
         _balance = self.raw_request('getbalance', {'account_index': account})
         return (from_atomic(_balance['balance']), from_atomic(_balance['unlocked_balance']))
 

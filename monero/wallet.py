@@ -22,8 +22,11 @@ class Wallet(object):
             idx += 1
 
     # Following methods operate on default account (index=0)
-    def get_balance(self):
-        return self.accounts[0].get_balance()
+    def get_balances(self):
+        return self.accounts[0].get_balances()
+
+    def get_balance(self, unlocked=False):
+        return self.accounts[0].get_balance(unlocked=unlocked)
 
     def get_address(self, index=0):
         return self.accounts[0].get_addresses()[0]
