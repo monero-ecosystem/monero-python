@@ -66,7 +66,7 @@ class JSONRPC(object):
     def _pythonify_payment(self, pm):
         return {
             'id': pm['txid'],
-            'when': datetime.fromtimestamp(pm['timestamp']),
+            'timestamp': datetime.fromtimestamp(pm['timestamp']),
             'amount': from_atomic(pm['amount']),
             'fee': from_atomic(pm['fee']),
             'height': pm['height'],
