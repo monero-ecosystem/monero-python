@@ -56,6 +56,10 @@ class SubaddrWalletTestCase(unittest.TestCase):
         balances = self.wallet.get_balances()
         self.assertEqual(balances[0], locked)
         self.assertEqual(balances[1], unlocked)
+        self.assertIsInstance(locked, Decimal)
+        self.assertIsInstance(unlocked, Decimal)
+        self.assertIsInstance(balances[0], Decimal)
+        self.assertIsInstance(balances[1], Decimal)
         self.assertEqual(locked, Decimal('224.916129245183'))
 
     @patch('monero.backends.jsonrpc.requests.post')
@@ -123,3 +127,68 @@ class SubaddrWalletTestCase(unittest.TestCase):
             waddr,
             '9vgV48wWAPTWik5QSUSoGYicdvvsbSNHrT9Arsx1XBTz6VrWPSgfmnUKSPZDMyX4Ms8R9TkhB4uFqK9s5LUBbV6YQN2Q9ag')
         self.assertEqual(len(self.wallet.accounts[0].get_addresses()), 8)
+
+    @patch('monero.backends.jsonrpc.requests.post')
+    def test_get_payments_in(self, mock_post):
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json.return_value = {'id': 0,
+            'jsonrpc': '2.0',
+            'result': {'subaddress_accounts': [{'account_index': 0,
+                                             'balance': 224916129245183,
+                                             'base_address': '9vgV48wWAPTWik5QSUSoGYicdvvsbSNHrT9Arsx1XBTz6VrWPSgfmnUKSPZDMyX4Ms8R9TkhB4uFqK9s5LUBbV6YQN2Q9ag',
+                                             'label': 'Primary account',
+                                             'unlocked_balance': 224916129245183},
+                                            {'account_index': 1,
+                                             'balance': 3981420960933,
+                                             'base_address': 'BaCBwYSK9BGSuKxb2msXEj4mmpvZYJexYHfqx7kNPDrXDePVXSfoofxGquhXxpA4uxawcnVnouusMDgP74CACa7e9siimpj',
+                                             'label': 'Untitled account',
+                                             'unlocked_balance': 3981420960933},
+                                            {'account_index': 2,
+                                             'balance': 7256159239955,
+                                             'base_address': 'BgCseuY3jFJAZS7kt9mrNg7fEG3bo5BV91CTyKbYu9GFiU6hUZhvdNWCTUdQNPNcA4PyFApsFr3EsQDEDfT3tQSY1mVZeP2',
+                                             'label': 'Untitled account',
+                                             'unlocked_balance': 7256159239955}],
+                    'total_balance': 236153709446071,
+                    'total_unlocked_balance': 236153709446071}}
+        self.wallet = Wallet(JSONRPC())
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json.return_value ={'id': 0,
+            'jsonrpc': '2.0',
+            'result': {'in': [{'amount': 2470000000000,
+                            'double_spend_seen': False,
+                            'fee': 0,
+                            'height': 1049947,
+                            'note': '',
+                            'payment_id': '0000000000000000',
+                            'subaddr_index': {'major': 0, 'minor': 0},
+                            'timestamp': 1511926250,
+                            'txid': '0cdde0eb934c44b523f6e966a5e19b131ed68c3c08600bc087f48ae13015b704',
+                            'type': 'in',
+                            'unlock_time': 0},
+                           {'amount': 6123000000000,
+                            'double_spend_seen': False,
+                            'fee': 0,
+                            'height': 1049947,
+                            'note': '',
+                            'payment_id': '0000000000000000',
+                            'subaddr_index': {'major': 0, 'minor': 0},
+                            'timestamp': 1511926250,
+                            'txid': '8b4154681c48a873550818ecaa6408a7c987a882b80917d6c902befd6ee57109',
+                            'type': 'in',
+                            'unlock_time': 0},
+                           {'amount': 9767000000000,
+                            'double_spend_seen': False,
+                            'fee': 0,
+                            'height': 1049947,
+                            'note': '',
+                            'payment_id': '0000000000000000',
+                            'subaddr_index': {'major': 0, 'minor': 0},
+                            'timestamp': 1511926250,
+                            'txid': 'd23a7d086e70df7aa0ca002361c4b35e35a272345b0a513ece4f21b773941f5e',
+                            'type': 'in',
+                            'unlock_time': 0}]}}
+        pay_in = self.wallet.get_payments_in()
+        self.assertEqual(len(list(pay_in)), 3)
+        for payment in pay_in:
+            self.assertIsInstance(payment['amount'], Decimal)
+            self.assertIsInstance(payment['fee'], Decimal)
