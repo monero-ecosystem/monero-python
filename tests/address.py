@@ -75,6 +75,9 @@ class Tests(object):
     def test_invalid(self):
         self.assertRaises(ValueError, Address, self.addr_invalid)
         self.assertRaises(ValueError, Address, self.iaddr_invalid)
+        a = Address(self.addr)
+        self.assertRaises(TypeError, a.with_payment_id, 2**64+1)
+        self.assertRaises(TypeError, a.with_payment_id, "%x" % (2**64+1))
 
     def test_type_mismatch(self):
         self.assertRaises(ValueError, Address, self.iaddr)
