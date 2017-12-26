@@ -7,7 +7,7 @@ except ImportError:
     from mock import patch, Mock
 
 from monero.wallet import Wallet
-from monero.backends.jsonrpc import JSONRPC
+from monero.backends.jsonrpc import JSONRPCWallet
 
 class SubaddrWalletTestCase(unittest.TestCase):
     get_accounts_result = {'id': 0,
@@ -34,7 +34,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
     def test_get_balance(self, mock_post):
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = self.get_accounts_result
-        self.wallet = Wallet(JSONRPC())
+        self.wallet = Wallet(JSONRPCWallet())
         mock_post.return_value.json.return_value = {'id': 0,
             'jsonrpc': '2.0',
             'result': {'balance': 224916129245183,
@@ -72,7 +72,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
     def test_get_address(self, mock_post):
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = self.get_accounts_result
-        self.wallet = Wallet(JSONRPC())
+        self.wallet = Wallet(JSONRPCWallet())
         mock_post.return_value.json.return_value = {'id': 0,
             'jsonrpc': '2.0',
             'result': {'address': '9vgV48wWAPTWik5QSUSoGYicdvvsbSNHrT9Arsx1XBTz6VrWPSgfmnUKSPZDMyX4Ms8R9TkhB4uFqK9s5LUBbV6YQN2Q9ag',
@@ -120,7 +120,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
     def test_get_payments_in(self, mock_post):
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = self.get_accounts_result
-        self.wallet = Wallet(JSONRPC())
+        self.wallet = Wallet(JSONRPCWallet())
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value ={'id': 0,
             'jsonrpc': '2.0',
@@ -167,7 +167,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
     def test_get_payments_out(self, mock_post):
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = self.get_accounts_result
-        self.wallet = Wallet(JSONRPC())
+        self.wallet = Wallet(JSONRPCWallet())
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = {'id': 0,
             'jsonrpc': '2.0',

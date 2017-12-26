@@ -9,7 +9,7 @@ except ImportError:
     from urlparse import urlparse
 #logging.basicConfig(level='DEBUG')
 
-from monero.backends.jsonrpc import JSONRPC
+from monero.backends.jsonrpc import JSONRPCWallet
 from monero import exceptions
 from monero import Address, Wallet, as_monero
 
@@ -20,7 +20,7 @@ def get_wallet():
     argsparser.add_argument('-u', dest='user', default='', help="Wallet RPC user")
     argsparser.add_argument('-p', dest='password', default='', help="Wallet RPC password")
     args = argsparser.parse_args()
-    return Wallet(JSONRPC(
+    return Wallet(JSONRPCWallet(
         host=args.host, port=args.port,
         user=args.user,
         password=args.password))

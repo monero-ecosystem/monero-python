@@ -13,7 +13,7 @@ from ..numbers import from_atomic, to_atomic
 _log = logging.getLogger(__name__)
 
 
-class JSONRPC(object):
+class JSONRPCWallet(object):
     def __init__(self, protocol='http', host='127.0.0.1', port=18082, path='/json_rpc', user='', password=''):
         self.url = '{protocol}://{host}:{port}/json_rpc'.format(
                 protocol=protocol,
