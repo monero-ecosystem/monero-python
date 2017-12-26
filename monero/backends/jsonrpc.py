@@ -71,7 +71,8 @@ class JSONRPC(object):
             'fee': from_atomic(pm['fee']),
             'height': pm['height'],
             'payment_id': pm['payment_id'],
-            'note': pm['note']
+            'note': pm['note'],
+            'subaddr': (pm['subaddr_index']['major'], pm['subaddr_index']['minor']),
         }
 
     def transfer(self, destinations, priority, mixin, unlock_time, account=0):
