@@ -7,7 +7,6 @@ try:
     from urllib.parse import urlparse
 except ImportError:
     from urlparse import urlparse
-#logging.basicConfig(level='DEBUG')
 
 from monero.backends.jsonrpc import JSONRPCWallet
 from monero import exceptions
@@ -19,7 +18,15 @@ def get_wallet():
     argsparser.add_argument('--port', dest='port', default='18082', help="Wallet RPC port")
     argsparser.add_argument('-u', dest='user', default='', help="Wallet RPC user")
     argsparser.add_argument('-p', dest='password', default='', help="Wallet RPC password")
+    argsparser.add_argument('-v', dest='verbosity', action='count', default=0,
+        help="Verbosity (repeat to increase; -v for INFO, -vv for DEBUG")
     args = argsparser.parse_args()
+    level = logging.WARNING
+    if args.verbosity == 1:
+        level = logging.INFO
+    elif args.verbosity > 1:
+        level = logging.DEBUG
+    logging.basicConfig(level=level, format="%(asctime)-15s %(message)s")
     return Wallet(JSONRPCWallet(
         host=args.host, port=args.port,
         user=args.user,
