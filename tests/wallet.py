@@ -7,6 +7,8 @@ except ImportError:
     from mock import patch, Mock
 
 from monero.wallet import Wallet
+from monero.address import Address
+from monero.transaction import Transaction, Payment, Transfer
 from monero.backends.jsonrpc import JSONRPCWallet
 
 class SubaddrWalletTestCase(unittest.TestCase):
@@ -117,7 +119,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
         self.assertEqual(len(self.wallet.accounts[0].get_addresses()), 8)
 
     @patch('monero.backends.jsonrpc.requests.post')
-    def test_get_payments_in(self, mock_post):
+    def test_get_transactions_in(self, mock_post):
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = self.get_accounts_result
         self.wallet = Wallet(JSONRPCWallet())
@@ -157,14 +159,16 @@ class SubaddrWalletTestCase(unittest.TestCase):
                             'txid': 'd23a7d086e70df7aa0ca002361c4b35e35a272345b0a513ece4f21b773941f5e',
                             'type': 'in',
                             'unlock_time': 0}]}}
-        pay_in = self.wallet.get_payments_in()
+        pay_in = self.wallet.get_transactions_in()
         self.assertEqual(len(list(pay_in)), 3)
-        for payment in pay_in:
-            self.assertIsInstance(payment['amount'], Decimal)
-            self.assertIsInstance(payment['fee'], Decimal)
+        for tx in pay_in:
+            self.assertIsInstance(tx, Transaction)
+#            self.assertIsInstance(tx.address, Address)
+            self.assertIsInstance(tx.amount, Decimal)
+            self.assertIsInstance(tx.fee, Decimal)
 
     @patch('monero.backends.jsonrpc.requests.post')
-    def test_get_payments_out(self, mock_post):
+    def test_get_transactions_out(self, mock_post):
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = self.get_accounts_result
         self.wallet = Wallet(JSONRPCWallet())
@@ -249,9 +253,34 @@ class SubaddrWalletTestCase(unittest.TestCase):
                              'txid': '7e3db6c59c02d870f18b37a37cfc5857eeb5412df4ea00bb1971f3095f72b0d8',
                              'type': 'out',
                              'unlock_time': 0}]}}
-        pay_out = self.wallet.get_payments_out()
+        pay_out = self.wallet.get_transactions_out()
         self.assertEqual(len(list(pay_out)), 6)
-        for payment in pay_out:
-            self.assertIsInstance(payment['amount'], Decimal)
-            self.assertIsInstance(payment['fee'], Decimal)
-            self.assertIsInstance(payment['timestamp'], datetime)
+        for tx in pay_out:
+            self.assertIsInstance(tx, Transaction)
+#            self.assertIsInstance(tx.address, Address)
+            self.assertIsInstance(tx.amount, Decimal)
+            self.assertIsInstance(tx.fee, Decimal)
+            self.assertIsInstance(tx.timestamp, datetime)
+
+    @patch('monero.backends.jsonrpc.requests.post')
+    def test_get_payments(self, mock_post):
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json.return_value = self.get_accounts_result
+        self.wallet = Wallet(JSONRPCWallet())
+        mock_post.return_value.status_code = 200 
+        mock_post.return_value.json.return_value = {'id': 0,
+            'jsonrpc': '2.0',
+            'result': {'payments': [{'address': 'BZ9V9tfTDgHYsnAxgeMLaGCUb6yMaGNiZJwiBWQrE23MXcRqSde9DKa9LnPw31o2G8QrdKdUNM7VWhd3dr22ivk54QGqZ6u',
+                          'amount': 2313370000000,
+                          'block_height': 1048268,
+                          'payment_id': 'feedbadbeef12345',
+                          'subaddr_index': {'major': 1, 'minor': 1},
+                          'tx_hash': 'e84343c2ebba4d4d94764e0cd275adee07cf7b4718565513be453d3724f6174b',
+                          'unlock_time': 0}]}}
+        payments = self.wallet.get_payments(payment_id=0xfeedbadbeef12345)
+        self.assertEqual(len(list(payments)), 1)
+        for payment in payments:
+            self.assertIsInstance(payment, Payment)
+            self.assertIsInstance(payment.address, Address)
+            self.assertIsInstance(payment.amount, Decimal)
+            self.assertIsInstance(payment.height, int)

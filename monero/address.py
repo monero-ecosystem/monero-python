@@ -1,18 +1,13 @@
 from binascii import hexlify, unhexlify
 import re
 import struct
-import sys
 from sha3 import keccak_256
 
 from . import base58
+from . import numbers
 
 _ADDR_REGEX = re.compile(r'^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{95}$')
 _IADDR_REGEX = re.compile(r'^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{106}$')
-
-if sys.version_info < (3,):
-    _integer_types = (int, long,)
-else:
-    _integer_types = (int,)
 
 
 class Address(object):
@@ -46,11 +41,7 @@ class Address(object):
         return hexlify(self._decoded[1:33]).decode()
 
     def with_payment_id(self, payment_id=0):
-        if isinstance(payment_id, (bytes, str)):
-            payment_id = int(payment_id, 16)
-        elif not isinstance(payment_id, _integer_types):
-            raise TypeError("payment_id must be either int or hexadecimal str or bytes, "
-                "is %r" % payment_id)
+        payment_id = numbers.payment_id_as_int(payment_id)
         if payment_id.bit_length() > 64:
             raise TypeError("Integrated payment_id cannot have more than 64 bits, "
                 "has %d" % payment_id.bit_length())

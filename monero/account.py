@@ -24,11 +24,14 @@ class Account(object):
     def get_addresses(self):
         return self._backend.get_addresses(account=self.index)
 
-    def get_payments_in(self):
-        return self._backend.get_payments_in(account=self.index)
+    def get_payments(self, payment_id=None):
+        return self._backend.get_payments(account=self.index, payment_id=payment_id)
 
-    def get_payments_out(self):
-        return self._backend.get_payments_out(account=self.index)
+    def get_transactions_in(self):
+        return self._backend.get_transactions_in(account=self.index)
+
+    def get_transactions_out(self):
+        return self._backend.get_transactions_out(account=self.index)
 
     def transfer(self, address, amount, priority=prio.NORMAL, mixin=5, unlock_time=0):
         return self._backend.transfer(

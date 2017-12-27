@@ -31,11 +31,14 @@ class Wallet(object):
     def get_address(self, index=0):
         return self.accounts[0].get_addresses()[0]
 
-    def get_payments_in(self):
-        return self.accounts[0].get_payments_in()
+    def get_payments(self, payment_id=None):
+        return self.accounts[0].get_payments(payment_id=payment_id)
 
-    def get_payments_out(self):
-        return self.accounts[0].get_payments_out()
+    def get_transactions_in(self):
+        return self.accounts[0].get_transactions_in()
+
+    def get_transactions_out(self):
+        return self.accounts[0].get_transactions_out()
 
     def transfer(self, address, amount, priority=prio.NORMAL, mixin=5, unlock_time=0):
         return self.accounts[0].transfer(

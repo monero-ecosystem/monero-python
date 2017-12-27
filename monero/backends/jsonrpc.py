@@ -8,12 +8,16 @@ import requests
 from .. import exceptions
 from ..account import Account
 from ..address import address, Address
-from ..numbers import from_atomic, to_atomic
+from ..numbers import from_atomic, to_atomic, payment_id_as_int
+from ..transaction import Transaction, Payment, Transfer
 
 _log = logging.getLogger(__name__)
 
 
 class JSONRPCWallet(object):
+    _master_address = None
+    _addresses = None
+
     def __init__(self, protocol='http', host='127.0.0.1', port=18082, path='/json_rpc', user='', password=''):
         self.url = '{protocol}://{host}:{port}/json_rpc'.format(
                 protocol=protocol,
@@ -30,9 +34,12 @@ class JSONRPCWallet(object):
         try:
             _accounts = self.raw_request('get_accounts')
         except MethodNotFound:
-            # monero <= 0.11
+            # monero <= 0.11 : there's only one account and one address
+            _lg.debug('Monero <= 0.11 found, no accounts')
+            self._master_address = self.get_addresses()[0]
             return [Account(self, 0)]
         idx = 0
+        self._master_address = Address(_accounts['subaddress_accounts'][0]['base_address'])
         for _acc in _accounts['subaddress_accounts']:
             assert idx == _acc['account_index']
             accounts.append(Account(self, _acc['account_index']))
@@ -43,6 +50,7 @@ class JSONRPCWallet(object):
         _addresses = self.raw_request('getaddress', {'account_index': account})
         if 'addresses' not in _addresses:
             # monero <= 0.11
+            _lg.debug('Monero <= 0.11 found, assuming single address')
             return [Address(_addresses['address'])]
         addresses = [None] * (max(map(operator.itemgetter('address_index'), _addresses['addresses'])) + 1)
         for _addr in _addresses['addresses']:
@@ -53,26 +61,48 @@ class JSONRPCWallet(object):
         _balance = self.raw_request('getbalance', {'account_index': account})
         return (from_atomic(_balance['balance']), from_atomic(_balance['unlocked_balance']))
 
-    def get_payments_in(self, account=0):
-        _payments = self.raw_request('get_transfers',
+    def get_payments(self, account=0, payment_id=0):
+        payment_id = payment_id_as_int(payment_id)
+        _log.debug("Getting payments for account {acc}, payment_id {pid}".format(
+            acc=account, pid=payment_id))
+        if payment_id.bit_length() > 64:
+            _pid = '{:064x}'.format(payment_id)
+        else:
+            _pid = '{:016x}'.format(payment_id)
+        _payments = self.raw_request('get_payments', {
+            'account_index': account,
+            'payment_id': _pid})
+        pmts = []
+        for tx in _payments['payments']:
+            data = self._tx2dict(tx)
+            # Monero <= 0.11 : no address is passed because there's only one
+            data['address'] = data['address'] or self._master_address
+            pmts.append(Payment(**data))
+        return pmts
+
+    def get_transactions_in(self, account=0):
+        _transfers = self.raw_request('get_transfers',
                 {'account_index': account, 'in': True, 'out': False, 'pool': False})
-        return map(self._pythonify_payment, _payments.get('in', []))
+        return [Transaction(**self._tx2dict(tx)) for tx in _transfers.get('in', [])]
 
-    def get_payments_out(self, account=0):
-        _payments = self.raw_request('get_transfers',
+    def get_transactions_out(self, account=0):
+        _transfers = self.raw_request('get_transfers',
                 {'account_index': account, 'in': False, 'out': True, 'pool': False})
-        return map(self._pythonify_payment, _payments.get('out', ''))
+        return [Transaction(**self._tx2dict(tx)) for tx in _transfers.get('out', [])]
 
-    def _pythonify_payment(self, pm):
+    def _tx2dict(self, tx):
         return {
-            'id': pm['txid'],
-            'timestamp': datetime.fromtimestamp(pm['timestamp']),
-            'amount': from_atomic(pm['amount']),
-            'fee': from_atomic(pm['fee']),
-            'height': pm['height'],
-            'payment_id': pm['payment_id'],
-            'note': pm['note'],
-            'subaddr': (pm['subaddr_index']['major'], pm['subaddr_index']['minor']),
+            'hash': tx.get('txid', tx.get('tx_hash')),
+            'timestamp': datetime.fromtimestamp(tx['timestamp']) if 'timestamp' in tx else None,
+            'amount': from_atomic(tx['amount']),
+            'fee': from_atomic(tx['fee']) if 'fee' in tx else None,
+            'height': tx.get('height', tx.get('block_height')),
+            'payment_id': tx['payment_id'],
+            'note': tx.get('note'),
+            # NOTE: address will be resolved only after PR#3010 has been merged to Monero
+            'address': address(tx['address']) if 'address' in tx else None,
+            'key': tx.get('key'),
+            'blob': tx.get('blob', None),
         }
 
     def transfer(self, destinations, priority, mixin, unlock_time, account=0):
@@ -89,26 +119,18 @@ class JSONRPCWallet(object):
             'new_algorithm': True,
         }
         _transfers = self.raw_request('transfer_split', data)
-        keys = ('hash', 'amount', 'fee', 'key', 'blob')
-        return list(map(
-            self._pythonify_tx,
-            [ dict(_tx) for _tx in map(
-                lambda vs: zip(keys,vs),
-                zip(
-                    *[_transfers[k] for k in (
-                        'tx_hash_list', 'amount_list', 'fee_list', 'tx_key_list', 'tx_blob_list')
-                    ]
-                ))
-            ]))
-
-    def _pythonify_tx(self, tx):
-        return {
-            'id': tx['hash'],
-            'amount': from_atomic(tx['amount']),
-            'fee': from_atomic(tx['fee']),
-            'key': tx['key'],
-            'blob': tx.get('blob', None),
-        }
+        keys = ('txid', 'amount', 'fee', 'key', 'blob')
+        return [
+            Transfer(**self._tx2dict(tx)) for tx in [
+                dict(_tx) for _tx in map(
+                    lambda vs: zip(keys,vs),
+                    zip(
+                        *[_transfers[k] for k in (
+                            'tx_hash_list', 'amount_list', 'fee_list', 'tx_key_list', 'tx_blob_list')
+                        ]
+                    ))
+                ]
+            ]
 
     def raw_request(self, method, params=None):
         hdr = {'Content-Type': 'application/json'}

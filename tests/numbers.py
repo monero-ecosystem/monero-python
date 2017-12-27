@@ -1,7 +1,7 @@
 from decimal import Decimal
 import unittest
 
-from monero.numbers import to_atomic, from_atomic
+from monero.numbers import to_atomic, from_atomic, payment_id_as_int
 
 class NumbersTestCase(unittest.TestCase):
     def test_simple_numbers(self):
@@ -14,3 +14,7 @@ class NumbersTestCase(unittest.TestCase):
 
     def test_rounding(self):
         self.assertEqual(to_atomic(Decimal('1.0000000000004')), 1000000000000)
+
+    def test_payment_id(self):
+        self.assertEqual(payment_id_as_int('0'), 0)
+        self.assertEqual(payment_id_as_int('abcdef'), 0xabcdef)

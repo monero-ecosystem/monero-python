@@ -36,11 +36,14 @@ _TXHDR = "timestamp         height  id/hash                                     
     "         amount         fee           payment_id"
 
 def tx2str(tx):
-    return "{time} {height} {fullid} {amount:17.12f} {fee:13.12f} {payment_id}".format(
-        time=tx['timestamp'].strftime("%d-%m-%y %H:%M:%S"),
-        shortid="[{}...]".format(tx['id'][:32]),
-        fullid=tx['id'],
-        **tx)
+    return "{time} {height} {hash} {amount:17.12f} {fee:13.12f} {payment_id} {addr}".format(
+        time=tx.timestamp.strftime("%d-%m-%y %H:%M:%S") if getattr(tx, 'timestamp', None) else None,
+        height=tx.height,
+        hash=tx.hash,
+        amount=tx.amount,
+        fee=tx.fee or 0,
+        payment_id=tx.payment_id,
+        addr=getattr(tx, 'receiving_address', None) or '')
 
 w = get_wallet()
 print(
@@ -60,28 +63,28 @@ if len(w.accounts) > 1:
         addresses = acc.get_addresses()
         print("{num:2d} address(es):".format(num=len(addresses)))
         print("\n".join(map(str, addresses)))
-        ins = acc.get_payments_in()
+        ins = acc.get_transactions_in()
         if ins:
-            print("\nIncoming payments:")
+            print("\nIncoming transactions:")
             print(_TXHDR)
             for tx in ins:
                 print(tx2str(tx))
-        outs = acc.get_payments_out()
+        outs = acc.get_transactions_out()
         if outs:
-            print("\nOutgoing transfers:")
+            print("\nOutgoing transactions:")
             print(_TXHDR)
             for tx in outs:
                 print(tx2str(tx))
 else:
-    ins = w.get_payments_in()
+    ins = w.get_transactions_in()
     if ins:
-        print("\nIncoming payments:")
+        print("\nIncoming transactions:")
         print(_TXHDR)
         for tx in ins:
             print(tx2str(tx))
-    outs = w.get_payments_out()
+    outs = w.get_transactions_out()
     if outs:
-        print("\nOutgoing transfers:")
+        print("\nOutgoing transactions:")
         print(_TXHDR)
         for tx in outs:
             print(tx2str(tx))
