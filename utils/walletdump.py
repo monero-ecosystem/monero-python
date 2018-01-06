@@ -3,10 +3,6 @@ from decimal import Decimal
 import logging
 import pprint
 import random
-try:
-    from urllib.parse import urlparse
-except ImportError:
-    from urlparse import urlparse
 
 from monero.backends.jsonrpc import JSONRPCWallet
 from monero import exceptions
