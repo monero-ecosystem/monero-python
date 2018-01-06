@@ -79,12 +79,14 @@ class JSONRPCWallet(object):
     def get_transactions_in(self, account=0):
         _transfers = self.raw_request('get_transfers',
                 {'account_index': account, 'in': True, 'out': False, 'pool': False})
-        return [Transaction(**self._tx2dict(tx)) for tx in _transfers.get('in', [])]
+        return [Transaction(**self._tx2dict(tx)) for tx in
+            sorted(_transfers.get('in', []), key=operator.itemgetter('timestamp'))]
 
     def get_transactions_out(self, account=0):
         _transfers = self.raw_request('get_transfers',
                 {'account_index': account, 'in': False, 'out': True, 'pool': False})
-        return [Transaction(**self._tx2dict(tx)) for tx in _transfers.get('out', [])]
+        return [Transaction(**self._tx2dict(tx)) for tx in
+            sorted(_transfers.get('out', []), key=operator.itemgetter('timestamp'))]
 
     def _tx2dict(self, tx):
         return {
