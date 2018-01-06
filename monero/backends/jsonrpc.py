@@ -76,7 +76,7 @@ class JSONRPCWallet(object):
         for tx in _payments['payments']:
             data = self._tx2dict(tx)
             # Monero <= 0.11 : no address is passed because there's only one
-            data['address'] = data['address'] or self._master_address
+            data['local_address'] = data['local_address'] or self._master_address
             pmts.append(Payment(**data))
         return pmts
 
@@ -100,7 +100,7 @@ class JSONRPCWallet(object):
             'payment_id': tx['payment_id'],
             'note': tx.get('note'),
             # NOTE: address will be resolved only after PR#3010 has been merged to Monero
-            'address': address(tx['address']) if 'address' in tx else None,
+            'local_address': address(tx['address']) if 'address' in tx else None,
             'key': tx.get('key'),
             'blob': tx.get('blob', None),
         }

@@ -281,6 +281,6 @@ class SubaddrWalletTestCase(unittest.TestCase):
         self.assertEqual(len(list(payments)), 1)
         for payment in payments:
             self.assertIsInstance(payment, Payment)
-            self.assertIsInstance(payment.address, Address)
+            self.assertIsInstance(payment.local_address, Address)
             self.assertIsInstance(payment.amount, Decimal)
             self.assertIsInstance(payment.height, int)

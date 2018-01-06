@@ -5,7 +5,7 @@ class Transaction(object):
     payment_id = '0000000000000000'
     amount = None
     fee = None
-    address = None
+    local_address = None
 
     def __init__(self, hash=None, **kwargs):
         self.hash = hash
@@ -14,7 +14,10 @@ class Transaction(object):
         self.payment_id = kwargs.get('payment_id', self.payment_id)
         self.amount = kwargs.get('amount', self.amount)
         self.fee = kwargs.get('fee', self.fee)
-        self.address = kwargs.get('address', self.address)
+        self.local_address = kwargs.get('local_address', self.local_address)
+
+    def __repr__(self):
+        return self.hash
 
 
 class Payment(Transaction):

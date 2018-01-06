@@ -33,7 +33,7 @@ def get_wallet():
         password=args.password))
 
 _TXHDR = "timestamp         height  id/hash                                                     " \
-    "         amount         fee           payment_id"
+    "         amount         fee           payment_id       {dir}"
 
 def tx2str(tx):
     return "{time} {height} {hash} {amount:17.12f} {fee:13.12f} {payment_id} {addr}".format(
@@ -43,7 +43,7 @@ def tx2str(tx):
         amount=tx.amount,
         fee=tx.fee or 0,
         payment_id=tx.payment_id,
-        addr=getattr(tx, 'receiving_address', None) or '')
+        addr=getattr(tx, 'local_address', None) or '')
 
 w = get_wallet()
 print(
@@ -66,25 +66,25 @@ if len(w.accounts) > 1:
         ins = acc.get_transactions_in()
         if ins:
             print("\nIncoming transactions:")
-            print(_TXHDR)
+            print(_TXHDR.format(dir='received by'))
             for tx in ins:
                 print(tx2str(tx))
         outs = acc.get_transactions_out()
         if outs:
             print("\nOutgoing transactions:")
-            print(_TXHDR)
+            print(_TXHDR.format(dir='sent from'))
             for tx in outs:
                 print(tx2str(tx))
 else:
     ins = w.get_transactions_in()
     if ins:
         print("\nIncoming transactions:")
-        print(_TXHDR)
+        print(_TXHDR.format(dir='received by'))
         for tx in ins:
             print(tx2str(tx))
     outs = w.get_transactions_out()
     if outs:
         print("\nOutgoing transactions:")
-        print(_TXHDR)
+        print(_TXHDR.format(dir='sent from'))
         for tx in outs:
             print(tx2str(tx))
