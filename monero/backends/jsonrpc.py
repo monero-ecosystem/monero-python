@@ -8,7 +8,7 @@ import requests
 from .. import exceptions
 from ..account import Account
 from ..address import address, Address
-from ..numbers import from_atomic, to_atomic, payment_id_as_int
+from ..numbers import from_atomic, to_atomic, PaymentID
 from ..transaction import Transaction, Payment, Transfer
 
 _log = logging.getLogger(__name__)
@@ -62,16 +62,12 @@ class JSONRPCWallet(object):
         return (from_atomic(_balance['balance']), from_atomic(_balance['unlocked_balance']))
 
     def get_payments(self, account=0, payment_id=0):
-        payment_id = payment_id_as_int(payment_id)
+        payment_id = PaymentID(payment_id)
         _log.debug("Getting payments for account {acc}, payment_id {pid}".format(
             acc=account, pid=payment_id))
-        if payment_id.bit_length() > 64:
-            _pid = '{:064x}'.format(payment_id)
-        else:
-            _pid = '{:016x}'.format(payment_id)
         _payments = self.raw_request('get_payments', {
             'account_index': account,
-            'payment_id': _pid})
+            'payment_id': str(payment_id)})
         pmts = []
         for tx in _payments['payments']:
             data = self._tx2dict(tx)
@@ -97,7 +93,7 @@ class JSONRPCWallet(object):
             'amount': from_atomic(tx['amount']),
             'fee': from_atomic(tx['fee']) if 'fee' in tx else None,
             'height': tx.get('height', tx.get('block_height')),
-            'payment_id': tx['payment_id'],
+            'payment_id': PaymentID(tx.get('payment_id', 0)),
             'note': tx.get('note'),
             # NOTE: address will be resolved only after PR#3010 has been merged to Monero
             'local_address': address(tx['address']) if 'address' in tx else None,
@@ -105,7 +101,7 @@ class JSONRPCWallet(object):
             'blob': tx.get('blob', None),
         }
 
-    def transfer(self, destinations, priority, mixin, unlock_time, account=0):
+    def transfer(self, destinations, priority, mixin, payment_id, unlock_time, account=0):
         data = {
             'account_index': account,
             'destinations': list(map(
@@ -114,6 +110,7 @@ class JSONRPCWallet(object):
             'mixin': mixin,
             'priority': priority,
             'unlock_time': 0,
+            'payment_id': payment_id,
             'get_tx_keys': True,
             'get_tx_hex': True,
             'new_algorithm': True,

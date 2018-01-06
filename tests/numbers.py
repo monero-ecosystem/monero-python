@@ -1,7 +1,7 @@
 from decimal import Decimal
 import unittest
 
-from monero.numbers import to_atomic, from_atomic, payment_id_as_int
+from monero.numbers import to_atomic, from_atomic, PaymentID
 
 class NumbersTestCase(unittest.TestCase):
     def test_simple_numbers(self):
@@ -16,5 +16,23 @@ class NumbersTestCase(unittest.TestCase):
         self.assertEqual(to_atomic(Decimal('1.0000000000004')), 1000000000000)
 
     def test_payment_id(self):
-        self.assertEqual(payment_id_as_int('0'), 0)
-        self.assertEqual(payment_id_as_int('abcdef'), 0xabcdef)
+        pid = PaymentID('0')
+        self.assertTrue(pid.is_short())
+        self.assertEqual(pid, 0)
+        self.assertEqual(pid, '0000000000000000')
+        self.assertEqual(PaymentID(pid), pid)
+        pid = PaymentID('abcdef')
+        self.assertTrue(pid.is_short())
+        self.assertEqual(pid, 0xabcdef)
+        self.assertEqual(pid, '0000000000abcdef')
+        self.assertEqual(PaymentID(pid), pid)
+        pid = PaymentID('1234567812345678')
+        self.assertTrue(pid.is_short())
+        self.assertEqual(pid, 0x1234567812345678)
+        self.assertEqual(pid, '1234567812345678')
+        self.assertEqual(PaymentID(pid), pid)
+        pid = PaymentID('a1234567812345678')
+        self.assertFalse(pid.is_short())
+        self.assertEqual(pid, 0xa1234567812345678)
+        self.assertEqual(pid, '00000000000000000000000000000000000000000000000a1234567812345678')
+        self.assertEqual(PaymentID(pid), pid)

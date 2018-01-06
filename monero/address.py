@@ -41,12 +41,11 @@ class Address(object):
         return hexlify(self._decoded[1:33]).decode()
 
     def with_payment_id(self, payment_id=0):
-        payment_id = numbers.payment_id_as_int(payment_id)
-        if payment_id.bit_length() > 64:
-            raise TypeError("Integrated payment_id cannot have more than 64 bits, "
-                "has %d" % payment_id.bit_length())
+        payment_id = numbers.PaymentID(payment_id)
+        if not payment_id.is_short():
+            raise TypeError("Integrated payment ID {0} has more than 64 bits".format(payment_id))
         prefix = 54 if self.is_testnet() else 19
-        data = bytearray([prefix]) + self._decoded[1:65] + struct.pack('>Q', payment_id)
+        data = bytearray([prefix]) + self._decoded[1:65] + struct.pack('>Q', int(payment_id))
         checksum = bytearray(keccak_256(data).digest()[:4])
         return IntegratedAddress(base58.encode(hexlify(data + checksum)))
 
@@ -79,7 +78,7 @@ class IntegratedAddress(Address):
         self._decode(address)
 
     def get_payment_id(self):
-        return hexlify(self._decoded[65:-4]).decode()
+        return numbers.PaymentID(hexlify(self._decoded[65:-4]).decode())
 
     def get_base_address(self):
         prefix = 53 if self.is_testnet() else 18

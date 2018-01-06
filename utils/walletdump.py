@@ -31,10 +31,10 @@ def get_wallet():
     return Wallet(JSONRPCWallet(**args.daemon_url))
 
 _TXHDR = "timestamp         height  id/hash                                                     " \
-    "         amount         fee           payment_id       {dir}"
+        "         amount         fee           {dir:95s} payment_id"
 
 def tx2str(tx):
-    return "{time} {height} {hash} {amount:17.12f} {fee:13.12f} {payment_id} {addr}".format(
+    return "{time} {height} {hash} {amount:17.12f} {fee:13.12f} {addr} {payment_id}".format(
         time=tx.timestamp.strftime("%d-%m-%y %H:%M:%S") if getattr(tx, 'timestamp', None) else None,
         height=tx.height,
         hash=tx.hash,
