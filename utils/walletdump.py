@@ -1,19 +1,24 @@
 import argparse
 from decimal import Decimal
 import logging
-import pprint
+import operator
 import random
+import re
 
 from monero.backends.jsonrpc import JSONRPCWallet
 from monero import exceptions
 from monero import Address, Wallet, as_monero
 
+def url_data(url):
+    gs = re.compile(
+        r'^(?:(?P<user>[a-z0-9_-]+)?(?::(?P<password>[^@]+))?@)?(?P<host>[^:\s]+)(?::(?P<port>[0-9]+))?$'
+        ).match(url).groupdict()
+    return dict(filter(operator.itemgetter(1), gs.items()))
+
 def get_wallet():
     argsparser = argparse.ArgumentParser(description="Display wallet contents")
-    argsparser.add_argument('--host', dest='host', default='127.0.0.1', help="Wallet RPC host")
-    argsparser.add_argument('--port', dest='port', default='18082', help="Wallet RPC port")
-    argsparser.add_argument('-u', dest='user', default='', help="Wallet RPC user")
-    argsparser.add_argument('-p', dest='password', default='', help="Wallet RPC password")
+    argsparser.add_argument('daemon_url', nargs='?', type=url_data, default='127.0.0.1:18082',
+        help="Daemon URL [user[:password]@]host[:port]")
     argsparser.add_argument('-v', dest='verbosity', action='count', default=0,
         help="Verbosity (repeat to increase; -v for INFO, -vv for DEBUG")
     args = argsparser.parse_args()
@@ -23,10 +28,7 @@ def get_wallet():
     elif args.verbosity > 1:
         level = logging.DEBUG
     logging.basicConfig(level=level, format="%(asctime)-15s %(message)s")
-    return Wallet(JSONRPCWallet(
-        host=args.host, port=args.port,
-        user=args.user,
-        password=args.password))
+    return Wallet(JSONRPCWallet(**args.daemon_url))
 
 _TXHDR = "timestamp         height  id/hash                                                     " \
     "         amount         fee           payment_id       {dir}"
