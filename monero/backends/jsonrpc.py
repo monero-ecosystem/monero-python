@@ -112,24 +112,19 @@ class JSONRPCWallet(object):
             'mixin': mixin,
             'priority': priority,
             'unlock_time': 0,
-            'payment_id': payment_id,
+            'payment_id': str(PaymentID(payment_id)),
             'get_tx_keys': True,
             'get_tx_hex': True,
             'new_algorithm': True,
         }
         _transfers = self.raw_request('transfer_split', data)
-        keys = ('txid', 'amount', 'fee', 'key', 'blob')
-        return [
-            Transfer(**self._tx2dict(tx)) for tx in [
-                dict(_tx) for _tx in map(
-                    lambda vs: zip(keys,vs),
-                    zip(
-                        *[_transfers[k] for k in (
-                            'tx_hash_list', 'amount_list', 'fee_list', 'tx_key_list', 'tx_blob_list')
-                        ]
-                    ))
-                ]
-            ]
+        _pertx = [dict(_tx) for _tx in map(
+            lambda vs: zip(('txid', 'amount', 'fee', 'key', 'blob', 'payment_id'), vs),
+            zip(*[_transfers[k] for k in (
+                'tx_hash_list', 'amount_list', 'fee_list', 'tx_key_list', 'tx_blob_list')]))]
+        for d in _pertx:
+            d['payment_id'] = payment_id
+        return [Transfer(**self._tx2dict(tx)) for tx in _pertx]
 
     def raw_request(self, method, params=None):
         hdr = {'Content-Type': 'application/json'}
