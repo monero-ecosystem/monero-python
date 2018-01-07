@@ -36,3 +36,4 @@ class NumbersTestCase(unittest.TestCase):
         self.assertEqual(pid, 0xa1234567812345678)
         self.assertEqual(pid, '00000000000000000000000000000000000000000000000a1234567812345678')
         self.assertEqual(PaymentID(pid), pid)
+        self.assertRaises(ValueError, PaymentID, 2**256+1)

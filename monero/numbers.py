@@ -34,7 +34,9 @@ class PaymentID(object):
             payment_id = int(payment_id, 16)
         elif not isinstance(payment_id, _integer_types):
             raise TypeError("payment_id must be either int or hexadecimal str or bytes, "
-                "is %r" % payment_id)
+                "is {0}".format(type(payment_id)))
+        if payment_id.bit_length() > 256:
+            raise ValueError("payment_id {0} is more than 256 bits long".format(payment_id))
         self._payment_id = payment_id
 
     def is_short(self):
