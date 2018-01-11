@@ -63,7 +63,7 @@ class Address(object):
 class SubAddress(Address):
     _valid_netbytes = (42, 63)
 
-    def with_payment_id(self):
+    def with_payment_id(self, _):
         raise TypeError("SubAddress cannot be integrated with payment ID")
 
 
