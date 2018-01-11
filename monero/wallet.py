@@ -21,6 +21,12 @@ class Wallet(object):
             self.accounts.append(_acc)
             idx += 1
 
+    def new_account(self, label=None):
+        acc, addr = self._backend.new_account(label=label)
+        assert acc.index == len(self.accounts)
+        self.accounts.append(acc)
+        return acc
+
     # Following methods operate on default account (index=0)
     def get_balances(self):
         return self.accounts[0].get_balances()
@@ -30,6 +36,9 @@ class Wallet(object):
 
     def get_address(self, index=0):
         return self.accounts[0].get_addresses()[0]
+
+    def new_address(self, label=None):
+        return self.accounts[0].new_address(label=label)
 
     def get_payments(self, payment_id=None):
         return self.accounts[0].get_payments(payment_id=payment_id)

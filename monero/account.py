@@ -24,6 +24,9 @@ class Account(object):
     def get_addresses(self):
         return self._backend.get_addresses(account=self.index)
 
+    def new_address(self, label=None):
+        return self._backend.new_address(account=self.index, label=label)
+
     def get_payments(self, payment_id=None):
         return self._backend.get_payments(account=self.index, payment_id=payment_id)
 

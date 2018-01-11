@@ -7,7 +7,7 @@ import requests
 
 from .. import exceptions
 from ..account import Account
-from ..address import address, Address
+from ..address import address, Address, SubAddress
 from ..numbers import from_atomic, to_atomic, PaymentID
 from ..transaction import Transaction, Payment, Transfer
 
@@ -46,6 +46,10 @@ class JSONRPCWallet(object):
             idx += 1
         return accounts
 
+    def new_account(self, label=None):
+        _account = self.raw_request('create_account', {'label': label})
+        return Account(self, _account['account_index']), SubAddress(_account['address'])
+
     def get_addresses(self, account=0):
         _addresses = self.raw_request('getaddress', {'account_index': account})
         if 'addresses' not in _addresses:
@@ -54,8 +58,15 @@ class JSONRPCWallet(object):
             return [Address(_addresses['address'])]
         addresses = [None] * (max(map(operator.itemgetter('address_index'), _addresses['addresses'])) + 1)
         for _addr in _addresses['addresses']:
-            addresses[_addr['address_index']] = address(_addr['address'])
+            addresses[_addr['address_index']] = address(
+                _addr['address'],
+                label=_addr.get('label', None))
         return addresses
+
+    def new_address(self, account=0, label=None):
+        _address = self.raw_request(
+            'create_address', {'account_index': account, 'label': label})
+        return SubAddress(_address['address'])
 
     def get_balances(self, account=0):
         _balance = self.raw_request('getbalance', {'account_index': account})

@@ -43,11 +43,16 @@ def tx2str(tx):
         payment_id=tx.payment_id,
         addr=getattr(tx, 'local_address', None) or '')
 
+def a2str(a):
+    return "{addr} {label}".format(
+        addr=a,
+        label=a.label or "")
+
 w = get_wallet()
 print(
     "Master address: {addr}\n" \
     "Balance: {total:16.12f} ({unlocked:16.12f} unlocked)".format(
-        addr=w.get_address(),
+        addr=a2str(w.get_address()),
         total=w.get_balance(),
         unlocked=w.get_balance(unlocked=True)))
 
@@ -60,7 +65,7 @@ if len(w.accounts) > 1:
             unlocked=acc.get_balance(unlocked=True)))
         addresses = acc.get_addresses()
         print("{num:2d} address(es):".format(num=len(addresses)))
-        print("\n".join(map(str, addresses)))
+        print("\n".join(map(a2str, addresses)))
         ins = acc.get_transactions_in()
         if ins:
             print("\nIncoming transactions:")

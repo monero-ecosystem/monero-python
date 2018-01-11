@@ -116,6 +116,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
         self.assertEqual(
             waddr,
             '9vgV48wWAPTWik5QSUSoGYicdvvsbSNHrT9Arsx1XBTz6VrWPSgfmnUKSPZDMyX4Ms8R9TkhB4uFqK9s5LUBbV6YQN2Q9ag')
+        self.assertEqual(a0addr.label, 'Primary account')
         self.assertEqual(len(self.wallet.accounts[0].get_addresses()), 8)
 
     @patch('monero.backends.jsonrpc.requests.post')
