@@ -21,3 +21,6 @@ class NotEnoughUnlockedMoney(NotEnoughMoney):
 
 class AmountIsZero(AccountException):
     pass
+
+class TransactionNotPossible(AccountException):
+    pass
