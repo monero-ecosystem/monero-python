@@ -31,13 +31,13 @@ argsparser.add_argument('-p', dest='prio',
     choices=['unimportant', 'normal', 'elevated', 'priority'],
     default='normal')
 argsparser.add_argument('-r', dest='ring_size', type=int, default=5, help="Ring size")
-argsparser.add_argument('-i', dest='payment_id', nargs='?', type=PaymentID, default=0,
+argsparser.add_argument('-i', dest='payment_id', nargs='?', type=PaymentID,
+    const=PaymentID(random.randint(0, 2**256)),
     help="Payment ID")
 argsparser.add_argument('destinations', metavar='address:amount', nargs='+', type=destpair,
     help="Destination address and amount (one or more pairs)")
 args = argsparser.parse_args()
 prio = getattr(monero.prio, args.prio.upper())
-payment_id = PaymentID(random.randint(0, 2**256)) if args.payment_id is None else args.payment_id
 
 level = logging.WARNING
 if args.verbosity == 1:
@@ -48,7 +48,7 @@ logging.basicConfig(level=level, format="%(asctime)-15s %(message)s")
 
 w = Wallet(JSONRPCWallet(**args.daemon_url))
 txfrs = w.accounts[args.account].transfer_multiple(
-    args.destinations, priority=prio, mixin=args.ring_size, payment_id=payment_id)
+    args.destinations, priority=prio, mixin=args.ring_size, payment_id=args.payment_id)
 for tx in txfrs:
     print(u"Transaction {hash}:\nXMR: {amount:21.12f} @ {fee:13.12f} fee\n"
        u"Payment ID: {payment_id}\nTx key:     {key}\nSize:       {size} B".format(
