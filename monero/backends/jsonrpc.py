@@ -171,6 +171,7 @@ class MethodNotFound(RPCError):
 _err2exc = {
     -2: exceptions.WrongAddress,
     -4: exceptions.NotEnoughUnlockedMoney,
+    -5: exceptions.WrongPaymentId,
     -20: exceptions.AmountIsZero,
     -32601: MethodNotFound,
 }

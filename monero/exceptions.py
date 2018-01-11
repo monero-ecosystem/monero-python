@@ -10,6 +10,9 @@ class AccountException(MoneroException):
 class WrongAddress(AccountException):
     pass
 
+class WrongPaymentId(AccountException):
+    pass
+
 class NotEnoughMoney(AccountException):
     pass
 
