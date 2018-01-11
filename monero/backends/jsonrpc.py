@@ -89,13 +89,14 @@ class JSONRPCWallet(object):
             sorted(_transfers.get('out', []), key=operator.itemgetter('timestamp'))]
 
     def _tx2dict(self, tx):
+        pid = tx.get('payment_id', None)
         return {
             'hash': tx.get('txid', tx.get('tx_hash')),
             'timestamp': datetime.fromtimestamp(tx['timestamp']) if 'timestamp' in tx else None,
             'amount': from_atomic(tx['amount']),
             'fee': from_atomic(tx['fee']) if 'fee' in tx else None,
             'height': tx.get('height', tx.get('block_height')),
-            'payment_id': PaymentID(tx.get('payment_id', 0)),
+            'payment_id': None if pid is None else PaymentID(pid),
             'note': tx.get('note'),
             # NOTE: address will be resolved only after PR#3010 has been merged to Monero
             'local_address': address(tx['address']) if 'address' in tx else None,
@@ -103,7 +104,7 @@ class JSONRPCWallet(object):
             'blob': tx.get('blob', None),
         }
 
-    def transfer(self, destinations, priority, mixin, payment_id, unlock_time, account=0):
+    def transfer(self, destinations, priority, mixin, payment_id=None, unlock_time=0, account=0):
         data = {
             'account_index': account,
             'destinations': list(map(
@@ -112,11 +113,12 @@ class JSONRPCWallet(object):
             'mixin': mixin,
             'priority': priority,
             'unlock_time': 0,
-            'payment_id': str(PaymentID(payment_id)),
             'get_tx_keys': True,
             'get_tx_hex': True,
             'new_algorithm': True,
         }
+        if payment_id is not None:
+            data['payment_id'] = str(PaymentID(payment_id))
         _transfers = self.raw_request('transfer_split', data)
         _pertx = [dict(_tx) for _tx in map(
             lambda vs: zip(('txid', 'amount', 'fee', 'key', 'blob', 'payment_id'), vs),
