@@ -34,8 +34,11 @@ class Wallet(object):
     def get_balance(self, unlocked=False):
         return self.accounts[0].get_balance(unlocked=unlocked)
 
-    def get_address(self, index=0):
+    def get_address(self):
         return self.accounts[0].get_addresses()[0]
+
+    def get_addresses(self):
+        return self.accounts[0].get_addresses()
 
     def new_address(self, label=None):
         return self.accounts[0].new_address(label=label)
@@ -49,22 +52,22 @@ class Wallet(object):
     def get_transactions_out(self):
         return self.accounts[0].get_transactions_out()
 
-    def transfer(self, address, amount, priority=prio.NORMAL, mixin=5, payment_id=None, unlock_time=0):
+    def transfer(self, address, amount, priority=prio.NORMAL, ringsize=5, payment_id=None, unlock_time=0):
         return self.accounts[0].transfer(
                 address,
                 amount,
                 priority=priority,
-                mixin=mixin,
+                ringsize=ringsize,
                 payment_id=None,
                 unlock_time=unlock_time)
 
-    def transfer_multiple(self, destinations, priority=prio.NORMAL, mixin=5, payment_id=None, unlock_time=0):
+    def transfer_multiple(self, destinations, priority=prio.NORMAL, ringsize=5, payment_id=None, unlock_time=0):
         """
         destinations = [(address, amount), ...]
         """
         return self.accounts[0].transfer_multiple(
                 destinations,
                 priority=priority,
-                mixin=mixin,
+                ringsize=ringsize,
                 payment_id=None,
                 unlock_time=unlock_time)

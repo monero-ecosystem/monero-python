@@ -115,13 +115,13 @@ class JSONRPCWallet(object):
             'blob': tx.get('blob', None),
         }
 
-    def transfer(self, destinations, priority, mixin, payment_id=None, unlock_time=0, account=0):
+    def transfer(self, destinations, priority, ringsize, payment_id=None, unlock_time=0, account=0):
         data = {
             'account_index': account,
             'destinations': list(map(
                 lambda dst: {'address': str(address(dst[0])), 'amount': to_atomic(dst[1])},
                 destinations)),
-            'mixin': mixin,
+            'mixin': ringsize - 1,
             'priority': priority,
             'unlock_time': 0,
             'get_tx_keys': True,
