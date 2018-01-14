@@ -36,16 +36,21 @@ class Account(object):
     def get_transactions_out(self):
         return self._backend.get_transactions_out(account=self.index)
 
-    def transfer(self, address, amount, priority=prio.NORMAL, ringsize=5, payment_id=None, unlock_time=0):
+    def transfer(self, address, amount,
+            priority=prio.NORMAL, ringsize=5, payment_id=None, unlock_time=0,
+            relay=True):
         return self._backend.transfer(
             [(address, amount)],
             priority,
             ringsize,
             payment_id,
             unlock_time,
-            account=self.index)
+            account=self.index,
+            relay=relay)
 
-    def transfer_multiple(self, destinations, priority=prio.NORMAL, ringsize=5, payment_id=None, unlock_time=0):
+    def transfer_multiple(self, destinations,
+            priority=prio.NORMAL, ringsize=5, payment_id=None, unlock_time=0,
+            relay=True):
         """
         destinations = [(address, amount), ...]
         """
@@ -55,4 +60,5 @@ class Account(object):
             ringsize,
             payment_id,
             unlock_time,
-            account=self.index)
+            account=self.index,
+            relay=relay)

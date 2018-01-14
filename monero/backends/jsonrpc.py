@@ -1,3 +1,4 @@
+import binascii
 from datetime import datetime
 import operator
 import json
@@ -115,7 +116,9 @@ class JSONRPCWallet(object):
             'blob': tx.get('blob', None),
         }
 
-    def transfer(self, destinations, priority, ringsize, payment_id=None, unlock_time=0, account=0):
+    def transfer(self, destinations, priority, ringsize,
+            payment_id=None, unlock_time=0, account=0,
+            relay=True):
         data = {
             'account_index': account,
             'destinations': list(map(
@@ -127,6 +130,7 @@ class JSONRPCWallet(object):
             'get_tx_keys': True,
             'get_tx_hex': True,
             'new_algorithm': True,
+            'do_not_relay': not relay,
         }
         if payment_id is not None:
             data['payment_id'] = str(PaymentID(payment_id))

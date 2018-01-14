@@ -52,16 +52,21 @@ class Wallet(object):
     def get_transactions_out(self):
         return self.accounts[0].get_transactions_out()
 
-    def transfer(self, address, amount, priority=prio.NORMAL, ringsize=5, payment_id=None, unlock_time=0):
+    def transfer(self, address, amount,
+            priority=prio.NORMAL, ringsize=5, payment_id=None, unlock_time=0,
+            relay=True):
         return self.accounts[0].transfer(
                 address,
                 amount,
                 priority=priority,
                 ringsize=ringsize,
                 payment_id=None,
-                unlock_time=unlock_time)
+                unlock_time=unlock_time,
+                relay=relay)
 
-    def transfer_multiple(self, destinations, priority=prio.NORMAL, ringsize=5, payment_id=None, unlock_time=0):
+    def transfer_multiple(self, destinations,
+            priority=prio.NORMAL, ringsize=5, payment_id=None, unlock_time=0,
+            relay=True):
         """
         destinations = [(address, amount), ...]
         """
@@ -70,4 +75,5 @@ class Wallet(object):
                 priority=priority,
                 ringsize=ringsize,
                 payment_id=None,
-                unlock_time=unlock_time)
+                unlock_time=unlock_time,
+                relay=relay)

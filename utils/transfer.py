@@ -2,6 +2,7 @@ import argparse
 from decimal import Decimal
 import operator
 import logging
+import os
 import random
 import re
 
@@ -34,6 +35,9 @@ argsparser.add_argument('-r', dest='ring_size', type=int, default=5, help="Ring 
 argsparser.add_argument('-i', dest='payment_id', nargs='?', type=PaymentID,
     const=PaymentID(random.randint(0, 2**256)),
     help="Payment ID")
+argsparser.add_argument('--save', dest='outdir', nargs='?', default=None, const='.',
+    help="Save to file, optionally follow by destination directory (default is .)\n"
+        "Transaction will be not relayed to the network.")
 argsparser.add_argument('destinations', metavar='address:amount', nargs='+', type=destpair,
     help="Destination address and amount (one or more pairs)")
 args = argsparser.parse_args()
@@ -48,9 +52,16 @@ logging.basicConfig(level=level, format="%(asctime)-15s %(message)s")
 
 w = Wallet(JSONRPCWallet(**args.daemon_url))
 txfrs = w.accounts[args.account].transfer_multiple(
-    args.destinations, priority=prio, mixin=args.ring_size, payment_id=args.payment_id)
+    args.destinations, priority=prio, ringsize=args.ring_size, payment_id=args.payment_id,
+    relay=args.outdir is None)
 for tx in txfrs:
     print(u"Transaction {hash}:\nXMR: {amount:21.12f} @ {fee:13.12f} fee\n"
        u"Payment ID: {payment_id}\nTx key:     {key}\nSize:       {size} B".format(
             hash=tx.hash, amount=tx.amount, fee=tx.fee,
-            payment_id=tx.payment_id, key=tx.key, size=len(tx.blob) >> 1))
+            payment_id=tx.payment_id, key=tx.key, size=len(tx.blob)))
+    if args.outdir:
+        outname = os.path.join(args.outdir, tx.hash + '.tx')
+        outfile = open(outname, 'wb')
+        outfile.write(tx.blob)
+        outfile.close()
+        print(u"Transaction saved to {}".format(outname))
