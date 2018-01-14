@@ -21,6 +21,18 @@ class Wallet(object):
             self.accounts.append(_acc)
             idx += 1
 
+    def get_view_key(self):
+        """
+        Returns private view key.
+        """
+        return self._backend.get_view_key()
+
+    def get_seed(self):
+        """
+        Returns word seed.
+        """
+        return self._backend.get_seed()
+
     def new_account(self, label=None):
         acc, addr = self._backend.new_account(label=label)
         assert acc.index == len(self.accounts)

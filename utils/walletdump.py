@@ -49,12 +49,24 @@ def a2str(a):
         label=a.label or "")
 
 w = get_wallet()
+masteraddr = w.get_address()
 print(
     "Master address: {addr}\n" \
     "Balance: {total:16.12f} ({unlocked:16.12f} unlocked)".format(
-        addr=a2str(w.get_address()),
+        addr=a2str(masteraddr),
         total=w.get_balance(),
         unlocked=w.get_balance(unlocked=True)))
+print(
+    "Keys:\n" \
+    "  private view:  {svk}\n" \
+    "  public spend:  {psk}\n" \
+    "  public view:   {pvk}\n\n" \
+    "Seed:\n{seed}".format(
+        svk=w.get_view_key(),
+        psk=masteraddr.get_spend_key(),
+        pvk=masteraddr.get_view_key(),
+        seed=w.get_seed()
+        ))
 
 if len(w.accounts) > 1:
     print("\nWallet has {num} account(s):".format(num=len(w.accounts)))
