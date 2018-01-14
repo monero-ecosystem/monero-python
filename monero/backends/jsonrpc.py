@@ -15,6 +15,53 @@ from ..transaction import Transaction, Payment, Transfer
 _log = logging.getLogger(__name__)
 
 
+class JSONRPCDaemon(object):
+    def __init__(self, protocol='http', host='127.0.0.1', port=18081, path='/json_rpc'):
+        self.url = '{protocol}://{host}:{port}/json_rpc'.format(
+                protocol=protocol,
+                host=host,
+                port=port)
+        _log.debug("JSONRPC daemon backend URL: {url}".format(url=self.url))
+
+    def get_info(self):
+        info = self.raw_jsonrpc_request('get_info')
+        return info
+
+    def raw_jsonrpc_request(self, method, params=None):
+        hdr = {'Content-Type': 'application/json'}
+        data = {'jsonrpc': '2.0', 'id': 0, 'method': method, 'params': params or {}}
+        _log.debug(u"Method: {method}\nParams:\n{params}".format(
+            method=method,
+            params=pprint.pformat(params)))
+        rsp = requests.post(self.url, headers=hdr, data=json.dumps(data))
+        if rsp.status_code != 200:
+            raise RPCError("Invalid HTTP status {code} for method {method}.".format(
+                code=rsp.status_code,
+                method=method))
+        result = rsp.json()
+        _ppresult = pprint.pformat(result)
+        _log.debug(u"Result:\n{result}".format(result=_ppresult))
+
+        if 'error' in result:
+            err = result['error']
+            _log.error(u"JSON RPC error:\n{result}".format(result=_ppresult))
+#            if err['code'] in _err2exc:
+#                raise _err2exc[err['code']](err['message'])
+#            else:
+#                raise RPCError(
+#                    "Method '{method}' failed with RPC Error of unknown code {code}, "
+#                    "message: {message}".format(method=method, data=data, result=result, **err))
+            raise RPCError(
+                "Method '{method}' failed with RPC Error of unknown code {code}, "
+                "message: {message}".format(method=method, data=data, result=result, **err))
+#
+#
+#
+        return result['result']
+
+
+
+
 class JSONRPCWallet(object):
     _master_address = None
     _addresses = None
@@ -24,10 +71,10 @@ class JSONRPCWallet(object):
                 protocol=protocol,
                 host=host,
                 port=port)
-        _log.debug("JSONRPC backend URL: {url}".format(url=self.url))
+        _log.debug("JSONRPC wallet backend URL: {url}".format(url=self.url))
         self.user = user
         self.password = password
-        _log.debug("JSONRPC backend auth: '{user}'/'{stars}'".format(
+        _log.debug("JSONRPC wallet backend auth: '{user}'/'{stars}'".format(
             user=user, stars=('*' * len(password)) if password else ''))
 
     def get_view_key(self):
