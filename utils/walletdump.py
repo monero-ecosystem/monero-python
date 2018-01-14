@@ -17,8 +17,8 @@ def url_data(url):
 
 def get_wallet():
     argsparser = argparse.ArgumentParser(description="Display wallet contents")
-    argsparser.add_argument('daemon_url', nargs='?', type=url_data, default='127.0.0.1:18082',
-        help="Daemon URL [user[:password]@]host[:port]")
+    argsparser.add_argument('wallet_rpc_url', nargs='?', type=url_data, default='127.0.0.1:18082',
+        help="Wallet RPC URL [user[:password]@]host[:port]")
     argsparser.add_argument('-v', dest='verbosity', action='count', default=0,
         help="Verbosity (repeat to increase; -v for INFO, -vv for DEBUG")
     args = argsparser.parse_args()
@@ -28,7 +28,7 @@ def get_wallet():
     elif args.verbosity > 1:
         level = logging.DEBUG
     logging.basicConfig(level=level, format="%(asctime)-15s %(message)s")
-    return Wallet(JSONRPCWallet(**args.daemon_url))
+    return Wallet(JSONRPCWallet(**args.wallet_rpc_url))
 
 _TXHDR = "timestamp         height  id/hash                                                     " \
         "         amount         fee           {dir:95s} payment_id"

@@ -25,7 +25,7 @@ def destpair(s):
 argsparser = argparse.ArgumentParser(description="Transfer Monero")
 argsparser.add_argument('-v', dest='verbosity', action='count', default=0,
     help="Verbosity (repeat to increase; -v for INFO, -vv for DEBUG")
-argsparser.add_argument('daemon_url', nargs='?', type=url_data, default='127.0.0.1:18082',
+argsparser.add_argument('wallet_rpc_url', nargs='?', type=url_data, default='127.0.0.1:18082',
     help="Daemon URL [user[:password]@]host[:port]")
 argsparser.add_argument('-a', dest='account', default=0, type=int, help="Source account index")
 argsparser.add_argument('-p', dest='prio',
@@ -50,7 +50,7 @@ elif args.verbosity > 1:
     level = logging.DEBUG
 logging.basicConfig(level=level, format="%(asctime)-15s %(message)s")
 
-w = Wallet(JSONRPCWallet(**args.daemon_url))
+w = Wallet(JSONRPCWallet(**args.wallet_rpc_url))
 txfrs = w.accounts[args.account].transfer_multiple(
     args.destinations, priority=prio, ringsize=args.ring_size, payment_id=args.payment_id,
     relay=args.outdir is None)
@@ -58,7 +58,7 @@ for tx in txfrs:
     print(u"Transaction {hash}:\nXMR: {amount:21.12f} @ {fee:13.12f} fee\n"
        u"Payment ID: {payment_id}\nTx key:     {key}\nSize:       {size} B".format(
             hash=tx.hash, amount=tx.amount, fee=tx.fee,
-            payment_id=tx.payment_id, key=tx.key, size=len(tx.blob)))
+            payment_id=tx.payment_id, key=tx.key, size=len(tx.blob) >> 1))
     if args.outdir:
         outname = os.path.join(args.outdir, tx.hash + '.tx')
         outfile = open(outname, 'wb')
