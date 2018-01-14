@@ -46,6 +46,9 @@ class Tests(object):
         self.assertEqual(ia2.is_testnet(), self.testnet)
         self.assertEqual(ia2.get_base_address(), a)
 
+        self.assertEqual(ia.get_view_key(), a.get_view_key())
+        self.assertEqual(ia.get_spend_key(), a.get_spend_key())
+
         sa = SubAddress(self.subaddr)
         sa2 = address(self.subaddr)
         self.assertIsInstance(sa2, SubAddress)
