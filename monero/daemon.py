@@ -4,3 +4,6 @@ class Daemon(object):
 
     def get_info(self):
         return self._backend.get_info()
+
+    def send_transaction(self, blob):
+        return self._backend.send_transaction(blob)

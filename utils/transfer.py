@@ -62,6 +62,6 @@ for tx in txfrs:
     if args.outdir:
         outname = os.path.join(args.outdir, tx.hash + '.tx')
         outfile = open(outname, 'wb')
-        outfile.write(tx.blob)
+        outfile.write(tx.blob.encode())
         outfile.close()
         print(u"Transaction saved to {}".format(outname))

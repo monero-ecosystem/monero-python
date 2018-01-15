@@ -24,3 +24,9 @@ class AmountIsZero(AccountException):
 
 class TransactionNotPossible(AccountException):
     pass
+
+class TransactionBroadcastError(BackendException):
+    def __init__(self, message, details=None):
+        self.details = details
+        super(TransactionBroadcastError, self).__init__(message)
+

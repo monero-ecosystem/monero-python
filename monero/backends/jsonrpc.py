@@ -17,7 +17,7 @@ _log = logging.getLogger(__name__)
 
 class JSONRPCDaemon(object):
     def __init__(self, protocol='http', host='127.0.0.1', port=18081, path='/json_rpc'):
-        self.url = '{protocol}://{host}:{port}/json_rpc'.format(
+        self.url = '{protocol}://{host}:{port}'.format(
                 protocol=protocol,
                 host=host,
                 port=port)
@@ -27,13 +27,37 @@ class JSONRPCDaemon(object):
         info = self.raw_jsonrpc_request('get_info')
         return info
 
+    def send_transaction(self, blob):
+        res = self.raw_request('/sendrawtransaction', {'tx_as_hex': blob})
+        if res['status'] == 'OK':
+            return res
+        raise exceptions.TransactionBroadcastError(
+                "{status}: {reason}".format(**res),
+                details=res)
+
+    def raw_request(self, path, data):
+        hdr = {'Content-Type': 'application/json'}
+        _log.debug(u"Request: {path}\nData: {data}".format(
+            path=path,
+            data=pprint.pformat(data)))
+        rsp = requests.post(self.url + path, headers=hdr, data=json.dumps(data))
+        if rsp.status_code != 200:
+            raise RPCError("Invalid HTTP status {code} for path {path}.".format(
+                code=rsp.status_code,
+                path=path))
+        result = rsp.json()
+        _ppresult = pprint.pformat(result)
+        _log.debug(u"Result:\n{result}".format(result=_ppresult))
+        return result
+
+
     def raw_jsonrpc_request(self, method, params=None):
         hdr = {'Content-Type': 'application/json'}
         data = {'jsonrpc': '2.0', 'id': 0, 'method': method, 'params': params or {}}
         _log.debug(u"Method: {method}\nParams:\n{params}".format(
             method=method,
             params=pprint.pformat(params)))
-        rsp = requests.post(self.url, headers=hdr, data=json.dumps(data))
+        rsp = requests.post(self.url + '/json_rpc', headers=hdr, data=json.dumps(data))
         if rsp.status_code != 200:
             raise RPCError("Invalid HTTP status {code} for method {method}.".format(
                 code=rsp.status_code,
