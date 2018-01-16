@@ -28,7 +28,9 @@ class JSONRPCDaemon(object):
         return info
 
     def send_transaction(self, blob):
-        res = self.raw_request('/sendrawtransaction', {'tx_as_hex': blob})
+        res = self.raw_request('/sendrawtransaction', {
+            'tx_as_hex': blob,
+            'do_not_relay': False})
         if res['status'] == 'OK':
             return res
         raise exceptions.TransactionBroadcastError(
