@@ -4,3 +4,4 @@
 *~
 *.bak
 *.swp
+docs/build/*
