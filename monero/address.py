@@ -11,6 +11,14 @@ _IADDR_REGEX = re.compile(r'^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqr
 
 
 class Address(object):
+    """Monero address.
+
+    Address of this class is the master address for a wallet.
+
+    :param address: a Monero address as string-like object
+    :param label: a label for the address (defaults to `None`)
+    """
+
     label = None
     _valid_netbytes = (18, 53)
     # NOTE: _valid_netbytes order is (real, testnet)
@@ -34,15 +42,34 @@ class Address(object):
                 allowed=", ".join(map(lambda b: '%02x' % b, self._valid_netbytes))))
 
     def is_testnet(self):
+        """Returns `True` if the address belongs to testnet.
+
+        :rtype: bool
+        """
         return self._decoded[0] == self._valid_netbytes[1]
 
     def get_view_key(self):
+        """Returns public view key.
+
+        :rtype: str
+        """
         return hexlify(self._decoded[33:65]).decode()
 
     def get_spend_key(self):
+        """Returns public spend key.
+
+        :rtype: str
+        """
         return hexlify(self._decoded[1:33]).decode()
 
     def with_payment_id(self, payment_id=0):
+        """Integrates payment id into the address.
+
+        :param payment_id: int, hexadecimal string or PaymentID (max 64-bit long)
+
+        :rtype: IntegratedAddress
+        :raises: TypeError if the payment id is too long
+        """
         payment_id = numbers.PaymentID(payment_id)
         if not payment_id.is_short():
             raise TypeError("Integrated payment ID {0} has more than 64 bits".format(payment_id))
@@ -63,6 +90,11 @@ class Address(object):
 
 
 class SubAddress(Address):
+    """Monero subaddress.
+
+    Any type of wallet address which is not the master one.
+    """
+
     _valid_netbytes = (42, 63)
 
     def with_payment_id(self, _):
@@ -70,6 +102,11 @@ class SubAddress(Address):
 
 
 class IntegratedAddress(Address):
+    """Monero integrated address.
+
+    A master address integrated with payment id (short one, max 64 bit).
+    """
+
     _valid_netbytes = (19, 54)
 
     def __init__(self, address):
@@ -80,9 +117,16 @@ class IntegratedAddress(Address):
         self._decode(address)
 
     def get_payment_id(self):
+        """Returns the integrated payment id.
+
+        :rtype: PaymentID
+        """
         return numbers.PaymentID(hexlify(self._decoded[65:-4]).decode())
 
     def get_base_address(self):
+        """Returns the base address without payment id.
+        :rtype: Address
+        """
         prefix = 53 if self.is_testnet() else 18
         data = bytearray([prefix]) + self._decoded[1:65]
         checksum = keccak_256(data).digest()[:4]
@@ -90,6 +134,13 @@ class IntegratedAddress(Address):
 
 
 def address(addr, label=None):
+    """Discover the proper class and return instance for a given Monero address.
+
+    :param addr: the address as a string-like object
+    :param label: a label for the address (defaults to `None`)
+
+    :rtype: Address, SubAddress or IntegratedAddress
+    """
     addr = str(addr)
     if _ADDR_REGEX.match(addr):
         netbyte = bytearray(unhexlify(base58.decode(addr)))[0]
