@@ -115,7 +115,7 @@ class JSONRPCWallet(object):
             _accounts = self.raw_request('get_accounts')
         except MethodNotFound:
             # monero <= 0.11 : there's only one account and one address
-            _lg.debug('Monero <= 0.11 found, no accounts')
+            _log.debug('Monero <= 0.11 found, no accounts')
             self._master_address = self.get_addresses()[0]
             return [Account(self, 0)]
         idx = 0
@@ -134,7 +134,7 @@ class JSONRPCWallet(object):
         _addresses = self.raw_request('getaddress', {'account_index': account})
         if 'addresses' not in _addresses:
             # monero <= 0.11
-            _lg.debug('Monero <= 0.11 found, assuming single address')
+            _log.debug('Monero <= 0.11 found, assuming single address')
             return [Address(_addresses['address'])]
         addresses = [None] * (max(map(operator.itemgetter('address_index'), _addresses['addresses'])) + 1)
         for _addr in _addresses['addresses']:
