@@ -92,7 +92,7 @@ class JSONRPCWallet(object):
     _master_address = None
     _addresses = None
 
-    def __init__(self, protocol='http', host='127.0.0.1', port=18082, path='/json_rpc', user='', password=''):
+    def __init__(self, protocol='http', host='127.0.0.1', port=18088, path='/json_rpc', user='', password=''):
         self.url = '{protocol}://{host}:{port}/json_rpc'.format(
                 protocol=protocol,
                 host=host,
