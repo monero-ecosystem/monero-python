@@ -72,7 +72,7 @@ class Address(object):
         """
         payment_id = numbers.PaymentID(payment_id)
         if not payment_id.is_short():
-            raise TypeError("Integrated payment ID {0} has more than 64 bits".format(payment_id))
+            raise TypeError("Payment ID {0} has more than 64 bits and cannot be integrated".format(payment_id))
         prefix = 54 if self.is_testnet() else 19
         data = bytearray([prefix]) + self._decoded[1:65] + struct.pack('>Q', int(payment_id))
         checksum = bytearray(keccak_256(data).digest()[:4])
