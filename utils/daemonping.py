@@ -4,7 +4,7 @@ import operator
 import re
 
 from monero.backends.jsonrpc import JSONRPCDaemon
-from monero import Daemon
+from monero.daemon import Daemon
 
 def url_data(url):
     gs = re.compile(

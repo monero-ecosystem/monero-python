@@ -5,7 +5,7 @@ import re
 import sys
 
 from monero.backends.jsonrpc import JSONRPCDaemon
-from monero import Daemon
+from monero.daemon import Daemon
 from monero import exceptions
 
 def url_data(url):

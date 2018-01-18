@@ -7,7 +7,9 @@ import re
 
 from monero.backends.jsonrpc import JSONRPCWallet
 from monero import exceptions
-from monero import Address, Wallet, as_monero
+from monero.address import Address
+from monero.numbers import as_monero
+from monero.wallet import Wallet
 
 def url_data(url):
     gs = re.compile(
