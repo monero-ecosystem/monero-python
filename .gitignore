@@ -5,3 +5,5 @@
 *.bak
 *.swp
 docs/build/*
+.venv
+venv
