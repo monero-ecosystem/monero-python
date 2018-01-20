@@ -56,7 +56,23 @@ a JSON RPC interface. Start it by typing:
 
     $ monero-wallet-rpc --testnet --wallet-file testwallet --password "" --rpc-bind-port 28088 --disable-rpc-login
 
-Now everything is ready to start using Python.
+Now you're almost ready to start using Python.
+
+Install Dependencies
+---------------------
+
+Before you can use the library, you first must download the Python library dependencies with ``pip``. It is recommended to use a `virtual environment`_ to isolate library versions. Assuming you have ``virtualenv`` installed to your system, set up a new env, activate it, and install the dependencies.
+
+.. _`virtual environment`: https://averlytics.com/2017/08/06/virtual-environment-a-python-best-practice/
+
+.. code-block:: shell
+
+    $ virtualenv .venv
+    $ source .venv/bin/activate
+    $ pip install -r requirements.txt
+    $ python
+
+Now you can proceed.
 
 Connect to the wallet
 ---------------------
