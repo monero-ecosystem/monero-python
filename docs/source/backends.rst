@@ -6,9 +6,9 @@ Backends are the protocols and methods used to communicate with the Monero daemo
 JSON RPC
 ----------------
 
-This backend requires a running *monero-wallet-rpc* process with a Monero wallet file opened. This can be on your local system or a remote node, depending on where the wallet file lives and where the daemon is running. Refer to the quickstart for general setup information.
+This backend requires a running ``monero-wallet-rpc`` process with a Monero wallet file opened. This can be on your local system or a remote node, depending on where the wallet file lives and where the daemon is running. Refer to the quickstart for general setup information.
 
-The Python `requests` library is used in order to facilitate HTTP requests to the JSON RPC interface. It makes POST requests and passes proper headers, parameters, and payload data as per the official `Wallet RPC` documentation.
+The Python `requests`_ library is used in order to facilitate HTTP requests to the JSON RPC interface. It makes POST requests and passes proper headers, parameters, and payload data as per the official `Wallet RPC`_ documentation.
 
 .. _`requests`: http://docs.python-requests.org/
 
