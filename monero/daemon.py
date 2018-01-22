@@ -5,5 +5,11 @@ class Daemon(object):
     def get_info(self):
         return self._backend.get_info()
 
+    def get_height(self):
+        return self._backend.get_info()['height']
+
     def send_transaction(self, blob):
         return self._backend.send_transaction(blob)
+
+    def get_mempool(self):
+        return self._backend.get_mempool()
