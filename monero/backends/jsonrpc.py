@@ -269,6 +269,7 @@ _err2exc = {
     -4: exceptions.NotEnoughUnlockedMoney,
     -5: exceptions.WrongPaymentId,
     -16: exceptions.TransactionNotPossible,
+    -17: exceptions.NotEnoughMoney,
     -20: exceptions.AmountIsZero,
     -32601: MethodNotFound,
 }
