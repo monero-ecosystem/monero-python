@@ -163,8 +163,9 @@ class SubaddrWalletTestCase(unittest.TestCase):
         pay_in = self.wallet.get_transactions_in()
         self.assertEqual(len(list(pay_in)), 3)
         for tx in pay_in:
-            self.assertIsInstance(tx, Transaction)
-#            self.assertIsInstance(tx.address, Address)
+            self.assertIsInstance(tx, Payment)
+# Once PR#3010 has been merged to Monero, update the JSON and enable the following:
+#            self.assertIsInstance(tx.local_address, Address)
             self.assertIsInstance(tx.amount, Decimal)
             self.assertIsInstance(tx.fee, Decimal)
 
@@ -257,8 +258,9 @@ class SubaddrWalletTestCase(unittest.TestCase):
         pay_out = self.wallet.get_transactions_out()
         self.assertEqual(len(list(pay_out)), 6)
         for tx in pay_out:
-            self.assertIsInstance(tx, Transaction)
-#            self.assertIsInstance(tx.address, Address)
+            self.assertIsInstance(tx, Transfer)
+# Once PR#3010 has been merged to Monero, update the JSON and enable the following:
+#            self.assertIsInstance(tx.local_address, Address)
             self.assertIsInstance(tx.amount, Decimal)
             self.assertIsInstance(tx.fee, Decimal)
             self.assertIsInstance(tx.timestamp, datetime)
