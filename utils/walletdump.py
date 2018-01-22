@@ -36,9 +36,9 @@ _TXHDR = "timestamp         height  id/hash                                     
         "         amount         fee           {dir:95s} payment_id"
 
 def tx2str(tx):
-    return "{time} {height} {hash} {amount:17.12f} {fee:13.12f} {addr} {payment_id}".format(
+    return "{time} {height:7d} {hash} {amount:17.12f} {fee:13.12f} {addr} {payment_id}".format(
         time=tx.timestamp.strftime("%d-%m-%y %H:%M:%S") if getattr(tx, 'timestamp', None) else None,
-        height=tx.height,
+        height=tx.height or 0,
         hash=tx.hash,
         amount=tx.amount,
         fee=tx.fee or 0,
@@ -80,26 +80,26 @@ if len(w.accounts) > 1:
         addresses = acc.get_addresses()
         print("{num:2d} address(es):".format(num=len(addresses)))
         print("\n".join(map(a2str, addresses)))
-        ins = acc.get_transactions_in()
+        ins = acc.get_transactions_in(unconfirmed=True)
         if ins:
             print("\nIncoming transactions:")
             print(_TXHDR.format(dir='received by'))
             for tx in ins:
                 print(tx2str(tx))
-        outs = acc.get_transactions_out()
+        outs = acc.get_transactions_out(unconfirmed=True)
         if outs:
             print("\nOutgoing transactions:")
             print(_TXHDR.format(dir='sent from'))
             for tx in outs:
                 print(tx2str(tx))
 else:
-    ins = w.get_transactions_in()
+    ins = w.get_transactions_in(unconfirmed=True)
     if ins:
         print("\nIncoming transactions:")
         print(_TXHDR.format(dir='received by'))
         for tx in ins:
             print(tx2str(tx))
-    outs = w.get_transactions_out()
+    outs = w.get_transactions_out(unconfirmed=True)
     if outs:
         print("\nOutgoing transactions:")
         print(_TXHDR.format(dir='sent from'))
