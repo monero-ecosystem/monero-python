@@ -40,7 +40,7 @@ class JSONRPCDaemon(object):
     def get_mempool(self):
         res = self.raw_request('/get_transaction_pool', {})
         txs = []
-        for tx in res['transactions']:
+        for tx in res.get('transactions', []):
             txs.append(Transaction(
                 hash=tx['id_hash'],
                 fee=from_atomic(tx['fee']),
