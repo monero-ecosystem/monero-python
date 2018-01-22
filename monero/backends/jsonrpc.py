@@ -295,6 +295,7 @@ _err2exc = {
     -2: exceptions.WrongAddress,
     -4: exceptions.NotEnoughUnlockedMoney,
     -5: exceptions.WrongPaymentId,
+    -8: exceptions.TransactionNotFound,
     -16: exceptions.TransactionNotPossible,
     -20: exceptions.AmountIsZero,
     -32601: MethodNotFound,
