@@ -75,7 +75,7 @@ class Wallet(object):
         return self.accounts[0].get_payments(payment_id=payment_id)
 
     def get_transactions_in(self, confirmed=True, unconfirmed=False):
-        return self.accounts[0].get_transactions_in(cofirmed=confirmed, unconfirmed=unconfirmed)
+        return self.accounts[0].get_transactions_in(confirmed=confirmed, unconfirmed=unconfirmed)
 
     def get_transactions_out(self, confirmed=True, unconfirmed=True):
         return self.accounts[0].get_transactions_out(confirmed=confirmed, unconfirmed=unconfirmed)
