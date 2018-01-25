@@ -30,11 +30,13 @@ class Account(object):
     def get_payments(self, payment_id=None):
         return self._backend.get_payments(account=self.index, payment_id=payment_id)
 
-    def get_transactions_in(self):
-        return self._backend.get_transactions_in(account=self.index)
+    def get_transactions_in(self, confirmed=True, unconfirmed=False):
+        return self._backend.get_transactions_in(
+            account=self.index, confirmed=confirmed, unconfirmed=unconfirmed)
 
-    def get_transactions_out(self):
-        return self._backend.get_transactions_out(account=self.index)
+    def get_transactions_out(self, confirmed=True, unconfirmed=True):
+        return self._backend.get_transactions_out(
+            account=self.index, confirmed=confirmed, unconfirmed=unconfirmed)
 
     def transfer(self, address, amount,
             priority=prio.NORMAL, ringsize=5, payment_id=None, unlock_time=0,

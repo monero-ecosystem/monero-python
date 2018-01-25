@@ -30,3 +30,5 @@ class TransactionBroadcastError(BackendException):
         self.details = details
         super(TransactionBroadcastError, self).__init__(message)
 
+class TransactionNotFound(AccountException):
+    pass

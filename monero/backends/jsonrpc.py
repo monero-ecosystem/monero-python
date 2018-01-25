@@ -37,6 +37,16 @@ class JSONRPCDaemon(object):
                 "{status}: {reason}".format(**res),
                 details=res)
 
+    def get_mempool(self):
+        res = self.raw_request('/get_transaction_pool', {})
+        txs = []
+        for tx in res.get('transactions', []):
+            txs.append(Transaction(
+                hash=tx['id_hash'],
+                fee=from_atomic(tx['fee']),
+                timestamp=datetime.fromtimestamp(tx['receive_time'])))
+        return txs
+
     def raw_request(self, path, data):
         hdr = {'Content-Type': 'application/json'}
         _log.debug(u"Request: {path}\nData: {data}".format(
@@ -103,6 +113,9 @@ class JSONRPCWallet(object):
         _log.debug("JSONRPC wallet backend auth: '{user}'/'{stars}'".format(
             user=user, stars=('*' * len(password)) if password else ''))
 
+    def get_height(self):
+        return self.raw_request('getheight')['height']
+
     def get_view_key(self):
         return self.raw_request('query_key', {'key_type': 'view_key'})['key']
 
@@ -167,17 +180,31 @@ class JSONRPCWallet(object):
             pmts.append(Payment(**data))
         return pmts
 
-    def get_transactions_in(self, account=0):
-        _transfers = self.raw_request('get_transfers',
-                {'account_index': account, 'in': True, 'out': False, 'pool': False})
+    def get_transactions_in(self, account=0, confirmed=True, unconfirmed=False):
+        _txns = self.raw_request('get_transfers',
+                {'account_index': account, 'in': confirmed, 'out': False, 'pool': unconfirmed})
+        txns = _txns.get('in', [])
+        if unconfirmed:
+            txns.extend(_txns.get('pool', []))
         return [Payment(**self._tx2dict(tx)) for tx in
-            sorted(_transfers.get('in', []), key=operator.itemgetter('timestamp'))]
+            sorted(txns, key=operator.itemgetter('timestamp'))]
 
-    def get_transactions_out(self, account=0):
-        _transfers = self.raw_request('get_transfers',
-                {'account_index': account, 'in': False, 'out': True, 'pool': False})
+    def get_transactions_out(self, account=0, confirmed=True, unconfirmed=True):
+        _txns = self.raw_request('get_transfers',
+                {'account_index': account, 'in': False, 'out': confirmed, 'pool': unconfirmed})
+        txns = _txns.get('out', [])
+        if unconfirmed:
+            txns.extend(_txns.get('pool', []))
         return [Transfer(**self._tx2dict(tx)) for tx in
-            sorted(_transfers.get('out', []), key=operator.itemgetter('timestamp'))]
+            sorted(txns, key=operator.itemgetter('timestamp'))]
+
+    def get_transaction(self, txhash):
+        _tx = self.raw_request('get_transfer_by_txid', {'txid': str(txhash)})['transfer']
+        try:
+            _class = {'in': Payment, 'out': Transfer}[_tx['type']]
+        except KeyError:
+            _class = Transaction
+        return _class(**self._tx2dict(_tx))
 
     def _tx2dict(self, tx):
         pid = tx.get('payment_id', None)
@@ -186,7 +213,7 @@ class JSONRPCWallet(object):
             'timestamp': datetime.fromtimestamp(tx['timestamp']) if 'timestamp' in tx else None,
             'amount': from_atomic(tx['amount']),
             'fee': from_atomic(tx['fee']) if 'fee' in tx else None,
-            'height': tx.get('height', tx.get('block_height')),
+            'height': tx.get('height', tx.get('block_height')) or None,
             'payment_id': None if pid is None else PaymentID(pid),
             'note': tx.get('note'),
             # NOTE: address will be resolved only after PR#3010 has been merged to Monero
@@ -268,6 +295,7 @@ _err2exc = {
     -2: exceptions.WrongAddress,
     -4: exceptions.NotEnoughUnlockedMoney,
     -5: exceptions.WrongPaymentId,
+    -8: exceptions.TransactionNotFound,
     -16: exceptions.TransactionNotPossible,
     -17: exceptions.NotEnoughMoney,
     -20: exceptions.AmountIsZero,

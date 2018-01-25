@@ -1,6 +1,7 @@
 from . import address
 from . import prio
 from . import account
+from . import transaction
 
 class Wallet(object):
     accounts = None
@@ -21,6 +22,12 @@ class Wallet(object):
             self.accounts.append(_acc)
             idx += 1
 
+    def get_height(self):
+        """
+        Returns the height of the wallet.
+        """
+        return self._backend.get_height()
+
     def get_view_key(self):
         """
         Returns private view key.
@@ -38,6 +45,15 @@ class Wallet(object):
         assert acc.index == len(self.accounts)
         self.accounts.append(acc)
         return acc
+
+    def get_transaction(self, hash):
+        return self._backend.get_transaction(hash)
+
+    def confirmations(self, txn):
+        txn = self._backend.get_transaction(txn)
+        if txn.height is None:
+            return 0
+        return max(0, self.get_height() - txn.height)
 
     # Following methods operate on default account (index=0)
     def get_balances(self):
@@ -58,11 +74,11 @@ class Wallet(object):
     def get_payments(self, payment_id=None):
         return self.accounts[0].get_payments(payment_id=payment_id)
 
-    def get_transactions_in(self):
-        return self.accounts[0].get_transactions_in()
+    def get_transactions_in(self, confirmed=True, unconfirmed=False):
+        return self.accounts[0].get_transactions_in(cofirmed=confirmed, unconfirmed=unconfirmed)
 
-    def get_transactions_out(self):
-        return self.accounts[0].get_transactions_out()
+    def get_transactions_out(self, confirmed=True, unconfirmed=True):
+        return self.accounts[0].get_transactions_out(confirmed=confirmed, unconfirmed=unconfirmed)
 
     def transfer(self, address, amount,
             priority=prio.NORMAL, ringsize=5, payment_id=None, unlock_time=0,
