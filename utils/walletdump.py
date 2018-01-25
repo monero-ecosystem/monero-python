@@ -35,15 +35,15 @@ def get_wallet():
 _TXHDR = "timestamp         height  id/hash                                                     " \
         "         amount         fee           {dir:95s} payment_id"
 
-def tx2str(tx):
+def pmt2str(pmt):
     return "{time} {height:7d} {hash} {amount:17.12f} {fee:13.12f} {addr} {payment_id}".format(
-        time=tx.timestamp.strftime("%d-%m-%y %H:%M:%S") if getattr(tx, 'timestamp', None) else None,
-        height=tx.height or 0,
-        hash=tx.hash,
-        amount=tx.amount,
-        fee=tx.fee or 0,
-        payment_id=tx.payment_id,
-        addr=getattr(tx, 'local_address', None) or '')
+        time=pmt.timestamp.strftime("%d-%m-%y %H:%M:%S") if getattr(pmt, 'timestamp', None) else None,
+        height=pmt.transaction.height or 0,
+        hash=pmt.transaction.hash,
+        amount=pmt.amount,
+        fee=pmt.transaction.fee or 0,
+        payment_id=pmt.payment_id,
+        addr=getattr(pmt, 'local_address', None) or '')
 
 def a2str(a):
     return "{addr} {label}".format(
@@ -85,23 +85,23 @@ if len(w.accounts) > 1:
             print("\nIncoming transactions:")
             print(_TXHDR.format(dir='received by'))
             for tx in ins:
-                print(tx2str(tx))
+                print(pmt2str(tx))
         outs = acc.get_transactions_out(unconfirmed=True)
         if outs:
             print("\nOutgoing transactions:")
             print(_TXHDR.format(dir='sent from'))
             for tx in outs:
-                print(tx2str(tx))
+                print(pmt2str(tx))
 else:
     ins = w.get_transactions_in(unconfirmed=True)
     if ins:
         print("\nIncoming transactions:")
         print(_TXHDR.format(dir='received by'))
         for tx in ins:
-            print(tx2str(tx))
+            print(pmt2str(tx))
     outs = w.get_transactions_out(unconfirmed=True)
     if outs:
         print("\nOutgoing transactions:")
         print(_TXHDR.format(dir='sent from'))
         for tx in outs:
-            print(tx2str(tx))
+            print(pmt2str(tx))

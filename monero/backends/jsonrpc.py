@@ -10,7 +10,7 @@ from .. import exceptions
 from ..account import Account
 from ..address import address, Address, SubAddress
 from ..numbers import from_atomic, to_atomic, PaymentID
-from ..transaction import Transaction, Payment, Transfer
+from ..transaction import Transaction, IncomingPayment, OutgoingPayment
 
 _log = logging.getLogger(__name__)
 
@@ -173,11 +173,10 @@ class JSONRPCWallet(object):
             'account_index': account,
             'payment_id': str(payment_id)})
         pmts = []
-        for tx in _payments['payments']:
-            data = self._tx2dict(tx)
+        for data in _payments['payments']:
             # Monero <= 0.11 : no address is passed because there's only one
-            data['local_address'] = data['local_address'] or self._master_address
-            pmts.append(Payment(**data))
+            data['address'] = data['address'] or self._master_address
+            pmts.append(self._inpayment(data))
         return pmts
 
     def get_transactions_in(self, account=0, confirmed=True, unconfirmed=False):
@@ -186,8 +185,7 @@ class JSONRPCWallet(object):
         txns = _txns.get('in', [])
         if unconfirmed:
             txns.extend(_txns.get('pool', []))
-        return [Payment(**self._tx2dict(tx)) for tx in
-            sorted(txns, key=operator.itemgetter('timestamp'))]
+        return [self._inpayment(tx) for tx in sorted(txns, key=operator.itemgetter('timestamp'))]
 
     def get_transactions_out(self, account=0, confirmed=True, unconfirmed=True):
         _txns = self.raw_request('get_transfers',
@@ -195,32 +193,46 @@ class JSONRPCWallet(object):
         txns = _txns.get('out', [])
         if unconfirmed:
             txns.extend(_txns.get('pool', []))
-        return [Transfer(**self._tx2dict(tx)) for tx in
-            sorted(txns, key=operator.itemgetter('timestamp'))]
+        return [self._outpayment(tx) for tx in sorted(txns, key=operator.itemgetter('timestamp'))]
 
     def get_transaction(self, txhash):
         _tx = self.raw_request('get_transfer_by_txid', {'txid': str(txhash)})['transfer']
-        try:
-            _class = {'in': Payment, 'out': Transfer}[_tx['type']]
-        except KeyError:
-            _class = Transaction
-        return _class(**self._tx2dict(_tx))
+        if _tx['type'] == 'in':
+            return self._inpayment(tx)
+        elif _tx['type'] == 'out':
+            return self._outpayment(tx)
+        return Payment(**self._paymentdict(tx))
 
-    def _tx2dict(self, tx):
-        pid = tx.get('payment_id', None)
+    def _paymentdict(self, data):
+        pid = data.get('payment_id', None)
         return {
-            'hash': tx.get('txid', tx.get('tx_hash')),
-            'timestamp': datetime.fromtimestamp(tx['timestamp']) if 'timestamp' in tx else None,
-            'amount': from_atomic(tx['amount']),
-            'fee': from_atomic(tx['fee']) if 'fee' in tx else None,
-            'height': tx.get('height', tx.get('block_height')) or None,
+            'txhash': data.get('txid', data.get('tx_hash')),
             'payment_id': None if pid is None else PaymentID(pid),
-            'note': tx.get('note'),
-            # NOTE: address will be resolved only after PR#3010 has been merged to Monero
-            'local_address': address(tx['address']) if 'address' in tx else None,
-            'key': tx.get('key'),
-            'blob': tx.get('blob', None),
+            'amount': from_atomic(data['amount']),
+            'timestamp': datetime.fromtimestamp(data['timestamp']) if 'timestamp' in data else None,
+            'note': data.get('note'),
+            'transaction': self._tx(data)
         }
+
+    def _inpayment(self, data):
+        p = self._paymentdict(data)
+        p.update({'received_by': address(data['address']) if 'address' in data else None})
+        return IncomingPayment(**p)
+
+    def _outpayment(self, data):
+        p = self._paymentdict(data)
+        p.update({'sent_from': address(data['address']) if 'address' in data else None})
+        return OutgoingPayment(**p)
+
+    def _tx(self, data):
+        return Transaction(**{
+            'hash': data.get('txid', data.get('tx_hash')),
+            'fee': from_atomic(data['fee']) if 'fee' in data else None,
+            'key': data.get('key'),
+            'height': data.get('height', data.get('block_height')) or None,
+            'timestamp': datetime.fromtimestamp(data['timestamp']) if 'timestamp' in data else None,
+            'blob': data.get('blob', None),
+        })
 
     def transfer(self, destinations, priority, ringsize,
             payment_id=None, unlock_time=0, account=0,
@@ -247,7 +259,7 @@ class JSONRPCWallet(object):
                 'tx_hash_list', 'amount_list', 'fee_list', 'tx_key_list', 'tx_blob_list')]))]
         for d in _pertx:
             d['payment_id'] = payment_id
-        return [Transfer(**self._tx2dict(tx)) for tx in _pertx]
+        return [self._tx(data) for data in _pertx]
 
     def raw_request(self, method, params=None):
         hdr = {'Content-Type': 'application/json'}

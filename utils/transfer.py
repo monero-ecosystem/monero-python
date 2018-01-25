@@ -51,14 +51,14 @@ elif args.verbosity > 1:
 logging.basicConfig(level=level, format="%(asctime)-15s %(message)s")
 
 w = Wallet(JSONRPCWallet(**args.wallet_rpc_url))
-txfrs = w.accounts[args.account].transfer_multiple(
+txns = w.accounts[args.account].transfer_multiple(
     args.destinations, priority=prio, ringsize=args.ring_size, payment_id=args.payment_id,
     relay=args.outdir is None)
-for tx in txfrs:
-    print(u"Transaction {hash}:\nXMR: {amount:21.12f} @ {fee:13.12f} fee\n"
-       u"Payment ID: {payment_id}\nTx key:     {key}\nSize:       {size} B".format(
-            hash=tx.hash, amount=tx.amount, fee=tx.fee,
-            payment_id=tx.payment_id, key=tx.key, size=len(tx.blob) >> 1))
+for tx in txns:
+    print(u"Transaction {hash}:\nfee: {fee:21.12f}\n"
+       u"Tx key:     {key}\nSize:       {size} B".format(
+            hash=tx.hash, fee=tx.fee,
+            key=tx.key, size=len(tx.blob) >> 1))
     if args.outdir:
         outname = os.path.join(args.outdir, tx.hash + '.tx')
         outfile = open(outname, 'wb')
