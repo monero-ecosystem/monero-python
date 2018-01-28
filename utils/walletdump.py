@@ -60,10 +60,12 @@ print(
         unlocked=w.get_balance(unlocked=True)))
 print(
     "Keys:\n" \
+    "  private spend: {ssk}\n" \
     "  private view:  {svk}\n" \
     "  public spend:  {psk}\n" \
     "  public view:   {pvk}\n\n" \
     "Seed:\n{seed}".format(
+        ssk=w.get_spend_key(),
         svk=w.get_view_key(),
         psk=masteraddr.get_spend_key(),
         pvk=masteraddr.get_view_key(),

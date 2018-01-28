@@ -116,6 +116,10 @@ class JSONRPCWallet(object):
     def get_height(self):
         return self.raw_request('getheight')['height']
 
+    def get_spend_key(self):
+        # NOTE: This will fail on 0.11.x, the method was missing
+        return self.raw_request('query_key', {'key_type': 'spend_key'})['key']
+
     def get_view_key(self):
         return self.raw_request('query_key', {'key_type': 'view_key'})['key']
 
@@ -305,11 +309,11 @@ class MethodNotFound(RPCError):
 
 _err2exc = {
     -2: exceptions.WrongAddress,
-    -4: exceptions.NotEnoughUnlockedMoney,
     -5: exceptions.WrongPaymentId,
     -8: exceptions.TransactionNotFound,
     -16: exceptions.TransactionNotPossible,
     -17: exceptions.NotEnoughMoney,
     -20: exceptions.AmountIsZero,
+    -37: exceptions.NotEnoughMoney, # PR pending: https://github.com/monero-project/monero/pull/3197
     -32601: MethodNotFound,
 }
