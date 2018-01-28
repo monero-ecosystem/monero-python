@@ -13,7 +13,7 @@ class Wallet(object):
     def refresh(self):
         self.accounts = self.accounts or []
         idx = 0
-        for _acc in self._backend.get_accounts():
+        for _acc in self._backend.accounts():
             try:
                 if self.accounts[idx]:
                     continue
@@ -22,29 +22,29 @@ class Wallet(object):
             self.accounts.append(_acc)
             idx += 1
 
-    def get_height(self):
+    def height(self):
         """
         Returns the height of the wallet.
         """
-        return self._backend.get_height()
+        return self._backend.height()
 
-    def get_spend_key(self):
+    def spend_key(self):
         """
         Returns private spend key.
         """
-        return self._backend.get_spend_key()
+        return self._backend.spend_key()
 
-    def get_view_key(self):
+    def view_key(self):
         """
         Returns private view key.
         """
-        return self._backend.get_view_key()
+        return self._backend.view_key()
 
-    def get_seed(self):
+    def seed(self):
         """
         Returns word seed.
         """
-        return self._backend.get_seed()
+        return self._backend.seed()
 
     def new_account(self, label=None):
         acc, addr = self._backend.new_account(label=label)
@@ -59,32 +59,32 @@ class Wallet(object):
         txn = self._backend.get_transaction(txn)
         if txn.height is None:
             return 0
-        return max(0, self.get_height() - txn.height)
+        return max(0, self.height() - txn.height)
 
     # Following methods operate on default account (index=0)
-    def get_balances(self):
-        return self.accounts[0].get_balances()
+    def balances(self):
+        return self.accounts[0].balances()
 
-    def get_balance(self, unlocked=False):
-        return self.accounts[0].get_balance(unlocked=unlocked)
+    def balance(self, unlocked=False):
+        return self.accounts[0].balance(unlocked=unlocked)
 
-    def get_address(self):
-        return self.accounts[0].get_addresses()[0]
+    def address(self):
+        return self.accounts[0].addresses()[0]
 
-    def get_addresses(self):
-        return self.accounts[0].get_addresses()
+    def addresses(self):
+        return self.accounts[0].addresses()
 
     def new_address(self, label=None):
         return self.accounts[0].new_address(label=label)
 
-    def get_payments(self, payment_id=None):
-        return self.accounts[0].get_payments(payment_id=payment_id)
+    def payments(self, payment_id=None):
+        return self.accounts[0].payments(payment_id=payment_id)
 
-    def get_transactions_in(self, confirmed=True, unconfirmed=False):
-        return self.accounts[0].get_transactions_in(confirmed=confirmed, unconfirmed=unconfirmed)
+    def transactions_in(self, confirmed=True, unconfirmed=False):
+        return self.accounts[0].transactions_in(confirmed=confirmed, unconfirmed=unconfirmed)
 
-    def get_transactions_out(self, confirmed=True, unconfirmed=True):
-        return self.accounts[0].get_transactions_out(confirmed=confirmed, unconfirmed=unconfirmed)
+    def transactions_out(self, confirmed=True, unconfirmed=True):
+        return self.accounts[0].transactions_out(confirmed=confirmed, unconfirmed=unconfirmed)
 
     def transfer(self, address, amount,
             priority=prio.NORMAL, ringsize=5, payment_id=None, unlock_time=0,

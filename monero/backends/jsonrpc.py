@@ -23,7 +23,7 @@ class JSONRPCDaemon(object):
                 port=port)
         _log.debug("JSONRPC daemon backend URL: {url}".format(url=self.url))
 
-    def get_info(self):
+    def info(self):
         info = self.raw_jsonrpc_request('get_info')
         return info
 
@@ -37,7 +37,7 @@ class JSONRPCDaemon(object):
                 "{status}: {reason}".format(**res),
                 details=res)
 
-    def get_mempool(self):
+    def mempool(self):
         res = self.raw_request('/get_transaction_pool', {})
         txs = []
         for tx in res.get('transactions', []):
@@ -113,20 +113,20 @@ class JSONRPCWallet(object):
         _log.debug("JSONRPC wallet backend auth: '{user}'/'{stars}'".format(
             user=user, stars=('*' * len(password)) if password else ''))
 
-    def get_height(self):
+    def height(self):
         return self.raw_request('getheight')['height']
 
-    def get_spend_key(self):
+    def spend_key(self):
         # NOTE: This will fail on 0.11.x, the method was missing
         return self.raw_request('query_key', {'key_type': 'spend_key'})['key']
 
-    def get_view_key(self):
+    def view_key(self):
         return self.raw_request('query_key', {'key_type': 'view_key'})['key']
 
-    def get_seed(self):
+    def seed(self):
         return self.raw_request('query_key', {'key_type': 'mnemonic'})['key']
 
-    def get_accounts(self):
+    def accounts(self):
         accounts = []
         try:
             _accounts = self.raw_request('get_accounts')
@@ -147,7 +147,7 @@ class JSONRPCWallet(object):
         _account = self.raw_request('create_account', {'label': label})
         return Account(self, _account['account_index']), SubAddress(_account['address'])
 
-    def get_addresses(self, account=0):
+    def addresses(self, account=0):
         _addresses = self.raw_request('getaddress', {'account_index': account})
         if 'addresses' not in _addresses:
             # monero <= 0.11
@@ -165,11 +165,11 @@ class JSONRPCWallet(object):
             'create_address', {'account_index': account, 'label': label})
         return SubAddress(_address['address'])
 
-    def get_balances(self, account=0):
+    def balances(self, account=0):
         _balance = self.raw_request('getbalance', {'account_index': account})
         return (from_atomic(_balance['balance']), from_atomic(_balance['unlocked_balance']))
 
-    def get_payments(self, account=0, payment_id=0):
+    def payments(self, account=0, payment_id=0):
         payment_id = PaymentID(payment_id)
         _log.debug("Getting payments for account {acc}, payment_id {pid}".format(
             acc=account, pid=payment_id))
@@ -183,7 +183,7 @@ class JSONRPCWallet(object):
             pmts.append(self._inpayment(data))
         return pmts
 
-    def get_transactions_in(self, account=0, confirmed=True, unconfirmed=False):
+    def transactions_in(self, account=0, confirmed=True, unconfirmed=False):
         _txns = self.raw_request('get_transfers',
                 {'account_index': account, 'in': confirmed, 'out': False, 'pool': unconfirmed})
         txns = _txns.get('in', [])
@@ -191,7 +191,7 @@ class JSONRPCWallet(object):
             txns.extend(_txns.get('pool', []))
         return [self._inpayment(tx) for tx in sorted(txns, key=operator.itemgetter('timestamp'))]
 
-    def get_transactions_out(self, account=0, confirmed=True, unconfirmed=True):
+    def transactions_out(self, account=0, confirmed=True, unconfirmed=True):
         _txns = self.raw_request('get_transfers',
                 {'account_index': account, 'in': False, 'out': confirmed, 'pool': unconfirmed})
         txns = _txns.get('out', [])

@@ -37,10 +37,10 @@ Let's start with the master address:
     In [3]: a.is_testnet()
     Out[3]: True
 
-    In [4]: a.get_spend_key()
+    In [4]: a.spend_key()
     Out[4]: 'f0481b63cb937fa5960529247ebf6db627ff1b0bb88de9feccc3c504c16aa4b0'
 
-    In [5]: a.get_view_key()
+    In [5]: a.view_key()
     Out[5]: '2c5ba76d22e48a7ea4ddabea3cce66808ba0cc91265371910f893962e977af1e'
 
     In [6]: type(a)
@@ -55,10 +55,10 @@ We may use a subaddress too:
     In [8]: b.is_testnet()
     Out[8]: True
 
-    In [9]: b.get_spend_key()
+    In [9]: b.spend_key()
     Out[9]: 'ae7e136f46f618fe7f4a6b323ed60864c20070bf110978d7e3868686d5677318'
 
-    In [10]: b.get_view_key()
+    In [10]: b.view_key()
     Out[10]: '2bf801cdaf3a8b41020098a6d5e194f48fa62129fe9d8f09d19fee9260665baa'
 
     In [11]: type(b)
@@ -85,13 +85,13 @@ an **integrated address**.
     In [13]: ia
     Out[13]: ABySz66nm1QUhPiwoAbR2tXU9LJu2U6fJjcsv3rxgkVRWU6tEYcn6C1NBc7wqCv5V7NW3zeYuzKf6RGGgZTFTpVC623BT1ptXvVU2GjR1B
 
-    In [14]: ia.get_base_address()
+    In [14]: ia.base_address()
     Out[14]: A2GmyHHJ9jtUhPiwoAbR2tXU9LJu2U6fJjcsv3rxgkVRWU6tEYcn6C1NBc7wqCv5V7NW3zeYuzKf6RGGgZTFTpVC4QxAiAX
 
-    In [15]: ia.get_base_address() == a
+    In [15]: ia.base_address() == a
     Out[15]: True
 
-    In [16]: ia.get_payment_id()
+    In [16]: ia.payment_id()
     Out[16]: 00000feedbadbeef
 
 

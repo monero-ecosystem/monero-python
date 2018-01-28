@@ -12,7 +12,7 @@ from monero.transaction import IncomingPayment, OutgoingPayment, Transaction
 from monero.backends.jsonrpc import JSONRPCWallet
 
 class SubaddrWalletTestCase(unittest.TestCase):
-    get_accounts_result = {'id': 0,
+    accounts_result = {'id': 0,
         'jsonrpc': '2.0',
         'result': {'subaddress_accounts': [{'account_index': 0,
                                          'balance': 224916129245183,
@@ -33,9 +33,9 @@ class SubaddrWalletTestCase(unittest.TestCase):
                 'total_unlocked_balance': 236153709446071}}
 
     @patch('monero.backends.jsonrpc.requests.post')
-    def test_get_balance(self, mock_post):
+    def test_balance(self, mock_post):
         mock_post.return_value.status_code = 200
-        mock_post.return_value.json.return_value = self.get_accounts_result
+        mock_post.return_value.json.return_value = self.accounts_result
         self.wallet = Wallet(JSONRPCWallet())
         mock_post.return_value.json.return_value = {'id': 0,
             'jsonrpc': '2.0',
@@ -59,9 +59,9 @@ class SubaddrWalletTestCase(unittest.TestCase):
                                         'num_unspent_outputs': 5,
                                         'unlocked_balance': 35000000000000}],
                     'unlocked_balance': 224916129245183}}
-        locked = self.wallet.get_balance()
-        unlocked = self.wallet.get_balance(unlocked=True)
-        balances = self.wallet.get_balances()
+        locked = self.wallet.balance()
+        unlocked = self.wallet.balance(unlocked=True)
+        balances = self.wallet.balances()
         self.assertEqual(balances[0], locked)
         self.assertEqual(balances[1], unlocked)
         self.assertIsInstance(locked, Decimal)
@@ -71,9 +71,9 @@ class SubaddrWalletTestCase(unittest.TestCase):
         self.assertEqual(locked, Decimal('224.916129245183'))
 
     @patch('monero.backends.jsonrpc.requests.post')
-    def test_get_address(self, mock_post):
+    def test_address(self, mock_post):
         mock_post.return_value.status_code = 200
-        mock_post.return_value.json.return_value = self.get_accounts_result
+        mock_post.return_value.json.return_value = self.accounts_result
         self.wallet = Wallet(JSONRPCWallet())
         mock_post.return_value.json.return_value = {'id': 0,
             'jsonrpc': '2.0',
@@ -110,19 +110,19 @@ class SubaddrWalletTestCase(unittest.TestCase):
                                    'address_index': 7,
                                    'label': '(Untitled address)',
                                    'used': True}]}}
-        waddr = self.wallet.get_address()
-        a0addr = self.wallet.accounts[0].get_address()
+        waddr = self.wallet.address()
+        a0addr = self.wallet.accounts[0].address()
         self.assertEqual(waddr, a0addr)
         self.assertEqual(
             waddr,
             '9vgV48wWAPTWik5QSUSoGYicdvvsbSNHrT9Arsx1XBTz6VrWPSgfmnUKSPZDMyX4Ms8R9TkhB4uFqK9s5LUBbV6YQN2Q9ag')
         self.assertEqual(a0addr.label, 'Primary account')
-        self.assertEqual(len(self.wallet.accounts[0].get_addresses()), 8)
+        self.assertEqual(len(self.wallet.accounts[0].addresses()), 8)
 
     @patch('monero.backends.jsonrpc.requests.post')
-    def test_get_transactions_in(self, mock_post):
+    def test_transactions_in(self, mock_post):
         mock_post.return_value.status_code = 200
-        mock_post.return_value.json.return_value = self.get_accounts_result
+        mock_post.return_value.json.return_value = self.accounts_result
         self.wallet = Wallet(JSONRPCWallet())
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value ={'id': 0,
@@ -160,7 +160,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
                             'txid': 'd23a7d086e70df7aa0ca002361c4b35e35a272345b0a513ece4f21b773941f5e',
                             'type': 'in',
                             'unlock_time': 0}]}}
-        pay_in = self.wallet.get_transactions_in()
+        pay_in = self.wallet.transactions_in()
         self.assertEqual(len(list(pay_in)), 3)
         for pmt in pay_in:
             self.assertIsInstance(pmt, IncomingPayment)
@@ -172,9 +172,9 @@ class SubaddrWalletTestCase(unittest.TestCase):
             self.assertIsInstance(pmt.transaction.height, int)
 
     @patch('monero.backends.jsonrpc.requests.post')
-    def test_get_transactions_out(self, mock_post):
+    def test_transactions_out(self, mock_post):
         mock_post.return_value.status_code = 200
-        mock_post.return_value.json.return_value = self.get_accounts_result
+        mock_post.return_value.json.return_value = self.accounts_result
         self.wallet = Wallet(JSONRPCWallet())
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = {'id': 0,
@@ -257,7 +257,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
                              'txid': '7e3db6c59c02d870f18b37a37cfc5857eeb5412df4ea00bb1971f3095f72b0d8',
                              'type': 'out',
                              'unlock_time': 0}]}}
-        pay_out = self.wallet.get_transactions_out()
+        pay_out = self.wallet.transactions_out()
         self.assertEqual(len(list(pay_out)), 6)
         for pmt in pay_out:
             self.assertIsInstance(pmt, OutgoingPayment)
@@ -270,9 +270,9 @@ class SubaddrWalletTestCase(unittest.TestCase):
             self.assertIsInstance(pmt.transaction.height, int)
 
     @patch('monero.backends.jsonrpc.requests.post')
-    def test_get_payments(self, mock_post):
+    def test_payments(self, mock_post):
         mock_post.return_value.status_code = 200
-        mock_post.return_value.json.return_value = self.get_accounts_result
+        mock_post.return_value.json.return_value = self.accounts_result
         self.wallet = Wallet(JSONRPCWallet())
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = {'id': 0,
@@ -284,7 +284,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
                           'subaddr_index': {'major': 1, 'minor': 1},
                           'tx_hash': 'e84343c2ebba4d4d94764e0cd275adee07cf7b4718565513be453d3724f6174b',
                           'unlock_time': 0}]}}
-        payments = self.wallet.get_payments(payment_id=0xfeedbadbeef12345)
+        payments = self.wallet.payments(payment_id=0xfeedbadbeef12345)
         self.assertEqual(len(list(payments)), 1)
         for pmt in payments:
             self.assertIsInstance(pmt, IncomingPayment)
@@ -296,7 +296,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
     @patch('monero.backends.jsonrpc.requests.post')
     def test_send_transfer(self, mock_post):
         mock_post.return_value.status_code = 200
-        mock_post.return_value.json.return_value = self.get_accounts_result
+        mock_post.return_value.json.return_value = self.accounts_result
         self.wallet = Wallet(JSONRPCWallet())
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = {'id': 0,

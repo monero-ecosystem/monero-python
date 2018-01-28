@@ -51,13 +51,13 @@ def a2str(a):
         label=a.label or "")
 
 w = get_wallet()
-masteraddr = w.get_address()
+masteraddr = w.address()
 print(
     "Master address: {addr}\n" \
     "Balance: {total:16.12f} ({unlocked:16.12f} unlocked)".format(
         addr=a2str(masteraddr),
-        total=w.get_balance(),
-        unlocked=w.get_balance(unlocked=True)))
+        total=w.balance(),
+        unlocked=w.balance(unlocked=True)))
 print(
     "Keys:\n" \
     "  private spend: {ssk}\n" \
@@ -65,11 +65,11 @@ print(
     "  public spend:  {psk}\n" \
     "  public view:   {pvk}\n\n" \
     "Seed:\n{seed}".format(
-        ssk=w.get_spend_key(),
-        svk=w.get_view_key(),
-        psk=masteraddr.get_spend_key(),
-        pvk=masteraddr.get_view_key(),
-        seed=w.get_seed()
+        ssk=w.spend_key(),
+        svk=w.view_key(),
+        psk=masteraddr.spend_key(),
+        pvk=masteraddr.view_key(),
+        seed=w.seed()
         ))
 
 if len(w.accounts) > 1:
@@ -77,31 +77,31 @@ if len(w.accounts) > 1:
     for acc in w.accounts:
         print("\nAccount {idx:02d}:".format(idx=acc.index))
         print("Balance: {total:16.12f} ({unlocked:16.12f} unlocked)".format(
-            total=acc.get_balance(),
-            unlocked=acc.get_balance(unlocked=True)))
-        addresses = acc.get_addresses()
+            total=acc.balance(),
+            unlocked=acc.balance(unlocked=True)))
+        addresses = acc.addresses()
         print("{num:2d} address(es):".format(num=len(addresses)))
         print("\n".join(map(a2str, addresses)))
-        ins = acc.get_transactions_in(unconfirmed=True)
+        ins = acc.transactions_in(unconfirmed=True)
         if ins:
             print("\nIncoming transactions:")
             print(_TXHDR.format(dir='received by'))
             for tx in ins:
                 print(pmt2str(tx))
-        outs = acc.get_transactions_out(unconfirmed=True)
+        outs = acc.transactions_out(unconfirmed=True)
         if outs:
             print("\nOutgoing transactions:")
             print(_TXHDR.format(dir='sent from'))
             for tx in outs:
                 print(pmt2str(tx))
 else:
-    ins = w.get_transactions_in(unconfirmed=True)
+    ins = w.transactions_in(unconfirmed=True)
     if ins:
         print("\nIncoming transactions:")
         print(_TXHDR.format(dir='received by'))
         for tx in ins:
             print(pmt2str(tx))
-    outs = w.get_transactions_out(unconfirmed=True)
+    outs = w.transactions_out(unconfirmed=True)
     if outs:
         print("\nOutgoing transactions:")
         print(_TXHDR.format(dir='sent from'))

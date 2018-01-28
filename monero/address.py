@@ -48,14 +48,14 @@ class Address(object):
         """
         return self._decoded[0] == self._valid_netbytes[1]
 
-    def get_view_key(self):
+    def view_key(self):
         """Returns public view key.
 
         :rtype: str
         """
         return hexlify(self._decoded[33:65]).decode()
 
-    def get_spend_key(self):
+    def spend_key(self):
         """Returns public spend key.
 
         :rtype: str
@@ -116,14 +116,14 @@ class IntegratedAddress(Address):
                 "is {addr} ({len} chars length)".format(addr=address, len=len(address)))
         self._decode(address)
 
-    def get_payment_id(self):
+    def payment_id(self):
         """Returns the integrated payment id.
 
         :rtype: PaymentID
         """
         return numbers.PaymentID(hexlify(self._decoded[65:-4]).decode())
 
-    def get_base_address(self):
+    def base_address(self):
         """Returns the base address without payment id.
         :rtype: Address
         """

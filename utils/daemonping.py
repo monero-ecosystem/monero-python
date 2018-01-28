@@ -28,7 +28,7 @@ def get_daemon():
     return Daemon(JSONRPCDaemon(**args.daemon_rpc_url))
 
 d = get_daemon()
-info = d.get_info()
+info = d.info()
 print("Net: {net:>18s}\n"
     "Height:      {height:10d}\n"
     "Difficulty:  {difficulty:10d}".format(

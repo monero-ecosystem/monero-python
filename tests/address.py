@@ -6,15 +6,15 @@ class Tests(object):
     def test_from_and_to_string(self):
         a = Address(self.addr)
         self.assertEqual(str(a), self.addr)
-        self.assertEqual(a.get_spend_key(), self.psk)
-        self.assertEqual(a.get_view_key(), self.pvk)
+        self.assertEqual(a.spend_key(), self.psk)
+        self.assertEqual(a.view_key(), self.pvk)
 
         ia = IntegratedAddress(self.iaddr)
-        self.assertEqual(ia.get_payment_id(), self.pid)
+        self.assertEqual(ia.payment_id(), self.pid)
         self.assertEqual(str(ia), self.iaddr)
-        self.assertEqual(ia.get_spend_key(), self.psk)
-        self.assertEqual(ia.get_view_key(), self.pvk)
-        self.assertEqual(ia.get_base_address(), a)
+        self.assertEqual(ia.spend_key(), self.psk)
+        self.assertEqual(ia.view_key(), self.pvk)
+        self.assertEqual(ia.base_address(), a)
 
         sa = SubAddress(self.subaddr)
         self.assertEqual(str(sa), self.subaddr)
@@ -23,7 +23,7 @@ class Tests(object):
         a = Address(self.addr)
         ia = a.with_payment_id(self.pid)
         self.assertIsInstance(ia, IntegratedAddress)
-        self.assertEqual(ia.get_payment_id(), self.pid)
+        self.assertEqual(ia.payment_id(), self.pid)
         self.assertEqual(str(ia), self.iaddr)
 
     def test_recognition_and_comparisons(self):
@@ -44,10 +44,10 @@ class Tests(object):
         self.assertEqual(self.iaddr, ia)
         self.assertEqual(ia.is_testnet(), self.testnet)
         self.assertEqual(ia2.is_testnet(), self.testnet)
-        self.assertEqual(ia2.get_base_address(), a)
+        self.assertEqual(ia2.base_address(), a)
 
-        self.assertEqual(ia.get_view_key(), a.get_view_key())
-        self.assertEqual(ia.get_spend_key(), a.get_spend_key())
+        self.assertEqual(ia.view_key(), a.view_key())
+        self.assertEqual(ia.spend_key(), a.spend_key())
 
         sa = SubAddress(self.subaddr)
         sa2 = address(self.subaddr)

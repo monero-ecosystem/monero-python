@@ -85,10 +85,10 @@ Connect to the wallet
 
     In [3]: w = Wallet(JSONRPCWallet(port=28088))
 
-    In [4]: w.get_address()
+    In [4]: w.address()
     Out[4]: A2GmyHHJ9jtUhPiwoAbR2tXU9LJu2U6fJjcsv3rxgkVRWU6tEYcn6C1NBc7wqCv5V7NW3zeYuzKf6RGGgZTFTpVC4QxAiAX
 
-    In [5]: w.get_balance()
+    In [5]: w.balance()
     Out[5]: Decimal('0E-12')
 
 Congratulations! You have connected to the wallet. You may now proceed to the
