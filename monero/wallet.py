@@ -28,6 +28,12 @@ class Wallet(object):
         """
         return self._backend.get_height()
 
+    def get_spend_key(self):
+        """
+        Returns private spend key.
+        """
+        return self._backend.get_spend_key()
+
     def get_view_key(self):
         """
         Returns private view key.
