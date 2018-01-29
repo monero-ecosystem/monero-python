@@ -1,3 +1,3 @@
-from .address import AddressTestCase, TestnetAddressTestCase
-from .numbers import NumbersTestCase
-from .wallet import SubaddrWalletTestCase
+from .address import *
+from .numbers import *
+from .wallet import *

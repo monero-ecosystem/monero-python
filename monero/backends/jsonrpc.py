@@ -169,35 +169,48 @@ class JSONRPCWallet(object):
         _balance = self.raw_request('getbalance', {'account_index': account})
         return (from_atomic(_balance['balance']), from_atomic(_balance['unlocked_balance']))
 
-    def payments(self, account=0, payment_id=0):
-        payment_id = PaymentID(payment_id)
-        _log.debug("Getting payments for account {acc}, payment_id {pid}".format(
-            acc=account, pid=payment_id))
-        _payments = self.raw_request('get_payments', {
+    def transfers_in(self, account, pmtfilter):
+        params = {'account_index': account}
+        method = 'get_transfers'
+        if pmtfilter.unconfirmed:
+            params['in'] = pmtfilter.confirmed
+            params['out'] = False
+            params['pool'] = True
+        else:
+            if pmtfilter.payment_ids:
+                method = 'get_bulk_payments'
+                params['payment_id'] = pmtfilter.payment_ids
+            else:
+                params['in'] = pmtfilter.confirmed
+                params['out'] = False
+                params['pool'] = False
+        if method == 'get_transfers':
+            arg = 'in'
+            if pmtfilter.min_height:
+                params['min_height'] = pmtfilter.min_height
+                params['filter_by_height'] = True
+            if pmtfilter.max_height:
+                params['max_height'] = pmtfilter.max_height
+                params['filter_by_height'] = True
+        elif pmtfilter.min_height:
+            arg = 'payments'
+            params['min_block_height'] = pmtfilter.min_height
+        _pmts = self.raw_request(method, params)
+        pmts = _pmts.get(arg, [])
+        if pmtfilter.unconfirmed:
+            pmts.extend(_pmts.get('pool', []))
+        return list(pmtfilter.filter(map(self._inpayment, pmts)))
+
+    def transfers_out(self, account, pmtfilter):
+        _pmts = self.raw_request('get_transfers', {
             'account_index': account,
-            'payment_id': str(payment_id)})
-        pmts = []
-        for data in _payments['payments']:
-            # Monero <= 0.11 : no address is passed because there's only one
-            data['address'] = data['address'] or self._master_address
-            pmts.append(self._inpayment(data))
-        return pmts
-
-    def transactions_in(self, account=0, confirmed=True, unconfirmed=False):
-        _txns = self.raw_request('get_transfers',
-                {'account_index': account, 'in': confirmed, 'out': False, 'pool': unconfirmed})
-        txns = _txns.get('in', [])
-        if unconfirmed:
-            txns.extend(_txns.get('pool', []))
-        return [self._inpayment(tx) for tx in sorted(txns, key=operator.itemgetter('timestamp'))]
-
-    def transactions_out(self, account=0, confirmed=True, unconfirmed=True):
-        _txns = self.raw_request('get_transfers',
-                {'account_index': account, 'in': False, 'out': confirmed, 'pool': unconfirmed})
-        txns = _txns.get('out', [])
-        if unconfirmed:
-            txns.extend(_txns.get('pool', []))
-        return [self._outpayment(tx) for tx in sorted(txns, key=operator.itemgetter('timestamp'))]
+            'in': False,
+            'out': pmtfilter.confirmed,
+            'pool': pmtfilter.unconfirmed})
+        pmts = _pmts.get('out', [])
+        if pmtfilter.unconfirmed:
+            pmts.extend(_pmts.get('pool', []))
+        return list(pmtfilter.filter(map(self._outpayment, pmts)))
 
     def get_transaction(self, txhash):
         _tx = self.raw_request('get_transfer_by_txid', {'txid': str(txhash)})['transfer']
@@ -209,24 +222,24 @@ class JSONRPCWallet(object):
 
     def _paymentdict(self, data):
         pid = data.get('payment_id', None)
+        addr = data.get('address', None)
+        if addr:
+            addr = address(addr)
         return {
             'txhash': data.get('txid', data.get('tx_hash')),
             'payment_id': None if pid is None else PaymentID(pid),
             'amount': from_atomic(data['amount']),
             'timestamp': datetime.fromtimestamp(data['timestamp']) if 'timestamp' in data else None,
-            'note': data.get('note'),
-            'transaction': self._tx(data)
+            'note': data.get('note', None),
+            'transaction': self._tx(data),
+            'address': addr,
         }
 
     def _inpayment(self, data):
-        p = self._paymentdict(data)
-        p.update({'received_by': address(data['address']) if 'address' in data else None})
-        return IncomingPayment(**p)
+        return IncomingPayment(**self._paymentdict(data))
 
     def _outpayment(self, data):
-        p = self._paymentdict(data)
-        p.update({'sent_from': address(data['address']) if 'address' in data else None})
-        return OutgoingPayment(**p)
+        return OutgoingPayment(**self._paymentdict(data))
 
     def _tx(self, data):
         return Transaction(**{

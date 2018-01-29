@@ -7,9 +7,168 @@ except ImportError:
     from mock import patch, Mock
 
 from monero.wallet import Wallet
-from monero.address import Address
+from monero.account import Account
+from monero.address import Address, address
+from monero.numbers import PaymentID
 from monero.transaction import IncomingPayment, OutgoingPayment, Transaction
 from monero.backends.jsonrpc import JSONRPCWallet
+
+class FiltersTestCase(unittest.TestCase):
+    def setUp(self):
+        class MockBackend(object):
+            def __init__(self):
+                self.transfers = []
+                tx = Transaction(
+                    timestamp=datetime(2018, 1, 29, 15, 0, 25),
+                    height=1087606,
+                    hash='a0b876ebcf7c1d499712d84cedec836f9d50b608bb22d6cb49fd2feae3ffed14',
+                    fee=Decimal('0.00352891'))
+                pm = IncomingPayment(
+                    amount=Decimal('1'),
+                    address=address('Bf6ngv7q2TBWup13nEm9AjZ36gLE6i4QCaZ7XScZUKDUeGbYEHmPRdegKGwLT8tBBK7P6L32RELNzCR6QzNFkmogDjvypyV'),
+                    payment_id=PaymentID('0166d8da6c0045c51273dd65d6f63734beb8a84e0545a185b2cfd053fced9f5d'),
+                    transaction=tx)
+                self.transfers.append(pm)
+                tx = Transaction(
+                    timestamp=datetime(2018, 1, 29, 14, 57, 47),
+                    height=1087601,
+                    hash='f34b495cec77822a70f829ec8a5a7f1e727128d62e6b1438e9cb7799654d610e',
+                    fee=Decimal('0.008661870000'))
+                pm = IncomingPayment(
+                    amount=Decimal('3.000000000000'),
+                    address=address('BhE3cQvB7VF2uuXcpXp28Wbadez6GgjypdRS1F1Mzqn8Advd6q8VfaX8ZoEDobjejrMfpHeNXoX8MjY8q8prW1PEALgr1En'),
+                    payment_id=PaymentID('f75ad90e25d71a12'),
+                    transaction=tx)
+                self.transfers.append(pm)
+                tx = Transaction(
+                    timestamp=datetime(2018, 1, 29, 13, 17, 18),
+                    height=1087530,
+                    hash='5c3ab739346e9d98d38dc7b8d36a4b7b1e4b6a16276946485a69797dbf887cd8',
+                    fee=Decimal('0.000962550000'))
+                pm = IncomingPayment(
+                    amount=Decimal('10.000000000000'),
+                    address=address('9tQoHWyZ4yXUgbz9nvMcFZUfDy5hxcdZabQCxmNCUukKYicXegsDL7nQpcUa3A1pF6K3fhq3scsyY88tdB1MqucULcKzWZC'),
+                    payment_id=PaymentID('f75ad90e25d71a12'),
+                    transaction=tx)
+                self.transfers.append(pm)
+                tx = Transaction(
+                    timestamp=datetime(2018, 1, 29, 13, 17, 18),
+                    height=1087530,
+                    hash='4ea70add5d0c7db33557551b15cd174972fcfc73bf0f6a6b47b7837564b708d3',
+                    fee=Decimal('0.000962550000'))
+                pm = IncomingPayment(
+                    amount=Decimal('4.000000000000'),
+                    address=address('9tQoHWyZ4yXUgbz9nvMcFZUfDy5hxcdZabQCxmNCUukKYicXegsDL7nQpcUa3A1pF6K3fhq3scsyY88tdB1MqucULcKzWZC'),
+                    payment_id=PaymentID('f75ad90e25d71a12'),
+                    transaction=tx)
+                self.transfers.append(pm)
+                tx = Transaction(
+                    timestamp=datetime(2018, 1, 29, 13, 17, 18),
+                    height=1087530,
+                    hash='e9a71c01875bec20812f71d155bfabf42024fde3ec82475562b817dcc8cbf8dc',
+                    fee=Decimal('0.000962550000'))
+                pm = IncomingPayment(
+                    amount=Decimal('2.120000000000'),
+                    address=address('9tQoHWyZ4yXUgbz9nvMcFZUfDy5hxcdZabQCxmNCUukKYicXegsDL7nQpcUa3A1pF6K3fhq3scsyY88tdB1MqucULcKzWZC'),
+                    payment_id=PaymentID('cb248105ea6a9189'),
+                    transaction=tx)
+                self.transfers.append(pm)
+                tx = Transaction(
+                    timestamp=datetime(2018, 1, 29, 14, 57, 47),
+                    height=1087601,
+                    hash='5ef7ead6a041101ed326568fbb59c128403cba46076c3f353cd110d969dac808',
+                    fee=Decimal('0.000962430000'))
+                pm = IncomingPayment(
+                    amount=Decimal('7.000000000000'),
+                    address=address('BhE3cQvB7VF2uuXcpXp28Wbadez6GgjypdRS1F1Mzqn8Advd6q8VfaX8ZoEDobjejrMfpHeNXoX8MjY8q8prW1PEALgr1En'),
+                    payment_id=PaymentID('0000000000000000'),
+                    transaction=tx)
+                self.transfers.append(pm)
+                tx = Transaction(
+                    timestamp=datetime(2018, 1, 29, 13, 17, 18),
+                    height=1087530,
+                    hash='cc44568337a186c2e1ccc080b43b4ae9db26a07b7afd7edeed60ce2fc4a6477f',
+                    fee=Decimal('0.000962550000'))
+                pm = IncomingPayment(
+                    amount=Decimal('10.000000000000'),
+                    address=address('9tQoHWyZ4yXUgbz9nvMcFZUfDy5hxcdZabQCxmNCUukKYicXegsDL7nQpcUa3A1pF6K3fhq3scsyY88tdB1MqucULcKzWZC'),
+                    payment_id=PaymentID('0000000000000000'),
+                    transaction=tx)
+                self.transfers.append(pm)
+                tx = Transaction(
+                    timestamp=datetime(2018, 1, 29, 21, 13, 28),
+                    height=None,
+                    hash='d29264ad317e8fdb55ea04484c00420430c35be7b3fe6dd663f99aebf41a786c',
+                    fee=Decimal('0.000961950000'))
+                pm = IncomingPayment(
+                    amount=Decimal('3.140000000000'),
+                    address=address('9tQoHWyZ4yXUgbz9nvMcFZUfDy5hxcdZabQCxmNCUukKYicXegsDL7nQpcUa3A1pF6K3fhq3scsyY88tdB1MqucULcKzWZC'),
+                    payment_id=PaymentID('03f6649304ea4cb2'),
+                    transaction=tx)
+                self.transfers.append(pm)
+
+            def accounts(self):
+                return [Account(self, 0)]
+
+            def transfers_in(self, account, pmtfilter):
+                return list(pmtfilter.filter(self.transfers))
+
+        self.wallet = Wallet(MockBackend())
+
+    def test_filter_none(self):
+        pmts = self.wallet.incoming()
+        self.assertEqual(len(pmts), 7)
+
+    def test_filter_payment_id(self):
+        pmts = self.wallet.incoming(payment_id='cb248105ea6a9189')
+        self.assertEqual(len(pmts), 1)
+        self.assertEqual(
+            pmts[0].transaction.hash,
+            'e9a71c01875bec20812f71d155bfabf42024fde3ec82475562b817dcc8cbf8dc')
+        pmts = self.wallet.incoming(payment_id='f75ad90e25d71a12')
+        self.assertEqual(len(pmts), 3)
+        pmts = self.wallet.incoming(payment_id=('cb248105ea6a9189', 'f75ad90e25d71a12'))
+        self.assertEqual(len(pmts), 4)
+        self.assertEqual(
+            pmts,
+            self.wallet.incoming(payment_id=(PaymentID('cb248105ea6a9189'), 'f75ad90e25d71a12')))
+
+    def test_filter_address(self):
+        pmts = self.wallet.incoming(address='BhE3cQvB7VF2uuXcpXp28Wbadez6GgjypdRS1F1Mzqn8Advd6q8VfaX8ZoEDobjejrMfpHeNXoX8MjY8q8prW1PEALgr1En')
+        self.assertEqual(len(pmts), 2)
+        pmts = self.wallet.incoming(address=(
+            'BhE3cQvB7VF2uuXcpXp28Wbadez6GgjypdRS1F1Mzqn8Advd6q8VfaX8ZoEDobjejrMfpHeNXoX8MjY8q8prW1PEALgr1En',
+            'Bf6ngv7q2TBWup13nEm9AjZ36gLE6i4QCaZ7XScZUKDUeGbYEHmPRdegKGwLT8tBBK7P6L32RELNzCR6QzNFkmogDjvypyV'))
+        self.assertEqual(len(pmts), 3)
+
+    def test_filter_mempool(self):
+        pmts = self.wallet.incoming()
+        self.assertEqual(len(pmts), 7)
+        pmts = self.wallet.incoming(unconfirmed=True)
+        self.assertEqual(len(pmts), 8)
+        pmts = self.wallet.incoming(unconfirmed=True, confirmed=False)
+        self.assertEqual(len(pmts), 1)
+        self.assertEqual(
+            pmts[0].transaction.hash,
+            'd29264ad317e8fdb55ea04484c00420430c35be7b3fe6dd663f99aebf41a786c')
+        pmts = self.wallet.incoming(payment_id='03f6649304ea4cb2')
+        self.assertEqual(len(pmts), 0)
+        pmts = self.wallet.incoming(unconfirmed=True, payment_id='03f6649304ea4cb2')
+        self.assertEqual(len(pmts), 1)
+        pmts = self.wallet.incoming(address='9tQoHWyZ4yXUgbz9nvMcFZUfDy5hxcdZabQCxmNCUukKYicXegsDL7nQpcUa3A1pF6K3fhq3scsyY88tdB1MqucULcKzWZC')
+        self.assertEqual(len(pmts), 4)
+        pmts = self.wallet.incoming(unconfirmed=True, address='9tQoHWyZ4yXUgbz9nvMcFZUfDy5hxcdZabQCxmNCUukKYicXegsDL7nQpcUa3A1pF6K3fhq3scsyY88tdB1MqucULcKzWZC')
+        self.assertEqual(len(pmts), 5)
+        pmts = self.wallet.incoming(
+            address='9tQoHWyZ4yXUgbz9nvMcFZUfDy5hxcdZabQCxmNCUukKYicXegsDL7nQpcUa3A1pF6K3fhq3scsyY88tdB1MqucULcKzWZC',
+            payment_id='03f6649304ea4cb2')
+        self.assertEqual(len(pmts), 0)
+        pmts = self.wallet.incoming(
+            unconfirmed=True,
+            address='9tQoHWyZ4yXUgbz9nvMcFZUfDy5hxcdZabQCxmNCUukKYicXegsDL7nQpcUa3A1pF6K3fhq3scsyY88tdB1MqucULcKzWZC',
+            payment_id='03f6649304ea4cb2')
+        self.assertEqual(len(pmts), 1)
+
 
 class SubaddrWalletTestCase(unittest.TestCase):
     accounts_result = {'id': 0,
@@ -120,7 +279,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
         self.assertEqual(len(self.wallet.accounts[0].addresses()), 8)
 
     @patch('monero.backends.jsonrpc.requests.post')
-    def test_transactions_in(self, mock_post):
+    def test_transfers_in(self, mock_post):
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = self.accounts_result
         self.wallet = Wallet(JSONRPCWallet())
@@ -133,6 +292,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
                             'height': 1049947,
                             'note': '',
                             'payment_id': '0000000000000000',
+                            'address': '9vgV48wWAPTWik5QSUSoGYicdvvsbSNHrT9Arsx1XBTz6VrWPSgfmnUKSPZDMyX4Ms8R9TkhB4uFqK9s5LUBbV6YQN2Q9ag',
                             'subaddr_index': {'major': 0, 'minor': 0},
                             'timestamp': 1511926250,
                             'txid': '0cdde0eb934c44b523f6e966a5e19b131ed68c3c08600bc087f48ae13015b704',
@@ -145,6 +305,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
                             'note': '',
                             'payment_id': '0000000000000000',
                             'subaddr_index': {'major': 0, 'minor': 0},
+                            'address': '9vgV48wWAPTWik5QSUSoGYicdvvsbSNHrT9Arsx1XBTz6VrWPSgfmnUKSPZDMyX4Ms8R9TkhB4uFqK9s5LUBbV6YQN2Q9ag',
                             'timestamp': 1511926250,
                             'txid': '8b4154681c48a873550818ecaa6408a7c987a882b80917d6c902befd6ee57109',
                             'type': 'in',
@@ -155,24 +316,24 @@ class SubaddrWalletTestCase(unittest.TestCase):
                             'height': 1049947,
                             'note': '',
                             'payment_id': '0000000000000000',
+                            'address': '9vgV48wWAPTWik5QSUSoGYicdvvsbSNHrT9Arsx1XBTz6VrWPSgfmnUKSPZDMyX4Ms8R9TkhB4uFqK9s5LUBbV6YQN2Q9ag',
                             'subaddr_index': {'major': 0, 'minor': 0},
                             'timestamp': 1511926250,
                             'txid': 'd23a7d086e70df7aa0ca002361c4b35e35a272345b0a513ece4f21b773941f5e',
                             'type': 'in',
                             'unlock_time': 0}]}}
-        pay_in = self.wallet.transactions_in()
+        pay_in = self.wallet.incoming()
         self.assertEqual(len(list(pay_in)), 3)
         for pmt in pay_in:
             self.assertIsInstance(pmt, IncomingPayment)
-# Once PR#3010 has been merged to Monero, update the JSON and enable the following:
-#            self.assertIsInstance(pmt.received_by, Address)
+            self.assertIsInstance(pmt.address, Address)
             self.assertIsInstance(pmt.amount, Decimal)
             self.assertIsInstance(pmt.transaction, Transaction)
             self.assertIsInstance(pmt.transaction.fee, Decimal)
             self.assertIsInstance(pmt.transaction.height, int)
 
     @patch('monero.backends.jsonrpc.requests.post')
-    def test_transactions_out(self, mock_post):
+    def test_transfers_out(self, mock_post):
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = self.accounts_result
         self.wallet = Wallet(JSONRPCWallet())
@@ -188,6 +349,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
                              'note': '',
                              'payment_id': '0000000000000000',
                              'subaddr_index': {'major': 2, 'minor': 0},
+                             'address': 'BgCseuY3jFJAZS7kt9mrNg7fEG3bo5BV91CTyKbYu9GFiU6hUZhvdNWCTUdQNPNcA4PyFApsFr3EsQDEDfT3tQSY1mVZeP2',
                              'timestamp': 1512095241,
                              'txid': 'eadca0f956a2a60cb3497a7dff1bd80153140a111d2f7db257a264bd9b76f0b3',
                              'type': 'out',
@@ -201,6 +363,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
                              'note': '',
                              'payment_id': '0000000000000000',
                              'subaddr_index': {'major': 2, 'minor': 0},
+                             'address': 'BgCseuY3jFJAZS7kt9mrNg7fEG3bo5BV91CTyKbYu9GFiU6hUZhvdNWCTUdQNPNcA4PyFApsFr3EsQDEDfT3tQSY1mVZeP2',
                              'timestamp': 1511922110,
                              'txid': '5486ae9e6867ceb6e5aa478b32cba5c11d28e6d905c8479565c78e3933163ab6',
                              'type': 'out',
@@ -214,6 +377,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
                              'note': '',
                              'payment_id': '0000000000000000',
                              'subaddr_index': {'major': 2, 'minor': 0},
+                             'address': 'BgCseuY3jFJAZS7kt9mrNg7fEG3bo5BV91CTyKbYu9GFiU6hUZhvdNWCTUdQNPNcA4PyFApsFr3EsQDEDfT3tQSY1mVZeP2',
                              'timestamp': 1512098498,
                              'txid': '9591c8f6832cc3b7908c2447b2feef58c44e7774a5c05cea617ad2f3b3866c18',
                              'type': 'out',
@@ -227,6 +391,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
                              'note': '',
                              'payment_id': '0000000000000000',
                              'subaddr_index': {'major': 2, 'minor': 0},
+                             'address': 'BgCseuY3jFJAZS7kt9mrNg7fEG3bo5BV91CTyKbYu9GFiU6hUZhvdNWCTUdQNPNcA4PyFApsFr3EsQDEDfT3tQSY1mVZeP2',
                              'timestamp': 1511926250,
                              'txid': 'af669b99162d9b514a0e8d3bd1d905e3b8778e6fcb88d172e5e049e909c4cc87',
                              'type': 'out',
@@ -240,6 +405,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
                              'note': '',
                              'payment_id': '0000000000000000',
                              'subaddr_index': {'major': 2, 'minor': 0},
+                             'address': 'BgCseuY3jFJAZS7kt9mrNg7fEG3bo5BV91CTyKbYu9GFiU6hUZhvdNWCTUdQNPNcA4PyFApsFr3EsQDEDfT3tQSY1mVZeP2',
                              'timestamp': 1511914391,
                              'txid': '2fa2de7fbf009093c5319d0421d3e8c684b8351a066c48d51369aedbbfd1d9af',
                              'type': 'out',
@@ -253,45 +419,22 @@ class SubaddrWalletTestCase(unittest.TestCase):
                              'note': '',
                              'payment_id': '0000000000000000',
                              'subaddr_index': {'major': 2, 'minor': 0},
+                             'address': 'BgCseuY3jFJAZS7kt9mrNg7fEG3bo5BV91CTyKbYu9GFiU6hUZhvdNWCTUdQNPNcA4PyFApsFr3EsQDEDfT3tQSY1mVZeP2',
                              'timestamp': 1511928624,
                              'txid': '7e3db6c59c02d870f18b37a37cfc5857eeb5412df4ea00bb1971f3095f72b0d8',
                              'type': 'out',
                              'unlock_time': 0}]}}
-        pay_out = self.wallet.transactions_out()
+        pay_out = self.wallet.outgoing()
         self.assertEqual(len(list(pay_out)), 6)
         for pmt in pay_out:
             self.assertIsInstance(pmt, OutgoingPayment)
-# Once PR#3010 has been merged to Monero, update the JSON and enable the following:
-#            self.assertIsInstance(pmt.sent_from, Address)
+            self.assertIsInstance(pmt.address, Address)
             self.assertIsInstance(pmt.amount, Decimal)
             self.assertIsInstance(pmt.timestamp, datetime)
             self.assertIsInstance(pmt.transaction, Transaction)
             self.assertIsInstance(pmt.transaction.fee, Decimal)
             self.assertIsInstance(pmt.transaction.height, int)
-
-    @patch('monero.backends.jsonrpc.requests.post')
-    def test_payments(self, mock_post):
-        mock_post.return_value.status_code = 200
-        mock_post.return_value.json.return_value = self.accounts_result
-        self.wallet = Wallet(JSONRPCWallet())
-        mock_post.return_value.status_code = 200
-        mock_post.return_value.json.return_value = {'id': 0,
-            'jsonrpc': '2.0',
-            'result': {'payments': [{'address': 'BZ9V9tfTDgHYsnAxgeMLaGCUb6yMaGNiZJwiBWQrE23MXcRqSde9DKa9LnPw31o2G8QrdKdUNM7VWhd3dr22ivk54QGqZ6u',
-                          'amount': 2313370000000,
-                          'block_height': 1048268,
-                          'payment_id': 'feedbadbeef12345',
-                          'subaddr_index': {'major': 1, 'minor': 1},
-                          'tx_hash': 'e84343c2ebba4d4d94764e0cd275adee07cf7b4718565513be453d3724f6174b',
-                          'unlock_time': 0}]}}
-        payments = self.wallet.payments(payment_id=0xfeedbadbeef12345)
-        self.assertEqual(len(list(payments)), 1)
-        for pmt in payments:
-            self.assertIsInstance(pmt, IncomingPayment)
-            self.assertIsInstance(pmt.received_by, Address)
-            self.assertIsInstance(pmt.amount, Decimal)
-            self.assertIsInstance(pmt.transaction, Transaction)
-            self.assertIsInstance(pmt.transaction.height, int)
+            self.assertEqual(pmt.note, '')
 
     @patch('monero.backends.jsonrpc.requests.post')
     def test_send_transfer(self, mock_post):

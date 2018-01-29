@@ -1,13 +1,15 @@
 from . import address
 from . import prio
 from . import account
-from . import transaction
+from .transaction import PaymentManager
 
 class Wallet(object):
     accounts = None
 
     def __init__(self, backend):
         self._backend = backend
+        self.incoming = PaymentManager(0, backend, 'in')
+        self.outgoing = PaymentManager(0, backend, 'out')
         self.refresh()
 
     def refresh(self):
@@ -77,14 +79,14 @@ class Wallet(object):
     def new_address(self, label=None):
         return self.accounts[0].new_address(label=label)
 
-    def payments(self, payment_id=None):
-        return self.accounts[0].payments(payment_id=payment_id)
+    def payments(self, payment_id):
+        return self.accounts[0].payments(payment_id)
 
-    def transactions_in(self, confirmed=True, unconfirmed=False):
-        return self.accounts[0].transactions_in(confirmed=confirmed, unconfirmed=unconfirmed)
+    def transfers_in(self, confirmed=True, unconfirmed=False):
+        return self.accounts[0].transfers_in(confirmed=confirmed, unconfirmed=unconfirmed)
 
-    def transactions_out(self, confirmed=True, unconfirmed=True):
-        return self.accounts[0].transactions_out(confirmed=confirmed, unconfirmed=unconfirmed)
+    def transfers_out(self, confirmed=True, unconfirmed=True):
+        return self.accounts[0].transfers_out(confirmed=confirmed, unconfirmed=unconfirmed)
 
     def transfer(self, address, amount,
             priority=prio.NORMAL, ringsize=5, payment_id=None, unlock_time=0,

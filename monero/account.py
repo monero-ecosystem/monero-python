@@ -1,5 +1,6 @@
 from . import address
 from . import prio
+from .transaction import PaymentManager
 
 
 class Account(object):
@@ -8,6 +9,8 @@ class Account(object):
     def __init__(self, backend, index):
         self.index = index
         self._backend = backend
+        self.incoming = PaymentManager(index, backend, 'in')
+        self.outgoing = PaymentManager(index, backend, 'out')
 
     def balances(self):
         return self._backend.balances(account=self.index)
@@ -26,17 +29,6 @@ class Account(object):
 
     def new_address(self, label=None):
         return self._backend.new_address(account=self.index, label=label)
-
-    def payments(self, payment_id=None):
-        return self._backend.payments(account=self.index, payment_id=payment_id)
-
-    def transactions_in(self, confirmed=True, unconfirmed=False):
-        return self._backend.transactions_in(
-            account=self.index, confirmed=confirmed, unconfirmed=unconfirmed)
-
-    def transactions_out(self, confirmed=True, unconfirmed=True):
-        return self._backend.transactions_out(
-            account=self.index, confirmed=confirmed, unconfirmed=unconfirmed)
 
     def transfer(self, address, amount,
             priority=prio.NORMAL, ringsize=5, payment_id=None, unlock_time=0,
