@@ -4,6 +4,9 @@ class MoneroException(Exception):
 class BackendException(MoneroException):
     pass
 
+class NoDaemonConnection(BackendException):
+    pass
+
 class AccountException(MoneroException):
     pass
 
