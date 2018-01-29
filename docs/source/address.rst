@@ -73,7 +73,8 @@ Payment IDs and integrated addresses
 Each Monero transaction may carry a **payment ID**. It is a 64 or 256-bit long
 number that carries additional information between parties. For example, a
 merchant can generate a payment ID for each order, or an exchange can assign
-one to each user, so they would know what is the purpose of incoming payment.
+one to each user. The customer/user would then attach the ID to the transaction,
+so the site operator would know what is the purpose of incoming payment.
 
 A short, 64-bit payment ID can be integrated into an address, creating, well...
 an **integrated address**.

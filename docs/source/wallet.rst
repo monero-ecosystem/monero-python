@@ -58,7 +58,7 @@ Every wallet can have separate accounts and each account can have numerous
 addresses. The ``Wallet.new_account()`` and ``Account.new_address()`` will
 create new instances.
 
-(This snippet, will fail on Monero v0.11.x)
+(This snippet will fail on Monero v0.11.x)
 
 .. code-block:: python
 
