@@ -7,7 +7,9 @@ except ImportError:
     from mock import patch, Mock
 
 from monero.wallet import Wallet
-from monero.address import Address
+from monero.account import Account
+from monero.address import Address, address
+from monero.numbers import PaymentID
 from monero.transaction import IncomingPayment, OutgoingPayment, Transaction
 from monero.backends.jsonrpc import JSONRPCWallet
 
@@ -120,7 +122,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
         self.assertEqual(len(self.wallet.accounts[0].addresses()), 8)
 
     @patch('monero.backends.jsonrpc.requests.post')
-    def test_transactions_in(self, mock_post):
+    def test_incoming(self, mock_post):
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = self.accounts_result
         self.wallet = Wallet(JSONRPCWallet())
@@ -133,6 +135,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
                             'height': 1049947,
                             'note': '',
                             'payment_id': '0000000000000000',
+                            'address': '9vgV48wWAPTWik5QSUSoGYicdvvsbSNHrT9Arsx1XBTz6VrWPSgfmnUKSPZDMyX4Ms8R9TkhB4uFqK9s5LUBbV6YQN2Q9ag',
                             'subaddr_index': {'major': 0, 'minor': 0},
                             'timestamp': 1511926250,
                             'txid': '0cdde0eb934c44b523f6e966a5e19b131ed68c3c08600bc087f48ae13015b704',
@@ -145,6 +148,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
                             'note': '',
                             'payment_id': '0000000000000000',
                             'subaddr_index': {'major': 0, 'minor': 0},
+                            'address': '9vgV48wWAPTWik5QSUSoGYicdvvsbSNHrT9Arsx1XBTz6VrWPSgfmnUKSPZDMyX4Ms8R9TkhB4uFqK9s5LUBbV6YQN2Q9ag',
                             'timestamp': 1511926250,
                             'txid': '8b4154681c48a873550818ecaa6408a7c987a882b80917d6c902befd6ee57109',
                             'type': 'in',
@@ -155,24 +159,24 @@ class SubaddrWalletTestCase(unittest.TestCase):
                             'height': 1049947,
                             'note': '',
                             'payment_id': '0000000000000000',
+                            'address': '9vgV48wWAPTWik5QSUSoGYicdvvsbSNHrT9Arsx1XBTz6VrWPSgfmnUKSPZDMyX4Ms8R9TkhB4uFqK9s5LUBbV6YQN2Q9ag',
                             'subaddr_index': {'major': 0, 'minor': 0},
                             'timestamp': 1511926250,
                             'txid': 'd23a7d086e70df7aa0ca002361c4b35e35a272345b0a513ece4f21b773941f5e',
                             'type': 'in',
                             'unlock_time': 0}]}}
-        pay_in = self.wallet.transactions_in()
+        pay_in = self.wallet.incoming()
         self.assertEqual(len(list(pay_in)), 3)
         for pmt in pay_in:
             self.assertIsInstance(pmt, IncomingPayment)
-# Once PR#3010 has been merged to Monero, update the JSON and enable the following:
-#            self.assertIsInstance(pmt.received_by, Address)
+            self.assertIsInstance(pmt.local_address, Address)
             self.assertIsInstance(pmt.amount, Decimal)
             self.assertIsInstance(pmt.transaction, Transaction)
             self.assertIsInstance(pmt.transaction.fee, Decimal)
             self.assertIsInstance(pmt.transaction.height, int)
 
     @patch('monero.backends.jsonrpc.requests.post')
-    def test_transactions_out(self, mock_post):
+    def test_outgoing(self, mock_post):
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = self.accounts_result
         self.wallet = Wallet(JSONRPCWallet())
@@ -188,6 +192,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
                              'note': '',
                              'payment_id': '0000000000000000',
                              'subaddr_index': {'major': 2, 'minor': 0},
+                             'address': 'BgCseuY3jFJAZS7kt9mrNg7fEG3bo5BV91CTyKbYu9GFiU6hUZhvdNWCTUdQNPNcA4PyFApsFr3EsQDEDfT3tQSY1mVZeP2',
                              'timestamp': 1512095241,
                              'txid': 'eadca0f956a2a60cb3497a7dff1bd80153140a111d2f7db257a264bd9b76f0b3',
                              'type': 'out',
@@ -201,6 +206,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
                              'note': '',
                              'payment_id': '0000000000000000',
                              'subaddr_index': {'major': 2, 'minor': 0},
+                             'address': 'BgCseuY3jFJAZS7kt9mrNg7fEG3bo5BV91CTyKbYu9GFiU6hUZhvdNWCTUdQNPNcA4PyFApsFr3EsQDEDfT3tQSY1mVZeP2',
                              'timestamp': 1511922110,
                              'txid': '5486ae9e6867ceb6e5aa478b32cba5c11d28e6d905c8479565c78e3933163ab6',
                              'type': 'out',
@@ -214,6 +220,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
                              'note': '',
                              'payment_id': '0000000000000000',
                              'subaddr_index': {'major': 2, 'minor': 0},
+                             'address': 'BgCseuY3jFJAZS7kt9mrNg7fEG3bo5BV91CTyKbYu9GFiU6hUZhvdNWCTUdQNPNcA4PyFApsFr3EsQDEDfT3tQSY1mVZeP2',
                              'timestamp': 1512098498,
                              'txid': '9591c8f6832cc3b7908c2447b2feef58c44e7774a5c05cea617ad2f3b3866c18',
                              'type': 'out',
@@ -227,6 +234,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
                              'note': '',
                              'payment_id': '0000000000000000',
                              'subaddr_index': {'major': 2, 'minor': 0},
+                             'address': 'BgCseuY3jFJAZS7kt9mrNg7fEG3bo5BV91CTyKbYu9GFiU6hUZhvdNWCTUdQNPNcA4PyFApsFr3EsQDEDfT3tQSY1mVZeP2',
                              'timestamp': 1511926250,
                              'txid': 'af669b99162d9b514a0e8d3bd1d905e3b8778e6fcb88d172e5e049e909c4cc87',
                              'type': 'out',
@@ -240,6 +248,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
                              'note': '',
                              'payment_id': '0000000000000000',
                              'subaddr_index': {'major': 2, 'minor': 0},
+                             'address': 'BgCseuY3jFJAZS7kt9mrNg7fEG3bo5BV91CTyKbYu9GFiU6hUZhvdNWCTUdQNPNcA4PyFApsFr3EsQDEDfT3tQSY1mVZeP2',
                              'timestamp': 1511914391,
                              'txid': '2fa2de7fbf009093c5319d0421d3e8c684b8351a066c48d51369aedbbfd1d9af',
                              'type': 'out',
@@ -253,45 +262,22 @@ class SubaddrWalletTestCase(unittest.TestCase):
                              'note': '',
                              'payment_id': '0000000000000000',
                              'subaddr_index': {'major': 2, 'minor': 0},
+                             'address': 'BgCseuY3jFJAZS7kt9mrNg7fEG3bo5BV91CTyKbYu9GFiU6hUZhvdNWCTUdQNPNcA4PyFApsFr3EsQDEDfT3tQSY1mVZeP2',
                              'timestamp': 1511928624,
                              'txid': '7e3db6c59c02d870f18b37a37cfc5857eeb5412df4ea00bb1971f3095f72b0d8',
                              'type': 'out',
                              'unlock_time': 0}]}}
-        pay_out = self.wallet.transactions_out()
+        pay_out = self.wallet.outgoing()
         self.assertEqual(len(list(pay_out)), 6)
         for pmt in pay_out:
             self.assertIsInstance(pmt, OutgoingPayment)
-# Once PR#3010 has been merged to Monero, update the JSON and enable the following:
-#            self.assertIsInstance(pmt.sent_from, Address)
+            self.assertIsInstance(pmt.local_address, Address)
             self.assertIsInstance(pmt.amount, Decimal)
             self.assertIsInstance(pmt.timestamp, datetime)
             self.assertIsInstance(pmt.transaction, Transaction)
             self.assertIsInstance(pmt.transaction.fee, Decimal)
             self.assertIsInstance(pmt.transaction.height, int)
-
-    @patch('monero.backends.jsonrpc.requests.post')
-    def test_payments(self, mock_post):
-        mock_post.return_value.status_code = 200
-        mock_post.return_value.json.return_value = self.accounts_result
-        self.wallet = Wallet(JSONRPCWallet())
-        mock_post.return_value.status_code = 200
-        mock_post.return_value.json.return_value = {'id': 0,
-            'jsonrpc': '2.0',
-            'result': {'payments': [{'address': 'BZ9V9tfTDgHYsnAxgeMLaGCUb6yMaGNiZJwiBWQrE23MXcRqSde9DKa9LnPw31o2G8QrdKdUNM7VWhd3dr22ivk54QGqZ6u',
-                          'amount': 2313370000000,
-                          'block_height': 1048268,
-                          'payment_id': 'feedbadbeef12345',
-                          'subaddr_index': {'major': 1, 'minor': 1},
-                          'tx_hash': 'e84343c2ebba4d4d94764e0cd275adee07cf7b4718565513be453d3724f6174b',
-                          'unlock_time': 0}]}}
-        payments = self.wallet.payments(payment_id=0xfeedbadbeef12345)
-        self.assertEqual(len(list(payments)), 1)
-        for pmt in payments:
-            self.assertIsInstance(pmt, IncomingPayment)
-            self.assertIsInstance(pmt.received_by, Address)
-            self.assertIsInstance(pmt.amount, Decimal)
-            self.assertIsInstance(pmt.transaction, Transaction)
-            self.assertIsInstance(pmt.transaction.height, int)
+            self.assertEqual(pmt.note, '')
 
     @patch('monero.backends.jsonrpc.requests.post')
     def test_send_transfer(self, mock_post):

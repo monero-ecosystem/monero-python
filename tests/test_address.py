@@ -58,6 +58,8 @@ class Tests(object):
         self.assertEqual(sa.is_testnet(), self.testnet)
         self.assertEqual(sa2.is_testnet(), self.testnet)
 
+        self.assertNotEqual(a, 0)
+
     def test_idempotence(self):
         a = Address(self.addr)
         a_idem = Address(a)
@@ -83,6 +85,21 @@ class Tests(object):
         self.assertRaises(TypeError, a.with_payment_id, "%x" % (2**64+1))
         s = SubAddress(self.subaddr)
         self.assertRaises(TypeError, s.with_payment_id, 0)
+        self.assertRaises(ValueError, address, 'whatever')
+        self.assertRaises(ValueError, Address, 'whatever')
+        self.assertRaises(ValueError, SubAddress, 'whatever')
+        self.assertRaises(ValueError, IntegratedAddress, 'whatever')
+        # Aeon
+        self.assertRaises(
+            ValueError,
+            address,
+            'Wmtj8UAJhdrhbKvwyBJmLEUZKHcffv2VHNBaq6oTxJFwJjUj3QwMUSS32mddSX7vchbxXdmb4QuZA9TsN47441f61yAYLQYTo')
+        # invalid netbyte
+        self.assertRaises(
+            ValueError,
+            address,
+            'Cf6RinMUztY5otm6NEFjg3UWBBkXK6Lh23wKrLFMEcCY7i3A6aPLH9i4QMCkf6CdWk8Q9N7yoJf7ANKgtQMuPM6JANXgCWs')
+
 
     def test_type_mismatch(self):
         self.assertRaises(ValueError, Address, self.iaddr)

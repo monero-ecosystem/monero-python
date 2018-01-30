@@ -82,26 +82,26 @@ if len(w.accounts) > 1:
         addresses = acc.addresses()
         print("{num:2d} address(es):".format(num=len(addresses)))
         print("\n".join(map(a2str, addresses)))
-        ins = acc.transactions_in(unconfirmed=True)
+        ins = acc.incoming(unconfirmed=True)
         if ins:
             print("\nIncoming transactions:")
             print(_TXHDR.format(dir='received by'))
             for tx in ins:
                 print(pmt2str(tx))
-        outs = acc.transactions_out(unconfirmed=True)
+        outs = acc.outgoing(unconfirmed=True)
         if outs:
             print("\nOutgoing transactions:")
             print(_TXHDR.format(dir='sent from'))
             for tx in outs:
                 print(pmt2str(tx))
 else:
-    ins = w.transactions_in(unconfirmed=True)
+    ins = w.incoming(unconfirmed=True)
     if ins:
         print("\nIncoming transactions:")
         print(_TXHDR.format(dir='received by'))
         for tx in ins:
             print(pmt2str(tx))
-    outs = w.transactions_out(unconfirmed=True)
+    outs = w.outgoing(unconfirmed=True)
     if outs:
         print("\nOutgoing transactions:")
         print(_TXHDR.format(dir='sent from'))
