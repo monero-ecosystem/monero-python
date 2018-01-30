@@ -212,27 +212,18 @@ class JSONRPCWallet(object):
             pmts.extend(_pmts.get('pool', []))
         return list(pmtfilter.filter(map(self._outpayment, pmts)))
 
-    def get_transaction(self, txhash):
-        _tx = self.raw_request('get_transfer_by_txid', {'txid': str(txhash)})['transfer']
-        if _tx['type'] == 'in':
-            return self._inpayment(tx)
-        elif _tx['type'] == 'out':
-            return self._outpayment(tx)
-        return Payment(**self._paymentdict(tx))
-
     def _paymentdict(self, data):
         pid = data.get('payment_id', None)
-        addr = data.get('address', None)
-        if addr:
-            addr = address(addr)
+        laddr = data.get('address', None)
+        if laddr:
+            laddr = address(laddr)
         return {
-            'txhash': data.get('txid', data.get('tx_hash')),
             'payment_id': None if pid is None else PaymentID(pid),
             'amount': from_atomic(data['amount']),
             'timestamp': datetime.fromtimestamp(data['timestamp']) if 'timestamp' in data else None,
             'note': data.get('note', None),
             'transaction': self._tx(data),
-            'address': addr,
+            'local_address': laddr,
         }
 
     def _inpayment(self, data):

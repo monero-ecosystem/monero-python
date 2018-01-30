@@ -7,14 +7,18 @@ class Payment(object):
     amount = None
     timestamp = None
     transaction = None
-    address = None
+    local_address = None
+    note = ''
 
     def __init__(self, **kwargs):
-        self.amount = kwargs.get('amount', self.amount)
-        self.timestamp = kwargs.get('timestamp', self.timestamp)
-        self.payment_id = kwargs.get('payment_id', self.payment_id)
-        self.transaction = kwargs.get('transaction', self.transaction)
-        self.address = kwargs.get('address', self.address)
+        self.amount = kwargs.pop('amount', self.amount)
+        self.timestamp = kwargs.pop('timestamp', self.timestamp)
+        self.payment_id = kwargs.pop('payment_id', self.payment_id)
+        self.transaction = kwargs.pop('transaction', self.transaction)
+        self.local_address = kwargs.pop('local_address', self.local_address)
+        self.note = kwargs.pop('note', self.note)
+        if len(kwargs):
+            raise ValueError("Excessive arguments for {}: {}".format(type(self), kwargs))
 
     def __repr__(self):
         return "{} {:.12f} id={}".format(self.transaction.hash, self.amount, self.payment_id)
@@ -26,12 +30,6 @@ class IncomingPayment(Payment):
 
 
 class OutgoingPayment(Payment):
-    note = ''
-
-    def __init__(self, **kwargs):
-        super(OutgoingPayment, self).__init__(**kwargs)
-        self.note = kwargs.get('note', self.note)
-
     def __repr__(self):
         return "out: {} {:.12f} id={}".format(self.transaction.hash, self.amount, self.payment_id)
 
@@ -82,23 +80,23 @@ class PaymentFilter(object):
         self.max_height = filterparams.pop('max_height', None)
         self.unconfirmed = filterparams.pop('unconfirmed', False)
         self.confirmed = filterparams.pop('confirmed', True)
-        _address = filterparams.pop('address', None)
+        _local_address = filterparams.pop('local_address', None)
         _payment_id = filterparams.pop('payment_id', None)
         if len(filterparams) > 0:
-            raise ValueError("Excessive arguments for payment query: {:r}".format(filterparams))
+            raise ValueError("Excessive arguments for payment query: {}".format(filterparams))
 
-        if _address is None:
-            self.addresses = []
+        if _local_address is None:
+            self.local_addresses = []
         else:
-            if isinstance(_address, _str_types):
-                addresses = [_address]
+            if isinstance(_local_address, _str_types):
+                local_addresses = [_local_address]
             else:
                 try:
-                    iter(_address)
-                    addresses = _address
+                    iter(_local_address)
+                    local_addresses = _local_address
                 except TypeError:
-                    addresses = [_address]
-            self.addresses = list(map(address, addresses))
+                    local_addresses = [_local_address]
+            self.local_addresses = list(map(address, local_addresses))
         if _payment_id is None:
             self.payment_ids = []
         else:
@@ -129,7 +127,7 @@ class PaymentFilter(object):
                 return False
         if self.payment_ids and payment.payment_id not in self.payment_ids:
             return False
-        if self.addresses and payment.address not in self.addresses:
+        if self.local_addresses and payment.local_address not in self.local_addresses:
             return False
         return True
 

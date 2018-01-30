@@ -23,12 +23,12 @@ class Address(object):
     _valid_netbytes = (18, 53)
     # NOTE: _valid_netbytes order is (real, testnet)
 
-    def __init__(self, address, label=None):
-        address = str(address)
-        if not _ADDR_REGEX.match(address):
+    def __init__(self, addr, label=None):
+        addr = str(addr)
+        if not _ADDR_REGEX.match(addr):
             raise ValueError("Address must be 95 characters long base58-encoded string, "
-                "is {addr} ({len} chars length)".format(addr=address, len=len(address)))
-        self._decode(address)
+                "is {addr} ({len} chars length)".format(addr=addr, len=len(addr)))
+        self._decode(addr)
         self.label = label or self.label
 
     def _decode(self, address):
@@ -86,7 +86,7 @@ class Address(object):
             return str(self) == str(other)
         if isinstance(other, str):
             return str(self) == other
-        return super()
+        return super(Address, self).__eq__(other)
 
 
 class SubAddress(Address):
@@ -148,12 +148,12 @@ def address(addr, label=None):
             return Address(addr, label=label)
         elif netbyte in SubAddress._valid_netbytes:
             return SubAddress(addr, label=label)
-        raise ValueError("Invalid address netbyte {nb}. Allowed values are: {allowed}".format(
-            nb=hexlify(chr(netbyte)),
+        raise ValueError("Invalid address netbyte {nb:x}. Allowed values are: {allowed}".format(
+            nb=netbyte,
             allowed=", ".join(map(
                 lambda b: '%02x' % b,
                 sorted(Address._valid_netbytes + SubAddress._valid_netbytes)))))
     elif _IADDR_REGEX.match(addr):
         return IntegratedAddress(addr)
     raise ValueError("Address must be either 95 or 106 characters long base58-encoded string, "
-        "is {addr} ({len} chars length)".format(addr=address, len=len(address)))
+        "is {addr} ({len} chars length)".format(addr=addr, len=len(addr)))

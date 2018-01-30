@@ -59,4 +59,4 @@ class PaymentID(object):
             return int(self) == other
         elif isinstance(other, _str_types):
             return str(self) == other
-        return super()
+        return super(PaymentID, self).__eq__(other)

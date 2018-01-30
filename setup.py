@@ -24,4 +24,5 @@ setup(
         'Programming Language :: Python',
     ],
     keywords = 'monero cryptocurrency',
+    test_suite='tests',
 )
