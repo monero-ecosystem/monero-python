@@ -8,8 +8,8 @@ class Daemon(object):
     def height(self):
         return self._backend.info()['height']
 
-    def send_transaction(self, tx):
-        return self._backend.send_transaction(tx.blob)
+    def send_transaction(self, tx, relay=True):
+        return self._backend.send_transaction(tx.blob, relay=relay)
 
     def mempool(self):
         return self._backend.mempool()
