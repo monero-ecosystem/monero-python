@@ -27,10 +27,10 @@ class JSONRPCDaemon(object):
         info = self.raw_jsonrpc_request('get_info')
         return info
 
-    def send_transaction(self, blob):
+    def send_transaction(self, blob, relay=True):
         res = self.raw_request('/sendrawtransaction', {
             'tx_as_hex': blob,
-            'do_not_relay': False})
+            'do_not_relay': not relay})
         if res['status'] == 'OK':
             return res
         raise exceptions.TransactionBroadcastError(

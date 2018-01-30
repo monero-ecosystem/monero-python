@@ -22,6 +22,8 @@ argsparser.add_argument('-v', dest='verbosity', action='count', default=0,
     help="Verbosity (repeat to increase; -v for INFO, -vv for DEBUG")
 argsparser.add_argument('-i', dest='tx_filenames', nargs='+', default=None,
     help="Files with transaction data. Will read from stdin if not given.")
+argsparser.add_argument('--no-relay', dest='relay', action='store_false',
+    help="Do not relay the transaction (it will stay at the node unless mined or expired)")
 args = argsparser.parse_args()
 level = logging.WARNING
 if args.verbosity == 1:
@@ -38,7 +40,7 @@ for name, blob in blobs:
     logging.debug("Sending {}".format(name))
     tx = Transaction(blob=blob)
     try:
-        res = d.send_transaction(tx)
+        res = d.send_transaction(tx, relay=args.relay)
     except exceptions.TransactionBroadcastError as e:
         print("{} not sent, reason: {}".format(name, e.details['reason']))
         logging.debug(e.details)
