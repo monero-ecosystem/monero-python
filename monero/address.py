@@ -35,7 +35,7 @@ class Address(object):
         self._decoded = bytearray(unhexlify(base58.decode(address)))
         checksum = self._decoded[-4:]
         if checksum != keccak_256(self._decoded[:-4]).digest()[:4]:
-            raise ValueError("Invalid checksum")
+            raise ValueError("Invalid checksum in address {}".format(address))
         if self._decoded[0] not in self._valid_netbytes:
             raise ValueError("Invalid address netbyte {nb}. Allowed values are: {allowed}".format(
                 nb=self._decoded[0],

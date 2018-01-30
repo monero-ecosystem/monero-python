@@ -170,7 +170,7 @@ class JSONRPCWallet(object):
         return (from_atomic(_balance['balance']), from_atomic(_balance['unlocked_balance']))
 
     def transfers_in(self, account, pmtfilter):
-        params = {'account_index': account}
+        params = {'account_index': account, 'pending': False}
         method = 'get_transfers'
         if pmtfilter.unconfirmed:
             params['in'] = pmtfilter.confirmed
@@ -179,7 +179,7 @@ class JSONRPCWallet(object):
         else:
             if pmtfilter.payment_ids:
                 method = 'get_bulk_payments'
-                params['payment_id'] = pmtfilter.payment_ids
+                params['payment_ids'] = list(map(str, pmtfilter.payment_ids))
             else:
                 params['in'] = pmtfilter.confirmed
                 params['out'] = False
@@ -192,9 +192,9 @@ class JSONRPCWallet(object):
             if pmtfilter.max_height:
                 params['max_height'] = pmtfilter.max_height
                 params['filter_by_height'] = True
-        elif pmtfilter.min_height:
+        else:
             arg = 'payments'
-            params['min_block_height'] = pmtfilter.min_height
+            params['min_block_height'] = pmtfilter.min_height or 0
         _pmts = self.raw_request(method, params)
         pmts = _pmts.get(arg, [])
         if pmtfilter.unconfirmed:
@@ -206,10 +206,11 @@ class JSONRPCWallet(object):
             'account_index': account,
             'in': False,
             'out': pmtfilter.confirmed,
-            'pool': pmtfilter.unconfirmed})
+            'pool': False,
+            'pending': pmtfilter.unconfirmed})
         pmts = _pmts.get('out', [])
         if pmtfilter.unconfirmed:
-            pmts.extend(_pmts.get('pool', []))
+            pmts.extend(_pmts.get('pending', []))
         return list(pmtfilter.filter(map(self._outpayment, pmts)))
 
     def _paymentdict(self, data):

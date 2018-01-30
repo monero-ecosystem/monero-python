@@ -183,3 +183,6 @@ class FiltersTestCase(unittest.TestCase):
             local_address='9tQoHWyZ4yXUgbz9nvMcFZUfDy5hxcdZabQCxmNCUukKYicXegsDL7nQpcUa3A1pF6K3fhq3scsyY88tdB1MqucULcKzWZC',
             payment_id='03f6649304ea4cb2')
         self.assertEqual(len(pmts), 1)
+
+    def test_filter_excessive(self):
+        self.assertRaises(ValueError, self.wallet.incoming, excessive_argument='foo')
