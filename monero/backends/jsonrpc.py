@@ -194,7 +194,8 @@ class JSONRPCWallet(object):
                 params['max_height'] = pmtfilter.max_height
                 params['filter_by_height'] = True
             # PR#3235 makes the following obsolete
-            params['max_height'] = params.get('max_height', 2**64-1)
+            # CRYPTONOTE_MAX_BLOCK_NUMBER = 500000000
+            params['max_height'] = params.get('max_height', 500000000)
         else:
             arg = 'payments'
             # NOTE: the API uses (min, max] range which is confusing
