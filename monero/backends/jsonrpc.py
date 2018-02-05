@@ -187,14 +187,18 @@ class JSONRPCWallet(object):
         if method == 'get_transfers':
             arg = 'in'
             if pmtfilter.min_height:
-                params['min_height'] = pmtfilter.min_height
+                # NOTE: the API uses (min, max] range which is confusing
+                params['min_height'] = pmtfilter.min_height - 1
                 params['filter_by_height'] = True
             if pmtfilter.max_height:
                 params['max_height'] = pmtfilter.max_height
                 params['filter_by_height'] = True
+            # PR#3235 makes the following obsolete
+            params['max_height'] = params.get('max_height', 2**64-1)
         else:
             arg = 'payments'
-            params['min_block_height'] = pmtfilter.min_height or 0
+            # NOTE: the API uses (min, max] range which is confusing
+            params['min_block_height'] = (pmtfilter.min_height or 1) - 1
         _pmts = self.raw_request(method, params)
         pmts = _pmts.get(arg, [])
         if pmtfilter.unconfirmed:
