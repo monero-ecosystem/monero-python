@@ -10,6 +10,8 @@ class Payment(object):
     local_address = None
     note = ''
 
+    _reprstr = "{} @ {} {:.12f} id={}"
+
     def __init__(self, **kwargs):
         self.amount = kwargs.pop('amount', self.amount)
         self.timestamp = kwargs.pop('timestamp', self.timestamp)
@@ -21,17 +23,16 @@ class Payment(object):
             raise ValueError("Excessive arguments for {}: {}".format(type(self), kwargs))
 
     def __repr__(self):
-        return "{} {:.12f} id={}".format(self.transaction.hash, self.amount, self.payment_id)
+        return self._reprstr.format(
+            self.transaction.hash, self.transaction.height or 'pool', self.amount, self.payment_id)
 
 
 class IncomingPayment(Payment):
-    def __repr__(self):
-        return "in: {} {:.12f} id={}".format(self.transaction.hash, self.amount, self.payment_id)
+    _reprstr = "in: {} @ {} {:.12f} id={}"
 
 
 class OutgoingPayment(Payment):
-    def __repr__(self):
-        return "out: {} {:.12f} id={}".format(self.transaction.hash, self.amount, self.payment_id)
+    _reprstr = "out: {} @ {} {:.12f} id={}"
 
 
 class Transaction(object):
