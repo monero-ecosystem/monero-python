@@ -16,11 +16,11 @@ where, as the name suggests, all tests are supposed to be run. It's also a
 place for early deployment of future features of the currency itself. You may
 read `a brief explanation at stackexchange`_.
 
-**Please run all tests on testnet.** The code presented in these docs will
-perform the requested operations right away, without asking for confirmation.
-This is live code, not a wallet application that makes sure the user has not
-made a mistake. **Running on the live net, if you make a mistake, you may lose
-money.**
+.. warning:: **Please run all tests on testnet.** The code presented in these docs will
+    perform the requested operations right away, without asking for confirmation.
+    This is live code, not a wallet application that makes sure the user has not
+    made a mistake. **Running on the live net, if you make a mistake, you may lose
+    money.**
 
 .. _a brief explanation at stackexchange: https://monero.stackexchange.com/questions/1591/what-is-the-monero-testnet-how-can-i-participate-in-it
 

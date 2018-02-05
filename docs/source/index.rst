@@ -17,6 +17,7 @@ planned as well.
    quickstart
    wallet
    address
+   transactions
    daemon
    backends
    exceptions

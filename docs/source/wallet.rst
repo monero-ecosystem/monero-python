@@ -93,6 +93,9 @@ As mentioned above, the wallet by default operates on the first account, so
 
 In the next chapter we will :doc:`learn about addresses <address>`.
 
+API reference
+-------------
+
 .. automodule:: monero.wallet
    :members:
 

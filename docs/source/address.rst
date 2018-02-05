@@ -165,7 +165,7 @@ Long payment IDs cannot be integrated:
     TypeError: Payment ID 000000000000000000000000000000000000000000000001234567890abcdef0 has more than 64 bits and cannot be integrated
 
 API reference
-=============
+-------------
 
 .. automodule:: monero.address
    :members:
