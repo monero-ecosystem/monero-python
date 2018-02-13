@@ -140,8 +140,102 @@ payment object:
 Mempool: Unconfirmed payments
 -----------------------------
 
+New transactions, before they are mined in the blocks, land in place called mempool. Each network
+node updates the mempool contents with new transactions coming from their peers, while offering
+them the transactions they do not have.
+
+.. warning:: The presence of a transaction in the mempool is an indication that someone has already
+    attempted a payment, but **should never be used as a proof the payment has been done**. A
+    transaction in mempool might be replaced by another one spending the same funds, it might
+    expire before being included in a block due to competition of other transactions with higher
+    fees. It might also be a result of a sophisticated attack.
+
+    **With significant amounts you should also wait for a few confirmations to appear.** The top
+    of the blockchain sometimes gets replaced by a competing block. It is a popular practice to
+    wait for at least 6 confirmations to appear, which is also the standard in Monero before funds
+    get unlocked and can be used in subsequent transactions.
+
+However, it is possible to query the wallet for transactions in the mempool. You may use them as
+proofs of payment for less significant amounts where time of acceptance is more important than
+limiting the risk of a fraud.
+
+By default, the queries check only the blockchain. This behavior can be changed by ``confirmed``
+and ``unconfirmed`` query parameters that accept boolean values:
+
+.. code-block:: python
+
+    In [12]: wallet.incoming(unconfirmed=True, confirmed=False)
+    Out[12]: [in: 21fd4c0b2671bfc32d7c968fdf3cab1001042128d9429d4a26d4f3dc76bcecb8 @ pool 3.141592653589 id=0000000000000000]
+
+    In [13]: incoming[0].transaction.height is None
+    Out[13]: True
+
+    In [14]: wallet.confirmations(incoming[0])
+    Out[14]: 0
+
+
+You may as well query for both confirmed and unconfirmed transactions using
+``wallet.incoming(unconfirmed=True)`` (the default value for ``confirmed`` is ``True``).
+
 Sending payments
 ----------------
+
+There are two methods for sending Monero. For a single payment use the ``transfer`` method of
+``Wallet`` or ``Account`` object.
+
+It returns a list of resulting transactions. In most cases it will contain only one element, but
+sometimes, for example when many small inputs are used, it might become necessary to split the
+payment into multiple transactions.
+
+.. code-block:: python
+
+    In [15]: from decimal import Decimal
+
+    In [16]: txs = wallet.transfer(
+        'BdYguH2fVo3G37o8bKp8RbTRuRsTpvBaUdxeo9fj6LFrE2XqNMYKytvBLXvNtnbmXtDUwrKLcpeH4NCuhFL2cXikDV4Rzq6',
+        Decimal('2.54'))
+
+    In [17]: txs
+    Out[17]: [f6e7532322f2cab837e668e7ee7be38f0ca4c0cb8c6cff7aa1cfaaf764735acb]
+
+    In [18]: txs[0].height is None
+    Out[18]: True
+
+    In [19]: wallet.confirmations(txs[0])
+    Out[19]: 0
+
+    In [20]: wallet.outgoing(unconfirmed=True, confirmed=False)
+    Out[20]: [out: f6e7532322f2cab837e668e7ee7be38f0ca4c0cb8c6cff7aa1cfaaf764735acb @ pool 2.540000000000 id=0000000000000000]
+
+
+When sending multiple payments at once, it is more convenient and cheaper in terms of network fees
+to use ``transfer_multiple``:
+
+.. code-block:: python
+
+    In [25]: txs = wallet.transfer_multiple([
+        ('Ba8xvGs5qw1JfiQVJDj8D28NuyL7MuKsB59jtnx2q1ydH4CazTWfJo9iKvTyeYEoYYQ6RT6A1DfoSj1UiwssKfdjUNumu2K', Decimal('0.11')),
+        ('BcVT4P2r1Md1DftWBDKHdK38Md6NtFPu4Heof8atNpxx7zbKfhMtRmUUMooU4cJuH4EKXrpke5A77XVbPhekWuiCSTaDFjw', Decimal('1.22')),
+        ('Bf2xXxMLdH9gyh35o6LEyKCz6ZsPRmcujBU9rFK81Brd8HmynFj16KFHAYCETU625hY2x7XBH7CvjCHAC6bxQfsjN77Jv7e', Decimal('2.33'))])
+
+    In [26]: txs
+    Out[26]: [2785a1ad7f6d794802ea27a00e679f8c9706be0ec0b78b73d3182c551c6d69d2]
+
+    In [28]: wallet.outgoing(unconfirmed=True, confirmed=False)
+    Out[28]: [out: 2785a1ad7f6d794802ea27a00e679f8c9706be0ec0b78b73d3182c551c6d69d2 @ pool 3.660000000000 id=0000000000000000]
+
+    In [29]: txs[0].fee
+    Out[29]: Decimal('0.006282400000')
+
+The fee is something you might like to verify before sending the transaction to the network.
+In such case you'd probably be interested in the chapter about :doc:`interaction with daemon
+<daemon>`.
+
+There are some additional options you may set when sending transfer, like payment ID, priority,
+ring size or unlock time. See API reference below for details.
+
+.. note:: Be aware that transactions sent from another instance of the same wallet will not appear
+    in mempool queries. They will, of course, become visible once mined.
 
 API reference
 -------------
