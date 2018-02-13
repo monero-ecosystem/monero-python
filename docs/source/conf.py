@@ -47,8 +47,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Monero Python module'
-copyright = '2018, Michał Sałaban'
-author = 'Michał Sałaban'
+copyright = '2018, Michal Salaban'
+author = 'Michal Salaban'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -140,7 +140,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'MoneroPythonmodule.tex', 'Monero Python module Documentation',
-     'Michał Sałaban', 'manual'),
+     'Michal Salaban', 'manual'),
 ]
 
 
