@@ -129,11 +129,11 @@ class JSONRPCWallet(object):
     def accounts(self):
         accounts = []
         try:
-            _accounts = self.raw_request('get_accounts')
+            _accounts = self.raw_request('get_accounts', squelch_error_logging=True)
         except MethodNotFound:
             # monero <= 0.11 : there's only one account and one address
             _log.debug('Monero <= 0.11 found, no accounts')
-            self._master_address = self.get_addresses()[0]
+            self._master_address = self.addresses()[0]
             return [Account(self, 0)]
         idx = 0
         self._master_address = Address(_accounts['subaddress_accounts'][0]['base_address'])
@@ -275,7 +275,7 @@ class JSONRPCWallet(object):
             d['payment_id'] = payment_id
         return [self._tx(data) for data in _pertx]
 
-    def raw_request(self, method, params=None):
+    def raw_request(self, method, params=None, squelch_error_logging=False):
         hdr = {'Content-Type': 'application/json'}
         data = {'jsonrpc': '2.0', 'id': 0, 'method': method, 'params': params or {}}
         _log.debug(u"Method: {method}\nParams:\n{params}".format(
@@ -295,7 +295,12 @@ class JSONRPCWallet(object):
 
         if 'error' in result:
             err = result['error']
-            _log.error(u"JSON RPC error:\n{result}".format(result=_ppresult))
+            if not squelch_error_logging:
+                _log.error(u"JSON RPC error:\n{result}".format(result=_ppresult))
+            # XXX: workaround for 0.11 bug throwing a wrong error code
+            if err['code'] == -4 and 'not enough money' in err['message']:
+                raise exceptions.NotEnoughMoney(err['message'])
+            #
             if err['code'] in _err2exc:
                 raise _err2exc[err['code']](err['message'])
             else:
