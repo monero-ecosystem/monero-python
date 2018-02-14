@@ -177,6 +177,8 @@ and ``unconfirmed`` query parameters that accept boolean values:
 You may as well query for both confirmed and unconfirmed transactions using
 ``wallet.incoming(unconfirmed=True)`` (the default value for ``confirmed`` is ``True``).
 
+.. _sending-payments:
+
 Sending payments
 ----------------
 
