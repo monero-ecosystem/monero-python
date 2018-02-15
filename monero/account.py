@@ -72,7 +72,9 @@ class Account(object):
 
         :param address: destination :class:`Address <monero.address.Address>` or subtype
         :param amount: amount to send
-        :param priority: transaction priority (implies fee)
+        :param priority: transaction priority, implies fee. The priority can be a number
+                    from 1 to 4 (unimportant, normal, elevated, priority) or a constant
+                    from `monero.prio`.
         :param ringsize: the ring size (mixin + 1)
         :param payment_id: ID for the payment (must be None if
                         :class:`IntegratedAddress <monero.address.IntegratedAddress>`
@@ -100,7 +102,9 @@ class Account(object):
 
         :param destinations: a list of destination and amount pairs:
                     [(:class:`Address <monero.address.Address>`, `Decimal`), ...]
-        :param priority: transaction priority (implies fee)
+        :param priority: transaction priority, implies fee. The priority can be a number
+                    from 1 to 4 (unimportant, normal, elevated, priority) or a constant
+                    from `monero.prio`.
         :param ringsize: the ring size (mixin + 1)
         :param payment_id: ID for the payment (must be None if
                         :class:`IntegratedAddress <monero.address.IntegratedAddress>`

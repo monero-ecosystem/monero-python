@@ -25,6 +25,15 @@ def as_monero(amount):
 
 
 class PaymentID(object):
+    """
+    A class that validates Monero payment ID.
+
+    Payment IDs can be used as str or int across the module, however this class
+    offers validation as well as simple conversion and comparison to those two
+    primitive types.
+
+    :param payment_id: the payment ID as integer or hexadecimal string
+    """
     _payment_id = None
 
     def __init__(self, payment_id):
@@ -41,7 +50,7 @@ class PaymentID(object):
 
     def is_short(self):
         """Returns True if payment ID is short enough to be included
-        in Integrated Address."""
+        in :class:`IntegratedAddress <monero.address.IntegratedAddress>`."""
         return self._payment_id.bit_length() <= 64
 
     def __repr__(self):
