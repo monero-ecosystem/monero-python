@@ -13,12 +13,11 @@ _IADDR_REGEX = re.compile(r'^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqr
 class Address(object):
     """Monero address.
 
-    Address of this class is the master address for a wallet.
+    Address of this class is the master address for a :class:`Wallet <monero.wallet.Wallet>`.
 
     :param address: a Monero address as string-like object
     :param label: a label for the address (defaults to `None`)
     """
-
     label = None
     _valid_netbytes = (18, 53)
     # NOTE: _valid_netbytes order is (real, testnet)
@@ -65,10 +64,11 @@ class Address(object):
     def with_payment_id(self, payment_id=0):
         """Integrates payment id into the address.
 
-        :param payment_id: int, hexadecimal string or PaymentID (max 64-bit long)
+        :param payment_id: int, hexadecimal string or :class:`PaymentID <monero.numbers.PaymentID>`
+                    (max 64-bit long)
 
-        :rtype: IntegratedAddress
-        :raises: TypeError if the payment id is too long
+        :rtype: `IntegratedAddress`
+        :raises: `TypeError` if the payment id is too long
         """
         payment_id = numbers.PaymentID(payment_id)
         if not payment_id.is_short():
@@ -92,7 +92,7 @@ class Address(object):
 class SubAddress(Address):
     """Monero subaddress.
 
-    Any type of wallet address which is not the master one.
+    Any type of address which is not the master one for a wallet.
     """
 
     _valid_netbytes = (42, 63)
@@ -119,13 +119,13 @@ class IntegratedAddress(Address):
     def payment_id(self):
         """Returns the integrated payment id.
 
-        :rtype: PaymentID
+        :rtype: :class:`PaymentID <monero.numbers.PaymentID>`
         """
         return numbers.PaymentID(hexlify(self._decoded[65:-4]).decode())
 
     def base_address(self):
         """Returns the base address without payment id.
-        :rtype: Address
+        :rtype: :class:`Address`
         """
         prefix = 53 if self.is_testnet() else 18
         data = bytearray([prefix]) + self._decoded[1:65]
@@ -139,7 +139,7 @@ def address(addr, label=None):
     :param addr: the address as a string-like object
     :param label: a label for the address (defaults to `None`)
 
-    :rtype: Address, SubAddress or IntegratedAddress
+    :rtype: :class:`Address`, :class:`SubAddress` or :class:`IntegratedAddress`
     """
     addr = str(addr)
     if _ADDR_REGEX.match(addr):
