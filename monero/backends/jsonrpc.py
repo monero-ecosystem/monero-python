@@ -16,6 +16,14 @@ _log = logging.getLogger(__name__)
 
 
 class JSONRPCDaemon(object):
+    """
+    JSON RPC backend for Monero daemon
+
+    :param protocol: `http` or `https`
+    :param host: host name or IP
+    :param port: port number
+    :param path: path for JSON RPC requests (should not be changed)
+    """
     def __init__(self, protocol='http', host='127.0.0.1', port=18081, path='/json_rpc'):
         self.url = '{protocol}://{host}:{port}'.format(
                 protocol=protocol,
@@ -99,6 +107,16 @@ class JSONRPCDaemon(object):
 
 
 class JSONRPCWallet(object):
+    """
+    JSON RPC backend for Monero wallet (``monero-wallet-rpc``)
+
+    :param protocol: `http` or `https`
+    :param host: host name or IP
+    :param port: port number
+    :param path: path for JSON RPC requests (should not be changed)
+    :param user: username to authenticate with over RPC
+    :param password: password to authenticate with over RPC
+    """
     _master_address = None
     _addresses = None
 

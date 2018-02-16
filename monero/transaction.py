@@ -3,6 +3,13 @@ from .address import address
 from .numbers import PaymentID
 
 class Payment(object):
+    """
+    A payment base class, representing payment not associated with any
+    :class:`Account <monero.account.Account>`.
+
+    This class is not intended to be turned into objects by the user,
+    it is used by backends.
+    """
     payment_id = None
     amount = None
     timestamp = None
@@ -28,14 +35,29 @@ class Payment(object):
 
 
 class IncomingPayment(Payment):
+    """
+    An incoming payment (one that increases the balance of an
+    :class:`Account <monero.account.Account>`)
+    """
     _reprstr = "in: {} @ {} {:.12f} id={}"
 
 
 class OutgoingPayment(Payment):
+    """
+    An outgoing payment (one that decreases the balance of an
+    :class:`Account <monero.account.Account>`)
+    """
     _reprstr = "out: {} @ {} {:.12f} id={}"
 
 
 class Transaction(object):
+    """
+    A Monero transaction. Identified by `hash`, it can be a part of a block of some `height`
+    or not yet mined (`height` is `None` then).
+
+    This class is not intended to be turned into objects by the user,
+    it is used by backends.
+    """
     hash = None
     fee = None
     height = None
@@ -62,6 +84,13 @@ else:
 
 
 class PaymentManager(object):
+    """
+    A payment query manager, handling either incoming or outgoing payments of
+    an :class:`Account <monero.account.Account>`.
+
+    This class is not intended to be turned into objects by the user,
+    it is used by backends.
+    """
     account_idx = 0
     backend = None
 
@@ -76,6 +105,12 @@ class PaymentManager(object):
 
 
 class PaymentFilter(object):
+    """
+    A helper class that filters payments retrieved by the backend.
+
+    This class is not intended to be turned into objects by the user,
+    it is used by backends.
+    """
     def __init__(self, **filterparams):
         self.min_height = filterparams.pop('min_height', None)
         self.max_height = filterparams.pop('max_height', None)

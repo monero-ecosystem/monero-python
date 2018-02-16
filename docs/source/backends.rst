@@ -24,5 +24,5 @@ the official `Wallet RPC`_ documentation.
 API reference
 -------------
 
-.. automodule:: monero.backends
+.. automodule:: monero.backends.jsonrpc
    :members:
