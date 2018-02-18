@@ -89,18 +89,9 @@ class JSONRPCDaemon(object):
         if 'error' in result:
             err = result['error']
             _log.error(u"JSON RPC error:\n{result}".format(result=_ppresult))
-#            if err['code'] in _err2exc:
-#                raise _err2exc[err['code']](err['message'])
-#            else:
-#                raise RPCError(
-#                    "Method '{method}' failed with RPC Error of unknown code {code}, "
-#                    "message: {message}".format(method=method, data=data, result=result, **err))
             raise RPCError(
                 "Method '{method}' failed with RPC Error of unknown code {code}, "
                 "message: {message}".format(method=method, data=data, result=result, **err))
-#
-#
-#
         return result['result']
 
 
