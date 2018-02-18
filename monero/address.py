@@ -170,6 +170,9 @@ class newAddress:
 	modulo = integer % ed25519.l
 	return hexlify(ed25519.encodeint(modulo))
 
+    def hexSeed(self):
+	return self.hex_seed
+
     def secretSpendKey(self):
 	return self.sc_reduce(self.hex_seed)
 
