@@ -160,40 +160,40 @@ def address(addr, label=None):
     raise ValueError("Address must be either 95 or 106 characters long base58-encoded string, "
         "is {addr} ({len} chars length)".format(addr=addr, len=len(addr)))
 
-class newAddress:
+class NewAddress:
 
     def __init__(self):
-        self.hex_seed = hexlify(os.urandom(32))
+        self.hexSeed = hexlify(os.urandom(32))
 
     def sc_reduce(self, input):
         integer = ed25519.decodeint(unhexlify(input))
-	modulo = integer % ed25519.l
-	return hexlify(ed25519.encodeint(modulo))
+        modulo = integer % ed25519.l
+        return hexlify(ed25519.encodeint(modulo))
 
-    def hexSeed(self):
-	return self.hex_seed
+    def hex_seed(self):
+        return self.hexSeed
 
-    def secretSpendKey(self):
-	return self.sc_reduce(self.hex_seed)
+    def secret_spend_key(self):
+        return self.sc_reduce(self.hexSeed)
 
-    def secretViewKey(self):
-	h = keccak_256()
-	h.update(unhexlify(self.secretSpendKey()))
-	return self.sc_reduce(h.hexdigest())
+    def secret_view_key(self):
+        h = keccak_256()
+        h.update(unhexlify(self.secret_spend_key()))
+        return self.sc_reduce(h.hexdigest())
 
-    def publicSpendKey(self):
-	keyInt = ed25519.decodeint(unhexlify(self.secretSpendKey()))
-	aG = ed25519.scalarmultbase(keyInt)
-	return hexlify(ed25519.encodepoint(aG))
+    def public_spend_key(self):
+        keyInt = ed25519.decodeint(unhexlify(self.secret_spend_key()))
+        aG = ed25519.scalarmultbase(keyInt)
+        return hexlify(ed25519.encodepoint(aG))
 
-    def publicViewKey(self):
-	keyInt = ed25519.decodeint(unhexlify(self.secretViewKey()))
-	aG = ed25519.scalarmultbase(keyInt)
-	return hexlify(ed25519.encodepoint(aG))
+    def public_view_key(self):
+        keyInt = ed25519.decodeint(unhexlify(self.secret_view_key()))
+        aG = ed25519.scalarmultbase(keyInt)
+        return hexlify(ed25519.encodepoint(aG))
 
-    def publicAddress(self):
-	data = "12" + self.publicSpendKey() + self.publicViewKey()
-	h = keccak_256()
-	h.update(unhexlify(data))
-	checksum = h.hexdigest()
-	return base58.encode(data + checksum[0:8])
+    def public_address(self):
+        data = str.encode("12") + self.public_spend_key() + self.public_view_key()
+        h = keccak_256()
+        h.update(unhexlify(data))
+        checksum = str.encode(h.hexdigest())
+        return base58.encode(data + checksum[0:8])
