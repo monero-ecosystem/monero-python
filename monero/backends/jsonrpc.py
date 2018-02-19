@@ -10,6 +10,7 @@ from .. import exceptions
 from ..account import Account
 from ..address import address, Address, SubAddress
 from ..numbers import from_atomic, to_atomic, PaymentID
+from ..seed import Seed
 from ..transaction import Transaction, IncomingPayment, OutgoingPayment
 
 _log = logging.getLogger(__name__)
@@ -133,7 +134,7 @@ class JSONRPCWallet(object):
         return self.raw_request('query_key', {'key_type': 'view_key'})['key']
 
     def seed(self):
-        return self.raw_request('query_key', {'key_type': 'mnemonic'})['key']
+        return Seed(self.raw_request('query_key', {'key_type': 'mnemonic'})['key'])
 
     def accounts(self):
         accounts = []
