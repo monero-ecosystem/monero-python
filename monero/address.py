@@ -157,4 +157,3 @@ def address(addr, label=None):
         return IntegratedAddress(addr)
     raise ValueError("Address must be either 95 or 106 characters long base58-encoded string, "
         "is {addr} ({len} chars length)".format(addr=addr, len=len(addr)))
-
