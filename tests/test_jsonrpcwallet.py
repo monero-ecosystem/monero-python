@@ -10,6 +10,7 @@ from monero.wallet import Wallet
 from monero.account import Account
 from monero.address import Address, address
 from monero.numbers import PaymentID
+from monero.seed import Seed
 from monero.transaction import IncomingPayment, OutgoingPayment, Transaction
 from monero.backends.jsonrpc import JSONRPCWallet
 
@@ -33,6 +34,22 @@ class SubaddrWalletTestCase(unittest.TestCase):
                                          'unlocked_balance': 7256159239955}],
                 'total_balance': 236153709446071,
                 'total_unlocked_balance': 236153709446071}}
+
+    @patch('monero.backends.jsonrpc.requests.post')
+    def test_seed(self, mock_post):
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json.return_value = self.accounts_result
+        self.wallet = Wallet(JSONRPCWallet())
+        phrase = 'phrases petals speedy fuming ascend weird duplex identity ' \
+           'yearbook masterful elope omission height empty react hope ' \
+           'left iceberg leisure bobsled pyramid ammo sorry tiers ' \
+           'pyramid'
+        mock_post.return_value.json.return_value = {'id': 0,
+            'jsonrpc': '2.0',
+            'result': {'key': phrase}}
+        seed = self.wallet.seed()
+        self.assertIsInstance(seed, Seed)
+        self.assertEqual(seed.phrase, phrase)
 
     @patch('monero.backends.jsonrpc.requests.post')
     def test_balance(self, mock_post):

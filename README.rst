@@ -3,10 +3,15 @@ Python Monero module
 
 A comprehensive Python module for handling Monero cryptocurrency.
 
-    * release 0.1.1
-    * Please read `the docs`_ (incomplete yet)
+* release 0.1.3
+* works with Monero 0.11.x and `the latest source`_ (at least we try to keep up)
+* Python 2.x and 3.x compatible
+* comes with `documentation`_
+* generously funded by `Monero FFS`_ donors
 
-.. _`The docs`: http://monero-python.readthedocs.io/en/latest/transactions.html
+.. _`the latest source`: https://github.com/monero-project/monero
+.. _`documentation`: http://monero-python.readthedocs.io/en/latest/
+.. _`Monero FFS`: https://forum.getmonero.org/9/work-in-progress
 
 Copyrights
 ----------

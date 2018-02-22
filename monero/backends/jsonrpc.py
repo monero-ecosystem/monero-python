@@ -10,6 +10,7 @@ from .. import exceptions
 from ..account import Account
 from ..address import address, Address, SubAddress
 from ..numbers import from_atomic, to_atomic, PaymentID
+from ..seed import Seed
 from ..transaction import Transaction, IncomingPayment, OutgoingPayment
 
 _log = logging.getLogger(__name__)
@@ -89,18 +90,9 @@ class JSONRPCDaemon(object):
         if 'error' in result:
             err = result['error']
             _log.error(u"JSON RPC error:\n{result}".format(result=_ppresult))
-#            if err['code'] in _err2exc:
-#                raise _err2exc[err['code']](err['message'])
-#            else:
-#                raise RPCError(
-#                    "Method '{method}' failed with RPC Error of unknown code {code}, "
-#                    "message: {message}".format(method=method, data=data, result=result, **err))
             raise RPCError(
                 "Method '{method}' failed with RPC Error of unknown code {code}, "
                 "message: {message}".format(method=method, data=data, result=result, **err))
-#
-#
-#
         return result['result']
 
 
@@ -142,7 +134,7 @@ class JSONRPCWallet(object):
         return self.raw_request('query_key', {'key_type': 'view_key'})['key']
 
     def seed(self):
-        return self.raw_request('query_key', {'key_type': 'mnemonic'})['key']
+        return Seed(self.raw_request('query_key', {'key_type': 'mnemonic'})['key'])
 
     def accounts(self):
         accounts = []
@@ -351,3 +343,4 @@ _err2exc = {
     -38: exceptions.NoDaemonConnection, # PR 3197
     -32601: MethodNotFound,
 }
+

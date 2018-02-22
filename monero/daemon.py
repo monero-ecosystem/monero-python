@@ -35,4 +35,9 @@ class Daemon(object):
         return self._backend.send_transaction(tx.blob, relay=relay)
 
     def mempool(self):
+        """
+        Returns current mempool contents.
+
+        :rtype: list of :class:`Transaction <monero.transaction.Transaction>`
+        """
         return self._backend.mempool()
