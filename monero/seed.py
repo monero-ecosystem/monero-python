@@ -31,8 +31,11 @@
 #     https://github.com/spesmilo/electrum/blob/master/lib/old_mnemonic.py ch:9a0aa9b4783ea03ea13c6d668e080e0cdf261c5b
 
 from monero import wordlists
-from binascii import crc32, hexlify
+from monero import ed25519
+from monero import base58
+from binascii import crc32, hexlify, unhexlify
 from os import urandom
+from sha3 import keccak_256
 
 class Seed(object):
     """Creates a seed object either from local system randomness or an imported phrase.
@@ -139,6 +142,39 @@ class Seed(object):
         is_match = get_checksum(self.phrase) == phrase[-1]
         assert is_match, "Not valid checksum"
         return is_match
+
+    def sc_reduce(self, input):
+        integer = ed25519.decodeint(unhexlify(input))
+        modulo = integer % ed25519.l
+        return hexlify(ed25519.encodeint(modulo))
+
+    def hex_seed(self):
+        return self.hex
+
+    def secret_spend_key(self):
+        return self.sc_reduce(self.hex)
+
+    def secret_view_key(self):
+        h = keccak_256()
+        h.update(unhexlify(self.secret_spend_key()))
+        return self.sc_reduce(h.hexdigest())
+
+    def public_spend_key(self):
+        keyInt = ed25519.decodeint(unhexlify(self.secret_spend_key()))
+        aG = ed25519.scalarmultbase(keyInt)
+        return hexlify(ed25519.encodepoint(aG))
+
+    def public_view_key(self):
+        keyInt = ed25519.decodeint(unhexlify(self.secret_view_key()))
+        aG = ed25519.scalarmultbase(keyInt)
+        return hexlify(ed25519.encodepoint(aG))
+
+    def public_address(self):
+        data = str.encode("12") + self.public_spend_key() + self.public_view_key()
+        h = keccak_256()
+        h.update(unhexlify(data))
+        checksum = str.encode(h.hexdigest())
+        return base58.encode(data + checksum[0:8])
 
 
 def get_checksum(phrase):
