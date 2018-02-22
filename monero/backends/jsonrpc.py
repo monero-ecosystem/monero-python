@@ -343,3 +343,4 @@ _err2exc = {
     -38: exceptions.NoDaemonConnection, # PR 3197
     -32601: MethodNotFound,
 }
+
