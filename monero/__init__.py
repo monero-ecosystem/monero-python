@@ -1,3 +1,3 @@
 from . import address, account, daemon, wallet, numbers, prio
 
-__version__ = '0.1.2'
+__version__ = '0.1.3'
