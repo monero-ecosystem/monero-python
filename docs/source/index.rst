@@ -24,6 +24,7 @@ Project homepage: https://github.com/emesik/monero-python
    transactions
    daemon
    backends
+   seed
    misc
    exceptions
    license
