@@ -24,3 +24,9 @@ Copyright (c) 2016 The MoneroPy Developers (``monero/base58.py`` taken from `Mon
 
 .. _`LICENSE.txt`: LICENSE.txt
 .. _`MoneroPy`: https://github.com/bigreddmachine/MoneroPy
+
+Want to help?
+-------------
+
+If you find this project useful, please consider a donation to the following address:
+``481SgRxo8hwBCY4z6r88JrN5X8JFCJYuJUDuJXGybTwaVKyoJPKoGj3hQRAEGgQTdmV1xH1URdnHkJv6He5WkEbq6iKhr94``
