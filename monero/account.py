@@ -65,7 +65,7 @@ class Account(object):
         return self._backend.new_address(account=self.index, label=label)
 
     def transfer(self, address, amount,
-            priority=prio.NORMAL, ringsize=5, payment_id=None, unlock_time=0,
+            priority=prio.NORMAL, ringsize=7, payment_id=None, unlock_time=0,
             relay=True):
         """
         Sends a transfer. Returns a list of resulting transactions.
@@ -95,7 +95,7 @@ class Account(object):
             relay=relay)
 
     def transfer_multiple(self, destinations,
-            priority=prio.NORMAL, ringsize=5, payment_id=None, unlock_time=0,
+            priority=prio.NORMAL, ringsize=7, payment_id=None, unlock_time=0,
             relay=True):
         """
         Sends a batch of transfers. Returns a list of resulting transactions.

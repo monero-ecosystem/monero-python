@@ -150,7 +150,7 @@ class Wallet(object):
         return self.accounts[0].new_address(label=label)
 
     def transfer(self, address, amount,
-            priority=prio.NORMAL, ringsize=5, payment_id=None, unlock_time=0,
+            priority=prio.NORMAL, ringsize=7, payment_id=None, unlock_time=0,
             relay=True):
         """
         Sends a transfer from the default account. Returns a list of resulting transactions.
@@ -180,7 +180,7 @@ class Wallet(object):
                 relay=relay)
 
     def transfer_multiple(self, destinations,
-            priority=prio.NORMAL, ringsize=5, payment_id=None, unlock_time=0,
+            priority=prio.NORMAL, ringsize=7, payment_id=None, unlock_time=0,
             relay=True):
         """
         Sends a batch of transfers from the default account. Returns a list of resulting
