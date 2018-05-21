@@ -19,8 +19,8 @@ class Address(object):
     :param label: a label for the address (defaults to `None`)
     """
     label = None
-    _valid_netbytes = (18, 53)
-    # NOTE: _valid_netbytes order is (real, testnet)
+    _valid_netbytes = (18, 53, 24)
+    # NOTE: _valid_netbytes order is (mainnet, testnet, stagenet)
 
     def __init__(self, addr, label=None):
         addr = str(addr)
@@ -40,12 +40,26 @@ class Address(object):
                 nb=self._decoded[0],
                 allowed=", ".join(map(lambda b: '%02x' % b, self._valid_netbytes))))
 
+    def is_mainnet(self):
+        """Returns `True` if the address belongs to mainnet.
+
+        :rtype: bool
+        """
+        return self._decoded[0] == self._valid_netbytes[0]
+
     def is_testnet(self):
         """Returns `True` if the address belongs to testnet.
 
         :rtype: bool
         """
         return self._decoded[0] == self._valid_netbytes[1]
+
+    def is_stagenet(self):
+        """Returns `True` if the address belongs to stagenet.
+
+        :rtype: bool
+        """
+        return self._decoded[0] == self._valid_netbytes[2]
 
     def view_key(self):
         """Returns public view key.
@@ -73,7 +87,7 @@ class Address(object):
         payment_id = numbers.PaymentID(payment_id)
         if not payment_id.is_short():
             raise TypeError("Payment ID {0} has more than 64 bits and cannot be integrated".format(payment_id))
-        prefix = 54 if self.is_testnet() else 19
+        prefix = 54 if self.is_testnet() else 25 if self.is_stagenet() else 19
         data = bytearray([prefix]) + self._decoded[1:65] + struct.pack('>Q', int(payment_id))
         checksum = bytearray(keccak_256(data).digest()[:4])
         return IntegratedAddress(base58.encode(hexlify(data + checksum)))
@@ -95,7 +109,8 @@ class SubAddress(Address):
     Any type of address which is not the master one for a wallet.
     """
 
-    _valid_netbytes = (42, 63)
+    _valid_netbytes = (42, 63, 36)
+    # NOTE: _valid_netbytes order is (mainnet, testnet, stagenet)
 
     def with_payment_id(self, _):
         raise TypeError("SubAddress cannot be integrated with payment ID")
@@ -107,7 +122,8 @@ class IntegratedAddress(Address):
     A master address integrated with payment id (short one, max 64 bit).
     """
 
-    _valid_netbytes = (19, 54)
+    _valid_netbytes = (19, 54, 25)
+    # NOTE: _valid_netbytes order is (mainnet, testnet, stagenet)
 
     def __init__(self, address):
         address = str(address)
@@ -127,7 +143,7 @@ class IntegratedAddress(Address):
         """Returns the base address without payment id.
         :rtype: :class:`Address`
         """
-        prefix = 53 if self.is_testnet() else 18
+        prefix = 53 if self.is_testnet() else 24 if self.is_stagenet() else 18
         data = bytearray([prefix]) + self._decoded[1:65]
         checksum = keccak_256(data).digest()[:4]
         return Address(base58.encode(hexlify(data + checksum)))

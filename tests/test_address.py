@@ -33,8 +33,12 @@ class Tests(object):
         self.assertEqual(a, a2)
         self.assertEqual(a, self.addr)
         self.assertEqual(self.addr, a)
+        self.assertEqual(a.is_mainnet(), self.mainnet)
         self.assertEqual(a.is_testnet(), self.testnet)
+        self.assertEqual(a.is_stagenet(), self.stagenet)
+        self.assertEqual(a2.is_mainnet(), self.mainnet)
         self.assertEqual(a2.is_testnet(), self.testnet)
+        self.assertEqual(a2.is_stagenet(), self.stagenet)
 
         ia = IntegratedAddress(self.iaddr)
         ia2 = address(self.iaddr)
@@ -42,8 +46,12 @@ class Tests(object):
         self.assertEqual(ia, ia2)
         self.assertEqual(ia, self.iaddr)
         self.assertEqual(self.iaddr, ia)
+        self.assertEqual(ia.is_mainnet(), self.mainnet)
         self.assertEqual(ia.is_testnet(), self.testnet)
+        self.assertEqual(ia.is_stagenet(), self.stagenet)
+        self.assertEqual(ia2.is_mainnet(), self.mainnet)
         self.assertEqual(ia2.is_testnet(), self.testnet)
+        self.assertEqual(ia2.is_stagenet(), self.stagenet)
         self.assertEqual(ia2.base_address(), a)
 
         self.assertEqual(ia.view_key(), a.view_key())
@@ -55,8 +63,12 @@ class Tests(object):
         self.assertEqual(sa, sa2)
         self.assertEqual(sa, self.subaddr)
         self.assertEqual(self.subaddr, sa)
+        self.assertEqual(sa.is_mainnet(), self.mainnet)
         self.assertEqual(sa.is_testnet(), self.testnet)
+        self.assertEqual(sa.is_stagenet(), self.stagenet)
+        self.assertEqual(sa2.is_mainnet(), self.mainnet)
         self.assertEqual(sa2.is_testnet(), self.testnet)
+        self.assertEqual(sa2.is_stagenet(), self.stagenet)
 
         self.assertNotEqual(a, 0)
 
@@ -120,7 +132,9 @@ class AddressTestCase(unittest.TestCase, Tests):
     pid = '4a6f686e47616c74'
     subaddr = '83bK2pMxCQXdRyd6W1haNWYRsF6Qb3iGa8gxKEynm9U7cYoXrMHFwRrFFuxRSgnLtGe7LM8SmrPY6L3TVBa3UV3YLuVJ7Rw'
     iaddr = '4DHKLPmWW8aBoEbSyzKVbbDRmc8nsnpZLUpQBYvhUxs3KVrodnaFaBEQMDp69u4VaiEG3LSQXA6M61mXPrztCLuhAR6GpL18QNwE8h3TuF'
+    mainnet = True
     testnet = False
+    stagenet = False
     addr_invalid = '43aeKax1ts4boEbSyzKVbbDRmc8nsnpZLUpQBYvhUxs3KVrodnaFaBEQMDp69u4VaiEG3LSQXA6M61mXPrztCLuh7PFUAmd'
     iaddr_invalid = '4DHKLpmWW8aBoEbSyzKVbbDRmc8nsnpZLUpQBYvhUxs3KVrodnaFaBEQMDp69u4VaiEG3LSQXA6M61mXPrztCLuhAR6GpL18QNwE8h3TuF'
 
@@ -132,6 +146,22 @@ class TestnetAddressTestCase(AddressTestCase, Tests):
     pid = '4a6f686e47616c74'
     iaddr = 'A6PA4wkzmeyWik5QSUSoGYicdvvsbSNHrT9Arsx1XBTz6VrWPSgfmnUKSPZDMyX4Ms8R9TkhB4uFqK9s5LUBbV6YbfyqvDecDn3E7cvp9b'
     subaddr = 'BbBjyYoYNNwFfL8RRVRTMiZUofBLpjRxdNnd5E4LyGcAK5CEsnL3gmE5QkrDRta7RPficGHcFdR6rUwWcjnwZVvCE3tLxhJ'
+    mainnet = False
     testnet = True
+    stagenet = False
     addr_invalid = '9vgV48wWAPTWik5QSUSoGYicdvvsbSNHrT9Arsx1XBTz6VrWPSgfmnUKSPZDMyX4Ms8R9TkhB4uFqK9s5LUbbV6YQN2Q9ag'
     iaddr_invalid = 'A6PA4wkzmeyWik5qSUSoGYicdvvsbSNHrT9Arsx1XBTz6VrWPSgfmnUKSPZDMyX4Ms8R9TkhB4uFqK9s5LUBbV6YbfyqvDecDn3E7cvp9b'
+
+
+class StagenetAddressTestCase(AddressTestCase, Tests):
+    addr = '56cXYWG13YKaT9z1aEy2hb9TZNnxrW3zE9S4nTQVDux5Qq7UYsmjuux3Zstxkorj9HAufyWLU3FwHW4uERQF6tkeUVogGN3'
+    psk = '7e33891fe6ea30c7fd79d48e250906329104dc77407cf732699f41564df8ca8e'
+    pvk = '77a3720428f91f0f58a196bb374f703b3ca45fa55f0764adc81ff241c4c797f3'
+    pid = '4a6f686e47616c74'
+    iaddr = '5GKCZK5VeoqaT9z1aEy2hb9TZNnxrW3zE9S4nTQVDux5Qq7UYsmjuux3Zstxkorj9HAufyWLU3FwHW4uERQF6tkehhE4RH8N7QfEAC8jMy'
+    subaddr = '7417qYoKBoYXCugU2KvJBZExmyjav4n1MVME74AeWNwxQ39wKtbWdyP6YGuMK6C7HkAjBuVcbUYmCWbxDLwk9GAX4qyb48U'
+    mainnet = False
+    testnet = False
+    stagenet = True
+    addr_invalid ='7417qYoKBoYXCugU2KvJBZExmyjav4n1MVME74AeWNwxQ39wKtbWdyP6YGuMK6C7HkAjBuVcbUYmCWbyDLwk9GAX4qyb48U'
+    iaddr_invalid = '5GKCZK5VeuqaT9z1aEy2hb9TZNnxrW3zE9S4nTQVDux5Qq7UYsmjuux3Zstxkorj9HAufyWLU3FwHW4uERQF6tkehhE4RH8N7QfEAC8jMy'
