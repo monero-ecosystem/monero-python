@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import argparse
 from decimal import Decimal
 import operator

@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import sys
 from monero.address import address
 from monero.numbers import PaymentID
