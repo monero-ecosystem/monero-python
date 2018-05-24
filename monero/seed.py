@@ -30,6 +30,7 @@
 #     https://github.com/bigreddmachine/MoneroPy/blob/master/moneropy/mnemonic.py ch: 80cc16c39b16c55a8d052fbf7fae68644f7a5f02
 #     https://github.com/spesmilo/electrum/blob/master/lib/old_mnemonic.py ch:9a0aa9b4783ea03ea13c6d668e080e0cdf261c5b
 
+from monero import address
 from monero import wordlists
 from monero import ed25519
 from monero import base58
@@ -146,7 +147,7 @@ class Seed(object):
     def sc_reduce(self, input):
         integer = ed25519.decodeint(unhexlify(input))
         modulo = integer % ed25519.l
-        return hexlify(ed25519.encodeint(modulo))
+        return hexlify(ed25519.encodeint(modulo)).decode()
 
     def hex_seed(self):
         return self.hex
@@ -162,18 +163,28 @@ class Seed(object):
     def public_spend_key(self):
         keyInt = ed25519.decodeint(unhexlify(self.secret_spend_key()))
         aG = ed25519.scalarmultbase(keyInt)
-        return hexlify(ed25519.encodepoint(aG))
+        return hexlify(ed25519.encodepoint(aG)).decode()
 
     def public_view_key(self):
         keyInt = ed25519.decodeint(unhexlify(self.secret_view_key()))
         aG = ed25519.scalarmultbase(keyInt)
-        return hexlify(ed25519.encodepoint(aG))
+        return hexlify(ed25519.encodepoint(aG)).decode()
 
-    def public_address(self):
-        data = str.encode("12") + self.public_spend_key() + self.public_view_key()
+    def public_address(self, net='mainnet'):
+        """Returns the master :class:`Address <monero.address.Address>` represented by the seed.
+
+        :param net: the network, one of 'mainnet', 'testnet', 'stagenet'. Default is 'mainnet'.
+
+        :rtype: :class:`Address <monero.address.Address>`
+        """
+        if net not in ('mainnet', 'testnet', 'stagenet'):
+            raise ValueError(
+                "Invalid net argument. Must be one of ('mainnet', 'testnet', 'stagenet').")
+        netbyte = 18 if net == 'mainnet' else 53 if net == 'testnet' else 24
+        data = "{:x}{:s}{:s}".format(netbyte, self.public_spend_key(), self.public_view_key())
         h = keccak_256()
         h.update(unhexlify(data))
-        checksum = str.encode(h.hexdigest())
+        checksum = h.hexdigest()
         return base58.encode(data + checksum[0:8])
 
 

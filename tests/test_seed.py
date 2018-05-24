@@ -61,5 +61,31 @@ class SeedTestCase(unittest.TestCase):
             Seed("\\x008")
         self.assertEqual(ts.expected, ValueError)
 
+
+    def test_keys(self):
+        seed = Seed("adjust mugged vaults atlas nasty mews damp toenail suddenly toxic possible "\
+            "framed succeed fuzzy return demonstrate nucleus album noises peculiar virtual "\
+            "rowboat inorganic jester fuzzy")
+        self.assertTrue(seed.validate_checksum())
+        self.assertEqual(
+            seed.secret_spend_key(),
+            '482700617ba810f94035d7f4d7ccc1a29878e165b4867872b705204c85406906')
+        self.assertEqual(
+            seed.secret_view_key(),
+            '09ed72c713d3e9e19bef2f5204cf85f6cb25de7842aa0722abeb12697f171903')
+        self.assertEqual(
+            seed.public_spend_key(),
+            '4ee576f52b9c6a824a3d5c2832d117177d2bb9992507c2c78788bb8dbaf4b640')
+        self.assertEqual(
+            seed.public_view_key(),
+            'e1ef99d66312ec0b16b17c66c591ab59594e21621588b63b62fa69fe615a768e')
+        self.assertEqual(
+            seed.public_address(),
+            '44cWztNFdAqNnycvZbUoj44vsbAEmKnx9aNgkjHdjtMsBrSeKiY8J4s2raH7EMawA2Fwo9utaRTV7Aw8EcTMNMxhH4YtKdH')
+        self.assertEqual(
+            seed.public_address(net='stagenet'),
+            '54pZ5jHDGmwNnycvZbUoj44vsbAEmKnx9aNgkjHdjtMsBrSeKiY8J4s2raH7EMawA2Fwo9utaRTV7Aw8EcTMNMxhH6cuARW')
+
+
 if __name__ == "__main__":
     unittest.main()
