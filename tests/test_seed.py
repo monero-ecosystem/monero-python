@@ -86,6 +86,19 @@ class SeedTestCase(unittest.TestCase):
             seed.public_address(net='stagenet'),
             '54pZ5jHDGmwNnycvZbUoj44vsbAEmKnx9aNgkjHdjtMsBrSeKiY8J4s2raH7EMawA2Fwo9utaRTV7Aw8EcTMNMxhH6cuARW')
 
+        seed = Seed("dwelt idols lopped blender haggled rabbits piloted value swagger taunts toolbox upgrade swagger")
+        self.assertTrue(seed.validate_checksum())
+        # the following fails, #21 addresses that
+        self.assertEqual(
+            seed.secret_spend_key(),
+            'a67505f92004dd6242b64acd16e34ecf788a2d28b6072091e054238d84591403')
+        self.assertEqual(
+            seed.secret_view_key(),
+            '83f652cb370948c8cbcf06839df043aa8c0d0ed36e38b3c827c4c00370af1a0f')
+        self.assertEqual(
+            seed.public_address(),
+            '47dwi1w9it69yZyTBBRD52ctQqw3B2FZx79bCEgVUKGHH2m7MjmaXrjeQfchMMkarG6AF9a36JvBWCyRaqEcUixpKLQRxdj')
+
 
 if __name__ == "__main__":
     unittest.main()
