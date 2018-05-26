@@ -66,6 +66,7 @@ class SeedTestCase(unittest.TestCase):
         seed = Seed("adjust mugged vaults atlas nasty mews damp toenail suddenly toxic possible "\
             "framed succeed fuzzy return demonstrate nucleus album noises peculiar virtual "\
             "rowboat inorganic jester fuzzy")
+        self.assertFalse(seed.is_mymonero())
         self.assertTrue(seed.validate_checksum())
         self.assertEqual(
             seed.secret_spend_key(),
@@ -87,6 +88,7 @@ class SeedTestCase(unittest.TestCase):
             '54pZ5jHDGmwNnycvZbUoj44vsbAEmKnx9aNgkjHdjtMsBrSeKiY8J4s2raH7EMawA2Fwo9utaRTV7Aw8EcTMNMxhH6cuARW')
 
         seed = Seed("dwelt idols lopped blender haggled rabbits piloted value swagger taunts toolbox upgrade swagger")
+        self.assertTrue(seed.is_mymonero())
         self.assertTrue(seed.validate_checksum())
         # the following fails, #21 addresses that
         self.assertEqual(

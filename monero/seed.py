@@ -85,6 +85,9 @@ class Seed(object):
             self.hex = generate_hex()
             self.encode_seed()
 
+    def is_mymonero(self):
+        """Returns True if the seed is MyMonero-style (12/13-word)."""
+        return len(self.hex) == 32
 
     def endian_swap(self, word):
         """Given any string, swap bits and return the result.
@@ -152,12 +155,19 @@ class Seed(object):
     def hex_seed(self):
         return self.hex
 
+    def _hex_seed_keccak(self):
+        h = keccak_256()
+        h.update(unhexlify(self.hex))
+        return h.hexdigest()
+
     def secret_spend_key(self):
-        return self.sc_reduce(self.hex)
+        a = self._hex_seed_keccak() if self.is_mymonero() else self.hex
+        return self.sc_reduce(a)
 
     def secret_view_key(self):
+        b = self._hex_seed_keccak() if self.is_mymonero() else self.secret_spend_key()
         h = keccak_256()
-        h.update(unhexlify(self.secret_spend_key()))
+        h.update(unhexlify(b))
         return self.sc_reduce(h.hexdigest())
 
     def public_spend_key(self):
