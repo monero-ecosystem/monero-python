@@ -3,6 +3,8 @@ Mnemonic seeds
 
 You can utilize the ``Seed`` class in order to generate or supply a 25 word mnemonic seed. From this mnemonic seed you can derive public and private spend keys, public and private view keys, and public wallet address. Read more about mnemonic seeds `here`_.
 
+The class also reads 12 or 13 word seeds, also known as *MyMonero style*.
+
 .. _here: https://getmonero.org/resources/moneropedia/mnemonicseed.html
 
 .. warning:: This class deals with highly sensitive strings in both inputs and outputs.
