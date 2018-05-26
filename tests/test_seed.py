@@ -79,6 +79,8 @@ class SeedTestCase(unittest.TestCase):
 
         seed = Seed("dwelt idols lopped blender haggled rabbits piloted value swagger taunts toolbox upgrade swagger")
         self.assertTrue(seed.is_mymonero())
+        # check if the same seed without checksum matches the hex
+        self.assertEqual(seed.hex, Seed(" ".join(seed.phrase.split(" ")[:12])).hex)
         # the following fails, #21 addresses that
         self.assertEqual(
             seed.secret_spend_key(),
