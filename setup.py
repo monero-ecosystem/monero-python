@@ -9,7 +9,7 @@ setup(
     version = version,
     description = 'A comprehensive Python module for handling Monero cryptocurrency',
     url = 'https://github.com/emesik/monero-python/',
-    long_description = open('README.rst').read(),
+    long_description = open('README.rst', encoding = 'utf8').read(),
     install_requires = open('requirements.txt', 'r').read().splitlines(),
     packages = find_packages('.', exclude=['tests']),
     include_package_data = True,
