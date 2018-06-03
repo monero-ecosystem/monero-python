@@ -39,7 +39,7 @@ from monero import address
 from monero import wordlists
 from monero import ed25519
 from monero import base58
-from binascii import crc32, hexlify, unhexlify
+from binascii import hexlify, unhexlify
 from os import urandom
 from sha3 import keccak_256
 
@@ -49,19 +49,18 @@ class Seed(object):
     :rtype: :class:`Seed <monero.seed.Seed>`
     """
 
-    n = 1626
-    wordlist = wordlists.english.wordlist # default english for now
-
-    phrase = "" #13 or 25 word mnemonic word string
-    hex = "" # hexadecimal
-
-    def __init__(self, phrase_or_hex=""):
+    def __init__(self, phrase_or_hex="", wordlist="English"):
         """If user supplied a seed string to the class, break it down and determine
         if it's hexadecimal or mnemonic word string. Gather the values and store them.
         If no seed is passed, automatically generate a new one from local system randomness.
 
         :rtype: :class:`Seed <monero.seed.Seed>`
         """
+        self.phrase = "" #13 or 25 word mnemonic word string
+        self.hex = "" # hexadecimal
+
+        self.word_list = wordlists.get_wordlist(wordlist)
+
         if phrase_or_hex:
             seed_split = phrase_or_hex.split(" ")
             if len(seed_split) >= 24:
@@ -94,41 +93,15 @@ class Seed(object):
         """Returns True if the seed is MyMonero-style (12/13-word)."""
         return len(self.hex) == 32
 
-    def endian_swap(self, word):
-        """Given any string, swap bits and return the result.
-
-        :rtype: str
-        """
-        return "".join([word[i:i+2] for i in [6, 4, 2, 0]])
-
     def _encode_seed(self):
         """Convert hexadecimal string to mnemonic word representation with checksum.
         """
-        out = []
-        for i in range(len(self.hex) // 8):
-            word = self.endian_swap(self.hex[8*i:8*i+8])
-            x = int(word, 16)
-            w1 = x % self.n
-            w2 = (x // self.n + w1) % self.n
-            w3 = (x // self.n // self.n + w2) % self.n
-            out += [self.wordlist[w1], self.wordlist[w2], self.wordlist[w3]]
-        checksum = get_checksum(" ".join(out))
-        out.append(checksum)
-        self.phrase = " ".join(out)
+        self.phrase = self.word_list.encode(self.hex)
 
     def _decode_seed(self):
         """Calculate hexadecimal representation of the phrase.
         """
-        phrase = self.phrase.split(" ")
-        out = ""
-        for i in range(len(phrase) // 3):
-            word1, word2, word3 = phrase[3*i:3*i+3]
-            w1 = self.wordlist.index(word1)
-            w2 = self.wordlist.index(word2) % self.n
-            w3 = self.wordlist.index(word3) % self.n
-            x = w1 + self.n *((w2 - w1) % self.n) + self.n * self.n * ((w3 - w2) % self.n)
-            out += self.endian_swap("%08x" % x)
-        self.hex = out
+        self.hex = self.word_list.decode(self.phrase)
 
     def _validate_checksum(self):
         """Given a mnemonic word string, confirm seed checksum (last word) matches the computed checksum.
@@ -136,7 +109,7 @@ class Seed(object):
         :rtype: bool
         """
         phrase = self.phrase.split(" ")
-        if get_checksum(self.phrase) == phrase[-1]:
+        if self.word_list.get_checksum(self.phrase) == phrase[-1]:
             return True
         raise ValueError("Invalid checksum")
 
@@ -190,25 +163,6 @@ class Seed(object):
         checksum = h.hexdigest()
         return base58.encode(data + checksum[0:8])
 
-
-def get_checksum(phrase):
-    """Given a mnemonic word string, return a string of the computed checksum.
-
-    :rtype: str
-    """
-    phrase_split = phrase.split(" ")
-    if len(phrase_split) < 12:
-        raise ValueError("Invalid mnemonic phrase")
-    if len(phrase_split) > 13:
-        # Standard format
-        phrase = phrase_split[:24]
-    else:
-        # MyMonero format
-        phrase = phrase_split[:12]
-    wstr = "".join(word[:3] for word in phrase)
-    z = ((crc32(wstr.encode()) & 0xffffffff) ^ 0xffffffff ) >> 0
-    z2 = ((z ^ 0xffffffff) >> 0) % len(phrase)
-    return phrase_split[z2]
 
 def generate_hex(n_bytes=32):
     """Generate a secure and random hexadecimal string. 32 bytes by default, but arguments can override.

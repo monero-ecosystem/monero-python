@@ -1,7 +1,8 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import unittest
-from monero.seed import Seed, get_checksum
+from monero.seed import Seed
 
 class SeedTestCase(unittest.TestCase):
 
