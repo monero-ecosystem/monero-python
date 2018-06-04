@@ -35,10 +35,10 @@
 #   + simplified interface, changed exceptions (assertions -> explicit raise)
 #   + optimization
 
-from monero import address
 from monero import wordlists
 from monero import ed25519
 from monero import base58
+from monero.address import address
 from binascii import hexlify, unhexlify
 from os import urandom
 from sha3 import keccak_256
@@ -161,7 +161,7 @@ class Seed(object):
         h = keccak_256()
         h.update(unhexlify(data))
         checksum = h.hexdigest()
-        return base58.encode(data + checksum[0:8])
+        return address(base58.encode(data + checksum[0:8]))
 
 
 def generate_hex(n_bytes=32):

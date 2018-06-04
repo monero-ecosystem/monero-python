@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
+from monero.address import Address
 from monero.seed import Seed
 from monero.wordlists import list_wordlists
 
@@ -75,9 +76,11 @@ class SeedTestCase(unittest.TestCase):
         self.assertEqual(
             seed.public_address(),
             '44cWztNFdAqNnycvZbUoj44vsbAEmKnx9aNgkjHdjtMsBrSeKiY8J4s2raH7EMawA2Fwo9utaRTV7Aw8EcTMNMxhH4YtKdH')
+        self.assertIsInstance(seed.public_address(), Address)
         self.assertEqual(
             seed.public_address(net='stagenet'),
             '54pZ5jHDGmwNnycvZbUoj44vsbAEmKnx9aNgkjHdjtMsBrSeKiY8J4s2raH7EMawA2Fwo9utaRTV7Aw8EcTMNMxhH6cuARW')
+        self.assertIsInstance(seed.public_address(net='stagenet'), Address)
 
         seed = Seed("dwelt idols lopped blender haggled rabbits piloted value swagger taunts toolbox upgrade swagger")
         self.assertTrue(seed.is_mymonero())
@@ -93,6 +96,7 @@ class SeedTestCase(unittest.TestCase):
         self.assertEqual(
             seed.public_address(),
             '47dwi1w9it69yZyTBBRD52ctQqw3B2FZx79bCEgVUKGHH2m7MjmaXrjeQfchMMkarG6AF9a36JvBWCyRaqEcUixpKLQRxdj')
+        self.assertIsInstance(seed.public_address(), Address)
 
     def test_languages(self):
         for wordlist in list_wordlists():
