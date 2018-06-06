@@ -1,8 +1,29 @@
 # -*- coding: utf-8 -*-
+import codecs
+import os
+import re
 from distutils.core import setup
+
 from setuptools import find_packages
 
-version = __import__('monero').__version__
+here = os.path.abspath(os.path.dirname(__file__))
+
+
+def find_version(*parts):
+    """
+    Figure out version number without importing the package.
+    https://packaging.python.org/guides/single-sourcing-package-version/
+    """
+    with codecs.open(os.path.join(here, *parts), 'r', errors='ignore') as fp:
+        version_file = fp.read()
+    version_match = re.search(r"^__version__ = ['\"](.*)['\"]",
+                              version_file, re.M)
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError("Unable to find version string.")
+
+
+version = find_version('monero', '__init__.py')
 
 setup(
     name = 'monero-python',
