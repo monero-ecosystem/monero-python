@@ -50,3 +50,21 @@ Want to help?
 
 If you find this project useful, please consider a donation to the following address:
 ``481SgRxo8hwBCY4z6r88JrN5X8JFCJYuJUDuJXGybTwaVKyoJPKoGj3hQRAEGgQTdmV1xH1URdnHkJv6He5WkEbq6iKhr94``
+
+
+Development
+-----------
+
+1. Clone the repo
+2. Create virtualenv & activate it, `python3.6 -m venv .venv`
+3. Install dependencies
+
+.. code-block:: python
+    pip install -r requirements.txt -r test_requirements.txt`
+
+4. Do your thing
+
+5. Run tests
+
+.. code-block:: python
+    pytest

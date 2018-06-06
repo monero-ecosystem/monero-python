@@ -1,10 +1,13 @@
 import unittest
 
 from monero.address import Address, SubAddress, IntegratedAddress, address
+from tests.utils import classproperty
 
 
 class Tests(object):
-    __test__ = False
+    @classproperty
+    def __test__(cls):
+        return issubclass(cls, unittest.TestCase)
 
     def test_from_and_to_string(self):
         a = Address(self.addr)
@@ -114,7 +117,6 @@ class Tests(object):
             ValueError,
             address,
             'Cf6RinMUztY5otm6NEFjg3UWBBkXK6Lh23wKrLFMEcCY7i3A6aPLH9i4QMCkf6CdWk8Q9N7yoJf7ANKgtQMuPM6JANXgCWs')
-
 
     def test_type_mismatch(self):
         self.assertRaises(ValueError, Address, self.iaddr)
