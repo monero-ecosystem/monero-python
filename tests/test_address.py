@@ -2,7 +2,10 @@ import unittest
 
 from monero.address import Address, SubAddress, IntegratedAddress, address
 
+
 class Tests(object):
+    __test__ = False
+
     def test_from_and_to_string(self):
         a = Address(self.addr)
         self.assertEqual(str(a), self.addr)
