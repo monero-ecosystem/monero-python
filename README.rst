@@ -56,15 +56,23 @@ Development
 -----------
 
 1. Clone the repo
-2. Create virtualenv & activate it, `python3.6 -m venv .venv`
+2. Create virtualenv & activate it
+
+.. code-block:: bash
+
+    python3.6 -m venv .venv
+    source .venv/bin/activate
+
 3. Install dependencies
 
-.. code-block:: python
-    pip install -r requirements.txt -r test_requirements.txt`
+.. code-block:: bash
+
+    pip install -r requirements.txt -r test_requirements.txt
 
 4. Do your thing
 
 5. Run tests
 
-.. code-block:: python
+.. code-block:: bash
+
     pytest
