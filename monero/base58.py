@@ -14,7 +14,7 @@ __fullEncodedBlockSize = 11
 
 def _hexToBin(hex):
     if len(hex) % 2 != 0:
-        return "Hex string has invalid length!"
+        raise ValueError("Hex string has invalid length!")
     return [int(hex[i*2:i*2+2], 16) for i in range(len(hex)//2)]
 
 def _binToHex(bin):
@@ -30,7 +30,7 @@ def _uint8be_to_64(data):
     l_data = len(data)
 
     if l_data < 1 or l_data > 8:
-        return "Invalid input length"
+        raise ValueError("Invalid input length: %d" % l_data)
 
     res = 0
     switch = 9 - l_data
@@ -52,13 +52,13 @@ def _uint8be_to_64(data):
         elif switch == 8:
             res = res << 8 | data[i]
         else:
-            return "Impossible condition"
+            raise ValueError("Impossible condition (9 - l_data = %d)" % switch)
     return res
 
 def _uint64_to_8be(num, size):
     res = [0] * size;
     if size < 1 or size > 8:
-        return "Invalid input length"
+        raise ValueError("Invalid input length: %d" % size)
 
     twopow8 = 2**8
     for i in range(size-1,-1,-1):
@@ -71,7 +71,7 @@ def encode_block(data, buf, index):
     l_data = len(data)
 
     if l_data < 1 or l_data > __fullEncodedBlockSize:
-        return "Invalid block length: " + str(l_data)
+        raise ValueError("Invalid block length: %d" % l_data)
 
     num = _uint8be_to_64(data)
     i = __encodedBlockSizes[l_data] - 1
@@ -112,28 +112,28 @@ def decode_block(data, buf, index):
     l_data = len(data)
 
     if l_data < 1 or l_data > __fullEncodedBlockSize:
-        return "Invalid block length: " + l_data
+        raise ValueError("Invalid block length: %d" % l_data)
 
     res_size = __encodedBlockSizes.index(l_data)
     if res_size <= 0:
-        return "Invalid block size"
+        raise ValueError("Invalid block size: %d" % res_size)
 
     res_num = 0
     order = 1
     for i in range(l_data-1, -1, -1):
         digit = __alphabet.index(data[i])
         if digit < 0:
-            return "Invalid symbol"
+            raise ValueError("Invalid symbol: %s" % data[i])
 
         product = order * digit + res_num
         if product > __UINT64MAX:
-            return "Overflow"
+            raise ValueError("Overflow: %d * %d + %d = %d" % (order, digit, res_num, product))
 
         res_num = product
         order = order * __b58base
 
     if res_size < __fullBlockSize and 2**(8 * res_size) <= res_num:
-        return "Overflow 2"
+        raise ValueError("Overflow: %d doesn't fit in %d bit(s)" % (res_num, res_size))
 
     tmp_buf = _uint64_to_8be(res_num, res_size)
     for i in range(len(tmp_buf)):
@@ -154,7 +154,7 @@ def decode(enc):
     last_block_decoded_size = __encodedBlockSizes.index(last_block_size)
 
     if last_block_decoded_size < 0:
-        return "Invalid encoded length"
+        raise ValueError("Invalid encoded length: %d" % last_block_decoded_size)
 
     data_size = full_block_count * __fullBlockSize + last_block_decoded_size
 

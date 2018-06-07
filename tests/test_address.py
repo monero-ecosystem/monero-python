@@ -165,3 +165,12 @@ class StagenetAddressTestCase(AddressTestCase, Tests):
     stagenet = True
     addr_invalid ='7417qYoKBoYXCugU2KvJBZExmyjav4n1MVME74AeWNwxQ39wKtbWdyP6YGuMK6C7HkAjBuVcbUYmCWbyDLwk9GAX4qyb48U'
     iaddr_invalid = '5GKCZK5VeuqaT9z1aEy2hb9TZNnxrW3zE9S4nTQVDux5Qq7UYsmjuux3Zstxkorj9HAufyWLU3FwHW4uERQF6tkehhE4RH8N7QfEAC8jMy'
+
+
+class KnownBugsTest(unittest.TestCase):
+    def test_issue27(self):
+        addr = '41tjz19p4qc2gudqnwsdrhgcgxud8bgxy84ufe869nyw7ywbxw9s9gqbix7piu9d7qjvbjtrdnbubhcf663ydq3bsxj1brL'
+        self.assertRaises(ValueError, Address, addr)
+        self.assertRaises(ValueError, SubAddress, addr)
+        self.assertRaises(ValueError, IntegratedAddress, addr)
+        self.assertRaises(ValueError, address, addr)
