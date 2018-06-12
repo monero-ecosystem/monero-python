@@ -1,0 +1,19 @@
+language: python
+python:
+  - "2.7"
+  - "3.6"
+  - "nightly"
+
+matrix:
+  allow_failures:
+    python: "nightly"
+
+cache: pip
+before_install:
+  - pip install -r test_requirements.txt
+install:
+  - pip install -e . # install dependencies as specified in setup.py
+script:
+  - pytest
+after_success:
+  - coveralls

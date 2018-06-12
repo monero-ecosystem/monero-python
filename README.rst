@@ -1,6 +1,17 @@
 Python Monero module
 ====================
 
+|travis|_ |coveralls|_
+
+
+.. |travis| image:: https://travis-ci.org/emesik/monero-python.svg
+.. _travis: https://travis-ci.org/emesik/monero-python
+
+
+.. |coveralls| image:: https://coveralls.io/repos/github/emesik/monero-python/badge.svg
+.. _coveralls: https://coveralls.io/github/emesik/monero-python
+
+
 A comprehensive Python module for handling Monero cryptocurrency.
 
 * release 0.3
@@ -40,3 +51,29 @@ Want to help?
 
 If you find this project useful, please consider a donation to the following address:
 ``481SgRxo8hwBCY4z6r88JrN5X8JFCJYuJUDuJXGybTwaVKyoJPKoGj3hQRAEGgQTdmV1xH1URdnHkJv6He5WkEbq6iKhr94``
+
+
+Development
+-----------
+
+1. Clone the repo
+2. Create virtualenv & activate it
+
+.. code-block:: bash
+
+    python3.6 -m venv .venv
+    source .venv/bin/activate
+
+3. Install dependencies
+
+.. code-block:: bash
+
+    pip install -r requirements.txt -r test_requirements.txt
+
+4. Do your thing
+
+5. Run tests
+
+.. code-block:: bash
+
+    pytest

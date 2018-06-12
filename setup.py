@@ -32,6 +32,10 @@ setup(
     url = 'https://github.com/emesik/monero-python/',
     long_description = open('README.rst', 'rb').read().decode('utf-8'),
     install_requires = open('requirements.txt', 'r').read().splitlines(),
+    tests_requires=open('test_requirements.txt', 'r').read().splitlines(),
+    setup_requires=[
+        'pytest-runner',
+    ],
     packages = find_packages('.', exclude=['tests']),
     include_package_data = True,
     author = 'Michał Sałaban',
