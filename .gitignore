@@ -1,5 +1,7 @@
 .*
+!.editorconfig
 !.gitignore
+!.travis.yml
 *.py[co]
 *~
 *.bak
