@@ -1,7 +1,9 @@
 language: python
+dist: xenial # minimal version required for python 3.7 support
 python:
   - "2.7"
   - "3.6"
+  - "3.7-dev"  # until 3.7 is officially supported by travis this is only (simple) way to test it
   - "nightly"
 
 matrix:

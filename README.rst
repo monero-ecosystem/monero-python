@@ -61,7 +61,7 @@ Development
 
 .. code-block:: bash
 
-    python3.6 -m venv .venv
+    python3 -m venv .venv
     source .venv/bin/activate
 
 3. Install dependencies
