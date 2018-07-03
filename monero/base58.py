@@ -14,11 +14,11 @@ __fullEncodedBlockSize = 11
 
 def _hexToBin(hex):
     if len(hex) % 2 != 0:
-        raise ValueError("Hex string has invalid length!")
+        raise ValueError("Hex string has invalid length: %d" % len(hex))
     return [int(hex[i*2:i*2+2], 16) for i in range(len(hex)//2)]
 
 def _binToHex(bin):
-    return "".join([("0" + hex(int(bin[i])).split('x')[1])[-2:] for i in range(len(bin))])
+    return "".join('%02x' % int(b) for b in bin)
 
 def _strToBin(a):
     return [ord(s) for s in a]
@@ -27,38 +27,18 @@ def _binToStr(bin):
     return ''.join([chr(bin[i]) for i in range(len(bin))])
 
 def _uint8be_to_64(data):
-    l_data = len(data)
-
-    if l_data < 1 or l_data > 8:
-        raise ValueError("Invalid input length: %d" % l_data)
+    if not (1 <= len(data) <= 8):
+        raise ValueError("Invalid input length: %d" % len(data))
 
     res = 0
-    switch = 9 - l_data
-    for i in range(l_data):
-        if switch == 1:
-            res = res << 8 | data[i]
-        elif switch == 2:
-            res = res << 8 | data[i]
-        elif switch == 3:
-            res = res << 8 | data[i]
-        elif switch == 4:
-            res = res << 8 | data[i]
-        elif switch == 5:
-            res = res << 8 | data[i]
-        elif switch == 6:
-            res = res << 8 | data[i]
-        elif switch == 7:
-            res = res << 8 | data[i]
-        elif switch == 8:
-            res = res << 8 | data[i]
-        else:
-            raise ValueError("Impossible condition (9 - l_data = %d)" % switch)
+    for b in data:
+        res = res << 8 | b
     return res
 
 def _uint64_to_8be(num, size):
-    res = [0] * size;
     if size < 1 or size > 8:
         raise ValueError("Invalid input length: %d" % size)
+    res = [0] * size
 
     twopow8 = 2**8
     for i in range(size-1,-1,-1):
@@ -79,7 +59,7 @@ def encode_block(data, buf, index):
     while num > 0:
         remainder = num % __b58base
         num = num // __b58base
-        buf[index+i] = __alphabet[remainder];
+        buf[index+i] = __alphabet[remainder]
         i -= 1
 
     return buf
@@ -96,9 +76,7 @@ def encode(hex):
     last_block_size = l_data % __fullBlockSize
     res_size = full_block_count * __fullEncodedBlockSize + __encodedBlockSizes[last_block_size]
 
-    res = [0] * res_size
-    for i in range(res_size):
-        res[i] = __alphabet[0]
+    res = [__alphabet[0]] * res_size
 
     for i in range(full_block_count):
         res = encode_block(data[(i*__fullBlockSize):(i*__fullBlockSize+__fullBlockSize)], res, i * __fullEncodedBlockSize)
@@ -151,10 +129,10 @@ def decode(enc):
 
     full_block_count = l_enc // __fullEncodedBlockSize
     last_block_size = l_enc % __fullEncodedBlockSize
-    last_block_decoded_size = __encodedBlockSizes.index(last_block_size)
-
-    if last_block_decoded_size < 0:
-        raise ValueError("Invalid encoded length: %d" % last_block_decoded_size)
+    try:
+        last_block_decoded_size = __encodedBlockSizes.index(last_block_size)
+    except ValueError:
+        raise ValueError("Invalid encoded length: %d" % l_enc)
 
     data_size = full_block_count * __fullBlockSize + last_block_decoded_size
 

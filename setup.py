@@ -32,7 +32,7 @@ setup(
     url = 'https://github.com/emesik/monero-python/',
     long_description = open('README.rst', 'rb').read().decode('utf-8'),
     install_requires = open('requirements.txt', 'r').read().splitlines(),
-    tests_requires=open('test_requirements.txt', 'r').read().splitlines(),
+    tests_require=open('test_requirements.txt', 'r').read().splitlines(),
     setup_requires=[
         'pytest-runner',
     ],
@@ -47,6 +47,8 @@ setup(
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
     keywords = 'monero cryptocurrency',
     test_suite='tests',

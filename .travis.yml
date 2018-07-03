@@ -1,7 +1,9 @@
 language: python
+dist: xenial # minimal version required for python 3.7 support
 python:
   - "2.7"
   - "3.6"
+  - "3.7-dev"  # until 3.7 is officially supported by travis this is only (simple) way to test it
   - "nightly"
 
 matrix:
@@ -10,9 +12,10 @@ matrix:
 
 cache: pip
 before_install:
-  - pip install -r test_requirements.txt
+  - rm -rf dist && python setup.py sdist # prep package distribution
 install:
-  - pip install -e . # install dependencies as specified in setup.py
+  - pip install dist/*.tar.gz # install dependencies as specified in setup.py
+  - pip install -r test_requirements.txt
 script:
   - pytest
 after_success:
