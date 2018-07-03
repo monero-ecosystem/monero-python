@@ -4,6 +4,10 @@
 # MoneroPy is released under the BSD 3-Clause license. Use and redistribution of
 # this software is subject to the license terms in the LICENSE file found in the
 # top-level directory of this distribution.
+#
+# Modified by emesik and rooterkyberian:
+#  + optimized
+#  + proper exceptions instead of returning errors as results
 
 __alphabet = [ord(s) for s in '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz']
 __b58base = 58
