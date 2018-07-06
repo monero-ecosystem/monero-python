@@ -175,7 +175,7 @@ class Wallet(object):
                 amount,
                 priority=priority,
                 ringsize=ringsize,
-                payment_id=None,
+                payment_id=payment_id,
                 unlock_time=unlock_time,
                 relay=relay)
 
@@ -204,6 +204,6 @@ class Wallet(object):
                 destinations,
                 priority=priority,
                 ringsize=ringsize,
-                payment_id=None,
+                payment_id=payment_id,
                 unlock_time=unlock_time,
                 relay=relay)
