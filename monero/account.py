@@ -1,4 +1,3 @@
-from . import address
 from . import prio
 from .transaction import PaymentManager
 
