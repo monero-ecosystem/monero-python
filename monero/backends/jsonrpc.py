@@ -25,12 +25,14 @@ class JSONRPCDaemon(object):
     :param port: port number
     :param path: path for JSON RPC requests (should not be changed)
     """
-    def __init__(self, protocol='http', host='127.0.0.1', port=18081, path='/json_rpc'):
+    def __init__(self, protocol='http', host='127.0.0.1', port=18081, path='/json_rpc', user='', password=''):
         self.url = '{protocol}://{host}:{port}'.format(
                 protocol=protocol,
                 host=host,
                 port=port)
         _log.debug("JSONRPC daemon backend URL: {url}".format(url=self.url))
+        self.user = user
+        self.password = password
 
     def info(self):
         info = self.raw_jsonrpc_request('get_info')
@@ -78,8 +80,11 @@ class JSONRPCDaemon(object):
         _log.debug(u"Method: {method}\nParams:\n{params}".format(
             method=method,
             params=pprint.pformat(params)))
-        rsp = requests.post(self.url + '/json_rpc', headers=hdr, data=json.dumps(data))
-        if rsp.status_code != 200:
+        auth = requests.auth.HTTPDigestAuth(self.user, self.password)
+        rsp = requests.post(self.url + '/json_rpc', headers=hdr, data=json.dumps(data), auth=auth)
+        if rsp.status_code == 401:
+            raise Unauthorized("401 Unauthorized. Invalid RPC user name or password.")
+        elif rsp.status_code != 200:
             raise RPCError("Invalid HTTP status {code} for method {method}.".format(
                 code=rsp.status_code,
                 method=method))
