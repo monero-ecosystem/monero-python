@@ -148,7 +148,7 @@ class Wallet(object):
         return self.accounts[0].new_address(label=label)
 
     def transfer(self, address, amount,
-            priority=prio.NORMAL, ringsize=7, payment_id=None, unlock_time=0,
+            priority=prio.NORMAL, ringsize=11, payment_id=None, unlock_time=0,
             relay=True):
         """
         Sends a transfer from the default account. Returns a list of resulting transactions.
@@ -158,7 +158,7 @@ class Wallet(object):
         :param priority: transaction priority, implies fee. The priority can be a number
                     from 1 to 4 (unimportant, normal, elevated, priority) or a constant
                     from `monero.prio`.
-        :param ringsize: the ring size (mixin + 1)
+        :param ringsize: the ring size (deprecated, will be gone in v0.5)
         :param payment_id: ID for the payment (must be None if
                         :class:`IntegratedAddress <monero.address.IntegratedAddress>`
                         is used as the destination)
@@ -178,7 +178,7 @@ class Wallet(object):
                 relay=relay)
 
     def transfer_multiple(self, destinations,
-            priority=prio.NORMAL, ringsize=7, payment_id=None, unlock_time=0,
+            priority=prio.NORMAL, ringsize=11, payment_id=None, unlock_time=0,
             relay=True):
         """
         Sends a batch of transfers from the default account. Returns a list of resulting
@@ -188,7 +188,7 @@ class Wallet(object):
         :param priority: transaction priority, implies fee. The priority can be a number
                     from 1 to 4 (unimportant, normal, elevated, priority) or a constant
                     from `monero.prio`.
-        :param ringsize: the ring size (mixin + 1)
+        :param ringsize: the ring size (deprecated, will be gone in v0.5)
         :param payment_id: ID for the payment (must be None if
                         :class:`IntegratedAddress <monero.address.IntegratedAddress>`
                         is used as a destination)

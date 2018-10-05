@@ -1,3 +1,5 @@
+import warnings
+from . import exceptions
 from . import prio
 from .transaction import PaymentManager
 
@@ -21,6 +23,14 @@ class Account(object):
         self._backend = backend
         self.incoming = PaymentManager(index, backend, 'in')
         self.outgoing = PaymentManager(index, backend, 'out')
+
+    def _check_ringsize(self, ringsize):
+        if ringsize != 11:
+            warnings.warn("Requested ring size {rs}. Since protocol v8 hard fork "
+                "(monero-0.13) the ring size is fixed to 11 (mixin size 10). The ringsize "
+                "argument will be dropped in version 0.5. Please update accordingly.".format(
+                    rs=ringsize),
+                DeprecationWarning)
 
     def balances(self):
         """
@@ -64,7 +74,7 @@ class Account(object):
         return self._backend.new_address(account=self.index, label=label)
 
     def transfer(self, address, amount,
-            priority=prio.NORMAL, ringsize=7, payment_id=None, unlock_time=0,
+            priority=prio.NORMAL, ringsize=11, payment_id=None, unlock_time=0,
             relay=True):
         """
         Sends a transfer. Returns a list of resulting transactions.
@@ -74,7 +84,7 @@ class Account(object):
         :param priority: transaction priority, implies fee. The priority can be a number
                     from 1 to 4 (unimportant, normal, elevated, priority) or a constant
                     from `monero.prio`.
-        :param ringsize: the ring size (mixin + 1)
+        :param ringsize: the ring size (deprecated, will be gone in v0.5)
         :param payment_id: ID for the payment (must be None if
                         :class:`IntegratedAddress <monero.address.IntegratedAddress>`
                         is used as the destination)
@@ -84,6 +94,7 @@ class Account(object):
                         so they might be broadcasted later
         :rtype: list of :class:`Transaction <monero.transaction.Transaction>`
         """
+        self._check_ringsize(ringsize)
         return self._backend.transfer(
             [(address, amount)],
             priority,
@@ -94,7 +105,7 @@ class Account(object):
             relay=relay)
 
     def transfer_multiple(self, destinations,
-            priority=prio.NORMAL, ringsize=7, payment_id=None, unlock_time=0,
+            priority=prio.NORMAL, ringsize=11, payment_id=None, unlock_time=0,
             relay=True):
         """
         Sends a batch of transfers. Returns a list of resulting transactions.
@@ -104,7 +115,7 @@ class Account(object):
         :param priority: transaction priority, implies fee. The priority can be a number
                     from 1 to 4 (unimportant, normal, elevated, priority) or a constant
                     from `monero.prio`.
-        :param ringsize: the ring size (mixin + 1)
+        :param ringsize: the ring size (deprecated, will be gone in v0.5)
         :param payment_id: ID for the payment (must be None if
                         :class:`IntegratedAddress <monero.address.IntegratedAddress>`
                         is used as the destination)
@@ -114,6 +125,7 @@ class Account(object):
                         so they might be broadcasted later
         :rtype: list of :class:`Transaction <monero.transaction.Transaction>`
         """
+        self._check_ringsize(ringsize)
         return self._backend.transfer(
             destinations,
             priority,
