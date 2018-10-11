@@ -104,6 +104,40 @@ class Wallet(object):
         except TypeError:
             return 0
 
+    def export_outputs(self):
+        """
+        Exports outputs in hexadecimal format.
+
+        :rtype: str
+        """
+        return self._backend.export_outputs()
+
+    def import_outputs(self, outputs_hex):
+        """
+        Imports outputs in hexadecimal format. Returns number of imported outputs.
+
+        :rtype: int
+
+        """
+        return self._backend.import_outputs(outputs_hex)
+
+    def export_key_images(self):
+        """
+        Exports signed key images as a list of dicts.
+
+        :rtype: [dict, dict, ...]
+        """
+        return self._backend.export_key_images()
+
+    def import_key_images(self, key_images_hex):
+        """
+        Imports key images from a list of dicts. Returns tuple of (height, spent, unspent).
+
+        :rtype: (int, Decimal, Decimal)
+
+        """
+        return self._backend.import_key_images(key_images_hex)
+
     # Following methods operate on default account (index=0)
     def balances(self):
         """

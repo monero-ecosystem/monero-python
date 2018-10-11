@@ -35,3 +35,6 @@ class TransactionBroadcastError(BackendException):
 
 class TransactionNotFound(AccountException):
     pass
+
+class SignatureCheckFailed(MoneroException):
+    pass

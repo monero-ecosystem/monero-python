@@ -1,4 +1,3 @@
-import binascii
 from datetime import datetime
 import operator
 import json
@@ -263,6 +262,23 @@ class JSONRPCWallet(object):
             'blob': data.get('blob', None),
         })
 
+    def export_outputs(self):
+        return self.raw_request('export_outputs')['outputs_data_hex']
+
+    def import_outputs(self, outputs_hex):
+        return self.raw_request(
+            'import_outputs',
+            {'outputs_data_hex': outputs_hex})['num_imported']
+
+    def export_key_images(self):
+        return self.raw_request('export_key_images')['signed_key_images']
+
+    def import_key_images(self, key_images):
+        _data = self.raw_request(
+            'import_key_images',
+            {'signed_key_images': key_images})
+        return (_data['height'], from_atomic(_data['spent']), from_atomic(_data['unspent']))
+
     def transfer(self, destinations, priority, ringsize,
             payment_id=None, unlock_time=0, account=0,
             relay=True):
@@ -341,6 +357,7 @@ _err2exc = {
     -2: exceptions.WrongAddress,
     -5: exceptions.WrongPaymentId,
     -8: exceptions.TransactionNotFound,
+    -9: exceptions.SignatureCheckFailed,
     -16: exceptions.TransactionNotPossible,
     -17: exceptions.NotEnoughMoney,
     -20: exceptions.AmountIsZero,
