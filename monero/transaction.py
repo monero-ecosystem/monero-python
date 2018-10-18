@@ -50,7 +50,7 @@ class OutgoingPayment(Payment):
     destinations = None
 
     def __init__(self, **kwargs):
-        self.destinations = kwargs.pop('destinations', self.destinations)
+        self.destinations = kwargs.pop('destinations', [])
         super(OutgoingPayment, self).__init__(**kwargs)
 
     _reprstr = "out: {} @ {} {:.12f} id={}"

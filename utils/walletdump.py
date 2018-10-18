@@ -33,14 +33,20 @@ _TXHDR = "timestamp         height  id/hash                                     
         "         amount         fee           {dir:95s} payment_id"
 
 def pmt2str(pmt):
-    return "{time} {height:7d} {hash} {amount:17.12f} {fee:13.12f} {addr} {payment_id}".format(
+    res = ["{time} {height:7d} {hash} {amount:17.12f} {fee:13.12f} {addr} {payment_id}".format(
         time=pmt.timestamp.strftime("%d-%m-%y %H:%M:%S") if getattr(pmt, 'timestamp', None) else None,
         height=pmt.transaction.height or 0,
         hash=pmt.transaction.hash,
         amount=pmt.amount,
         fee=pmt.transaction.fee or 0,
         payment_id=pmt.payment_id,
-        addr=getattr(pmt, 'local_address', None) or '')
+        addr=getattr(pmt, 'local_address', None) or '')]
+    try:
+        for dest in pmt.destinations:
+            res.append("    {amount:17.12f} to {address}".format(address=dest[0], amount=dest[1]))
+    except AttributeError:
+        pass
+    return "\n".join(res)
 
 def a2str(a):
     return "{addr} {label}".format(

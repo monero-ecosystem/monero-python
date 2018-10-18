@@ -247,7 +247,7 @@ class JSONRPCWallet(object):
         }
         if 'destinations' in data:
             result['destinations'] = [
-                {'address': address(x['address']), 'amount': from_atomic(data['amount'])}
+                (address(x['address']), from_atomic(data['amount']))
                 for x in data.get('destinations')
             ]
         return result
