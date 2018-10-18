@@ -112,6 +112,38 @@ class PaymentManager(object):
         return fetch(self.account_idx, PaymentFilter(**filterparams))
 
 
+class _ByHeight(object):
+    """A helper class used as key in sorting of payments by height.
+    Mempool goes on top, blockchain payments are ordered with descending block numbers.
+
+    **WARNING:** Integer sorting is reversed here.
+    """
+    def __init__(self, pmt):
+        self.pmt = pmt
+    def _cmp(self, other):
+        sh = self.pmt.transaction.height
+        oh = other.pmt.transaction.height
+        if sh is oh is None:
+            return 0
+        if sh is None:
+            return 1
+        if oh is None:
+            return -1
+        return (sh > oh) - (sh < oh)
+    def __lt__(self, other):
+        return self._cmp(other) > 0
+    def __le__(self, other):
+        return self._cmp(other) >= 0
+    def __eq__(self, other):
+        return self._cmp(other) == 0
+    def __ge__(self, other):
+        return self._cmp(other) <= 0
+    def __gt__(self, other):
+        return self._cmp(other) < 0
+    def __ne__(self, other):
+        return self._cmp(other) != 0
+
+
 class PaymentFilter(object):
     """
     A helper class that filters payments retrieved by the backend.
@@ -176,4 +208,6 @@ class PaymentFilter(object):
         return True
 
     def filter(self, payments):
-        return filter(self.check, payments)
+        return sorted(
+            filter(self.check, payments),
+            key=_ByHeight)
