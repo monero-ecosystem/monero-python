@@ -361,7 +361,8 @@ _err2exc = {
     -16: exceptions.TransactionNotPossible,
     -17: exceptions.NotEnoughMoney,
     -20: exceptions.AmountIsZero,
-    -37: exceptions.NotEnoughUnlockedMoney, # PR pending: https://github.com/monero-project/monero/pull/3197
-    -38: exceptions.NoDaemonConnection, # PR 3197
+    -37: exceptions.NotEnoughUnlockedMoney,
+    -38: exceptions.NoDaemonConnection,
+    -43: exceptions.WalletIsNotDeterministic, # https://github.com/monero-project/monero/pull/4653
     -32601: MethodNotFound,
 }
