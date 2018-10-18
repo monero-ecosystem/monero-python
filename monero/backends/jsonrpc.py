@@ -267,6 +267,7 @@ class JSONRPCWallet(object):
             'height': data.get('height', data.get('block_height')) or None,
             'timestamp': datetime.fromtimestamp(data['timestamp']) if 'timestamp' in data else None,
             'blob': data.get('blob', None),
+            'confirmations': data.get('confirmations', None)
         })
 
     def export_outputs(self):

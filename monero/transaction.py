@@ -70,6 +70,7 @@ class Transaction(object):
     timestamp = None
     key = None
     blob = None
+    confirmations = None
 
     def __init__(self, **kwargs):
         self.hash = kwargs.get('hash', self.hash)
@@ -78,6 +79,7 @@ class Transaction(object):
         self.timestamp = kwargs.get('timestamp', self.timestamp)
         self.key = kwargs.get('key', self.key)
         self.blob = kwargs.get('blob', self.blob)
+        self.confirmations = kwargs.get('confirmations', self.confirmations)
 
     def __repr__(self):
         return self.hash
