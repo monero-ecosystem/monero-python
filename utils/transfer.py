@@ -32,7 +32,6 @@ argsparser.add_argument('-a', dest='account', default=0, type=int, help="Source 
 argsparser.add_argument('-p', dest='prio',
     choices=['unimportant', 'normal', 'elevated', 'priority'],
     default='normal')
-argsparser.add_argument('-r', dest='ring_size', type=int, default=5, help="Ring size")
 argsparser.add_argument('-i', dest='payment_id', nargs='?', type=PaymentID,
     const=PaymentID(random.randint(0, 2**256)),
     help="Payment ID")
@@ -53,7 +52,7 @@ logging.basicConfig(level=level, format="%(asctime)-15s %(message)s")
 
 w = Wallet(JSONRPCWallet(**args.wallet_rpc_url))
 txns = w.accounts[args.account].transfer_multiple(
-    args.destinations, priority=prio, ringsize=args.ring_size, payment_id=args.payment_id,
+    args.destinations, priority=prio, payment_id=args.payment_id,
     relay=args.outdir is None)
 for tx in txns:
     print(u"Transaction {hash}:\nfee: {fee:21.12f}\n"
