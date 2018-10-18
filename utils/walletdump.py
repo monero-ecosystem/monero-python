@@ -4,7 +4,8 @@ import logging
 import operator
 import re
 
-from monero.backends.jsonrpc import JSONRPCWallet
+from monero import exceptions
+from monero.backends.jsonrpc import JSONRPCWallet, RPCError
 from monero.wallet import Wallet
 
 def url_data(url):
@@ -54,6 +55,10 @@ print(
         addr=a2str(masteraddr),
         total=w.balance(),
         unlocked=w.balance(unlocked=True)))
+try:
+    seed = w.seed()
+except (exceptions.WalletIsNotDeterministic, RPCError): # FIXME: Remove RPCError once PR#4563 is merged in monero
+    seed = '[--- wallet is not deterministic and has no seed ---]'
 print(
     "Keys:\n" \
     "  private spend: {ssk}\n" \
@@ -65,7 +70,7 @@ print(
         svk=w.view_key(),
         psk=masteraddr.spend_key(),
         pvk=masteraddr.view_key(),
-        seed=w.seed()
+        seed=seed
         ))
 
 if len(w.accounts) > 1:

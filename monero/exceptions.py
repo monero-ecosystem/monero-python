@@ -38,3 +38,6 @@ class TransactionNotFound(AccountException):
 
 class SignatureCheckFailed(MoneroException):
     pass
+
+class WalletIsNotDeterministic(MoneroException):
+    pass
