@@ -102,6 +102,9 @@ if len(w.accounts) > 1:
             for tx in outs:
                 print(pmt2str(tx))
 else:
+    addresses = w.accounts[0].addresses()
+    print("{num:2d} address(es):".format(num=len(addresses)))
+    print("\n".join(map(a2str, addresses)))
     ins = w.incoming(unconfirmed=True)
     if ins:
         print("\nIncoming transactions:")
