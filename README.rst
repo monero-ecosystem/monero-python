@@ -40,13 +40,15 @@ Copyright (c) 2011 thomasv@gitorious (``monero/seed.py`` based on `Electrum`_)
 .. _`MoneroPy`: https://github.com/bigreddmachine/MoneroPy
 .. _`Electrum`: https://github.com/spesmilo/electrum
 
-Contributors: `lalanza808`_, `cryptochangements34`_, `atward`_, `rooterkyberian`_, `brucexiu`_.
+Contributors: `lalanza808`_, `cryptochangements34`_, `atward`_, `rooterkyberian`_, `brucexiu`_,
+`lialsoftlab`_.
 
 .. _`lalanza808`: https://github.com/lalanza808
 .. _`cryptochangements34`: https://github.com/cryptochangements34
 .. _`atward`: https://github.com/atward
 .. _`rooterkyberian`: https://github.com/rooterkyberian
 .. _`brucexiu`: https://github.com/brucexiu
+.. _`lialsoftlab`: https://github.com/lialsoftlab
 
 Want to help?
 -------------
