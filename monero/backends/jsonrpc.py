@@ -237,7 +237,7 @@ class JSONRPCWallet(object):
         laddr = data.get('address', None)
         if laddr:
             laddr = address(laddr)
-        return {
+        result = {
             'payment_id': None if pid is None else PaymentID(pid),
             'amount': from_atomic(data['amount']),
             'timestamp': datetime.fromtimestamp(data['timestamp']) if 'timestamp' in data else None,
@@ -245,6 +245,13 @@ class JSONRPCWallet(object):
             'transaction': self._tx(data),
             'local_address': laddr,
         }
+        if 'destinations' in data:
+            result['destinations'] = [
+                {'address': address(x['address']), 'amount': from_atomic(data['amount'])}
+                for x in data.get('destinations')
+            ]
+        return result
+
 
     def _inpayment(self, data):
         return IncomingPayment(**self._paymentdict(data))

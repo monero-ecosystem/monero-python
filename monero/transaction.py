@@ -47,6 +47,12 @@ class OutgoingPayment(Payment):
     An outgoing payment (one that decreases the balance of an
     :class:`Account <monero.account.Account>`)
     """
+    destinations = None
+
+    def __init__(self, **kwargs):
+        self.destinations = kwargs.pop('destinations', self.destinations)
+        super().__init__(**kwargs)
+
     _reprstr = "out: {} @ {} {:.12f} id={}"
 
 
