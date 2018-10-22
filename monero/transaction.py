@@ -71,6 +71,7 @@ class Transaction(object):
     key = None
     blob = None
     confirmations = None
+    signed = False
 
     def __init__(self, **kwargs):
         self.hash = kwargs.get('hash', self.hash)
@@ -83,6 +84,27 @@ class Transaction(object):
 
     def __repr__(self):
         return self.hash
+
+
+class UnsignedTransaction(Transaction):
+    pass
+
+
+class SignedTransaction(Transaction):
+    signed = True
+
+
+class MultisigTransaction(Transaction):
+    pass
+
+
+class TransactionSet(set):
+    unsigned_txset = None
+    multisig_txset = None
+
+    @property
+    def signed(self):
+        return self.unsigned_txset is None and self.multisig_txset is None
 
 
 if sys.version_info < (3,):

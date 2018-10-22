@@ -188,7 +188,7 @@ class Wallet(object):
             priority=prio.NORMAL, payment_id=None, unlock_time=0,
             relay=True):
         """
-        Sends a transfer from the default account. Returns a list of resulting transactions.
+        Sends a transfer from the default account. Returns a set of resulting transactions.
 
         :param address: destination :class:`Address <monero.address.Address>` or subtype
         :param amount: amount to send
@@ -202,7 +202,7 @@ class Wallet(object):
         :param relay: if `True`, the wallet will relay the transaction(s) to the network
                         immediately; when `False`, it will only return the transaction(s)
                         so they might be broadcasted later
-        :rtype: list of :class:`Transaction <monero.transaction.Transaction>`
+        :rtype: set of :class:`Transaction <monero.transaction.Transaction>`
         """
         return self.accounts[0].transfer(
                 address,
@@ -216,7 +216,7 @@ class Wallet(object):
             priority=prio.NORMAL, payment_id=None, unlock_time=0,
             relay=True):
         """
-        Sends a batch of transfers from the default account. Returns a list of resulting
+        Sends a batch of transfers from the default account. Returns a set of resulting
         transactions.
 
         :param destinations: a list of destination and amount pairs: [(address, amount), ...]
@@ -230,7 +230,7 @@ class Wallet(object):
         :param relay: if `True`, the wallet will relay the transaction(s) to the network
                         immediately; when `False`, it will only return the transaction(s)
                         so they might be broadcasted later
-        :rtype: list of :class:`Transaction <monero.transaction.Transaction>`
+        :rtype: set of :class:`Transaction <monero.transaction.Transaction>`
         """
         return self.accounts[0].transfer_multiple(
                 destinations,

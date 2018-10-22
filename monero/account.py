@@ -1,4 +1,3 @@
-import warnings
 from . import prio
 from .transaction import PaymentManager
 
@@ -68,7 +67,7 @@ class Account(object):
             priority=prio.NORMAL, payment_id=None, unlock_time=0,
             relay=True):
         """
-        Sends a transfer. Returns a list of resulting transactions.
+        Sends a transfer. Returns a set of resulting transactions.
 
         :param address: destination :class:`Address <monero.address.Address>` or subtype
         :param amount: amount to send
@@ -82,7 +81,7 @@ class Account(object):
         :param relay: if `True`, the wallet will relay the transaction(s) to the network
                         immediately; when `False`, it will only return the transaction(s)
                         so they might be broadcasted later
-        :rtype: list of :class:`Transaction <monero.transaction.Transaction>`
+        :rtype: set of :class:`Transaction <monero.transaction.Transaction>`
         """
         return self._backend.transfer(
             [(address, amount)],
@@ -96,7 +95,7 @@ class Account(object):
             priority=prio.NORMAL, payment_id=None, unlock_time=0,
             relay=True):
         """
-        Sends a batch of transfers. Returns a list of resulting transactions.
+        Sends a batch of transfers. Returns a set of resulting transactions.
 
         :param destinations: a list of destination and amount pairs:
                     [(:class:`Address <monero.address.Address>`, `Decimal`), ...]
@@ -110,7 +109,7 @@ class Account(object):
         :param relay: if `True`, the wallet will relay the transaction(s) to the network
                         immediately; when `False`, it will only return the transaction(s)
                         so they might be broadcasted later
-        :rtype: list of :class:`Transaction <monero.transaction.Transaction>`
+        :rtype: set of :class:`Transaction <monero.transaction.Transaction>`
         """
         return self._backend.transfer(
             destinations,

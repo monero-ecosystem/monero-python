@@ -41,3 +41,6 @@ class SignatureCheckFailed(MoneroException):
 
 class WalletIsNotDeterministic(MoneroException):
     pass
+
+class TransactionNotSigned(TransactionBroadcastError):
+    pass

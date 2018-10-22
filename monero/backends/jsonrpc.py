@@ -10,7 +10,9 @@ from ..account import Account
 from ..address import address, Address, SubAddress
 from ..numbers import from_atomic, to_atomic, PaymentID
 from ..seed import Seed
-from ..transaction import Transaction, IncomingPayment, OutgoingPayment
+from ..transaction import (
+    SignedTransaction, UnsignedTransaction, MultisigTransaction, TransactionSet,
+    IncomingPayment, OutgoingPayment )
 
 _log = logging.getLogger(__name__)
 
@@ -51,7 +53,7 @@ class JSONRPCDaemon(object):
         res = self.raw_request('/get_transaction_pool', {})
         txs = []
         for tx in res.get('transactions', []):
-            txs.append(Transaction(
+            txs.append(SignedTransaction(
                 hash=tx['id_hash'],
                 fee=from_atomic(tx['fee']),
                 timestamp=datetime.fromtimestamp(tx['receive_time'])))
@@ -242,7 +244,7 @@ class JSONRPCWallet(object):
             'amount': from_atomic(data['amount']),
             'timestamp': datetime.fromtimestamp(data['timestamp']) if 'timestamp' in data else None,
             'note': data.get('note', None),
-            'transaction': self._tx(data),
+            'transaction': self._tx(data, SignedTransaction),
             'local_address': laddr,
         }
         if 'destinations' in data:
@@ -259,8 +261,8 @@ class JSONRPCWallet(object):
     def _outpayment(self, data):
         return OutgoingPayment(**self._paymentdict(data))
 
-    def _tx(self, data):
-        return Transaction(**{
+    def _tx(self, data, klass):
+        return klass(**{
             'hash': data.get('txid', data.get('tx_hash')),
             'fee': from_atomic(data['fee']) if 'fee' in data else None,
             'key': data.get('key'),
@@ -311,7 +313,23 @@ class JSONRPCWallet(object):
                 'tx_hash_list', 'amount_list', 'fee_list', 'tx_key_list', 'tx_blob_list')]))]
         for d in _pertx:
             d['payment_id'] = payment_id
-        return [self._tx(data) for data in _pertx]
+        result = TransactionSet()
+        klass = SignedTransaction
+        try:
+            if _transfers['unsigned_txset']:
+                result.unsigned_txset = _transfers['unsigned_txset']
+                klass = UnsignedTransaction
+        except KeyError:
+            pass
+        try:
+            if _transfers['multisig_txset']:
+                result.multisig_txset = _transfers['multisig_txset']
+                klass = MultisigTransaction
+        except KeyError:
+            pass
+        for data in _pertx:
+            result.add(self._tx(data, klass))
+        return result
 
     def raw_request(self, method, params=None, squelch_error_logging=False):
         hdr = {'Content-Type': 'application/json'}

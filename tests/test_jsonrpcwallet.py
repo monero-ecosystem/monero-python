@@ -5,12 +5,11 @@ try:
     from unittest.mock import patch, Mock
 except ImportError:
     from mock import patch, Mock
-import warnings
 
 from monero.wallet import Wallet
 from monero.address import Address
 from monero.seed import Seed
-from monero.transaction import IncomingPayment, OutgoingPayment, Transaction
+from monero.transaction import IncomingPayment, OutgoingPayment, SignedTransaction
 from monero.backends.jsonrpc import JSONRPCWallet
 
 class SubaddrWalletTestCase(unittest.TestCase):
@@ -260,7 +259,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
             self.assertIsInstance(pmt, IncomingPayment)
             self.assertIsInstance(pmt.local_address, Address)
             self.assertIsInstance(pmt.amount, Decimal)
-            self.assertIsInstance(pmt.transaction, Transaction)
+            self.assertIsInstance(pmt.transaction, SignedTransaction)
             self.assertIsInstance(pmt.transaction.fee, Decimal)
             self.assertIsInstance(pmt.transaction.height, int)
 
@@ -411,7 +410,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
             self.assertIsInstance(pmt, IncomingPayment)
             self.assertIsInstance(pmt.local_address, Address)
             self.assertIsInstance(pmt.amount, Decimal)
-            self.assertIsInstance(pmt.transaction, Transaction)
+            self.assertIsInstance(pmt.transaction, SignedTransaction)
             self.assertIsInstance(pmt.transaction.fee, Decimal)
             self.assertIsInstance(pmt.transaction.height, (int, type(None)))
 
@@ -454,7 +453,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
             self.assertIsInstance(pmt, IncomingPayment)
             self.assertIsInstance(pmt.local_address, Address)
             self.assertIsInstance(pmt.amount, Decimal)
-            self.assertIsInstance(pmt.transaction, Transaction)
+            self.assertIsInstance(pmt.transaction, SignedTransaction)
             self.assertIsInstance(pmt.transaction.fee, Decimal)
             self.assertIs(pmt.transaction.height, None)
 
@@ -495,7 +494,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
             self.assertIsInstance(pmt, IncomingPayment)
             self.assertIsInstance(pmt.local_address, Address)
             self.assertIsInstance(pmt.amount, Decimal)
-            self.assertIsInstance(pmt.transaction, Transaction)
+            self.assertIsInstance(pmt.transaction, SignedTransaction)
 # Fee is not returned by this RPC method!
 #            self.assertIsInstance(pmt.transaction.fee, Decimal)
             self.assertIsInstance(pmt.transaction.height, int)
@@ -539,7 +538,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
             self.assertIsInstance(pmt, IncomingPayment)
             self.assertIsInstance(pmt.local_address, Address)
             self.assertIsInstance(pmt.amount, Decimal)
-            self.assertIsInstance(pmt.transaction, Transaction)
+            self.assertIsInstance(pmt.transaction, SignedTransaction)
 # Fee is not returned by this RPC method!
 #            self.assertIsInstance(pmt.transaction.fee, Decimal)
             self.assertIsInstance(pmt.transaction.height, int)
@@ -709,7 +708,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
             self.assertIsInstance(pmt.local_address, Address)
             self.assertIsInstance(pmt.amount, Decimal)
             self.assertIsInstance(pmt.timestamp, datetime)
-            self.assertIsInstance(pmt.transaction, Transaction)
+            self.assertIsInstance(pmt.transaction, SignedTransaction)
             self.assertIsInstance(pmt.transaction.fee, Decimal)
             self.assertIsInstance(pmt.transaction.height, int)
 
@@ -889,7 +888,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
             self.assertIsInstance(pmt.local_address, Address)
             self.assertIsInstance(pmt.amount, Decimal)
             self.assertIsInstance(pmt.timestamp, datetime)
-            self.assertIsInstance(pmt.transaction, Transaction)
+            self.assertIsInstance(pmt.transaction, SignedTransaction)
             self.assertIsInstance(pmt.transaction.fee, Decimal)
             self.assertIsInstance(pmt.transaction.height, (int, type(None)))
 
@@ -921,7 +920,7 @@ class SubaddrWalletTestCase(unittest.TestCase):
             self.assertIsInstance(pmt.local_address, Address)
             self.assertIsInstance(pmt.amount, Decimal)
             self.assertIsInstance(pmt.timestamp, datetime)
-            self.assertIsInstance(pmt.transaction, Transaction)
+            self.assertIsInstance(pmt.transaction, SignedTransaction)
             self.assertIsInstance(pmt.transaction.fee, Decimal)
             self.assertIs(pmt.transaction.height, None)
 
@@ -943,8 +942,11 @@ class SubaddrWalletTestCase(unittest.TestCase):
             '9wFuzNoQDck1pnS9ZhG47kDdLD1BUszSbWpGfWcSRy9m6Npq9NoHWd141KvGag8hu2gajEwzRXJ4iJwmxruv9ofc2CwnYCE',
             3)
         self.assertEqual(len(txns), 1)
-        txn = txns[0]
-        self.assertIsInstance(txn, Transaction)
+        self.assertIsNone(txns.unsigned_txset)
+        self.assertIsNone(txns.multisig_txset)
+        txn = txns.pop()
+        self.assertIsInstance(txn, SignedTransaction)
+        self.assertTrue(txn.signed)
         self.assertIsInstance(txn.fee, Decimal)
         self.assertEqual(txn.hash,
             '401d8021975a0fee16fe84acbfc4d8ba6312e563fa245baba2aac382e787fb60')
