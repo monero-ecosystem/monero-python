@@ -1,5 +1,4 @@
 import warnings
-from . import exceptions
 from . import prio
 from .transaction import PaymentManager
 
