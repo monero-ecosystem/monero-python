@@ -54,11 +54,14 @@ class Wallet(object):
 
     def spend_key(self):
         """
-        Returns private spend key.
+        Returns private spend key. None if wallet is view-only.
 
-        :rtype: str
+        :rtype: str or None
         """
-        return self._backend.spend_key()
+        key = self._backend.spend_key()
+        if key.strip('0') == '':
+            return None
+        return key
 
     def view_key(self):
         """
