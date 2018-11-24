@@ -102,9 +102,13 @@ html_static_path = ['_static']
 # This is required for the alabaster theme
 # refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
 html_sidebars = {
-    '**': [
+    'index': [
         'relations.html',  # needs 'show_related': True theme option to display
+        'searchbox.html'
+    ],
+    '**': [
         'searchbox.html',
+        'globaltoc.html'
     ]
 }
 
@@ -164,6 +168,3 @@ texinfo_documents = [
      author, 'MoneroPythonmodule', 'One line description of project.',
      'Miscellaneous'),
 ]
-
-
-
