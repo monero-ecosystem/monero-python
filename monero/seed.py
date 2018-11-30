@@ -137,14 +137,10 @@ class Seed(object):
         return self.sc_reduce(h.digest())
 
     def public_spend_key(self):
-        keyInt = ed25519.decodeint(unhexlify(self.secret_spend_key()))
-        aG = ed25519.scalarmultbase(keyInt)
-        return hexlify(ed25519.encodepoint(aG)).decode()
+        return ed25519.public_from_secret_hex(self.secret_spend_key())
 
     def public_view_key(self):
-        keyInt = ed25519.decodeint(unhexlify(self.secret_view_key()))
-        aG = ed25519.scalarmultbase(keyInt)
-        return hexlify(ed25519.encodepoint(aG)).decode()
+        return ed25519.public_from_secret_hex(self.secret_view_key())
 
     def public_address(self, net='mainnet'):
         """Returns the master :class:`Address <monero.address.Address>` represented by the seed.

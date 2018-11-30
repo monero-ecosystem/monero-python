@@ -4,6 +4,7 @@ import struct
 from sha3 import keccak_256
 
 from . import base58
+from . import ed25519
 from . import numbers
 
 _ADDR_REGEX = re.compile(r'^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{95}$')
@@ -74,6 +75,20 @@ class Address(object):
         :rtype: str
         """
         return hexlify(self._decoded[1:33]).decode()
+
+    def check_private_view_key(self, key):
+        """Checks if private view key matches this address.
+
+        :rtype: bool
+        """
+        return ed25519.public_from_secret_hex(key) == self.view_key()
+
+    def check_private_spend_key(self, key):
+        """Checks if private spend key matches this address.
+
+        :rtype: bool
+        """
+        return ed25519.public_from_secret_hex(key) == self.spend_key()
 
     def with_payment_id(self, payment_id=0):
         """Integrates payment id into the address.
