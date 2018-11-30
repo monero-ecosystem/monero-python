@@ -177,6 +177,10 @@ and ``unconfirmed`` query parameters that accept boolean values:
 You may as well query for both confirmed and unconfirmed transactions using
 ``wallet.incoming(unconfirmed=True)`` (the default value for ``confirmed`` is ``True``).
 
+.. note:: Mempool transactions don't belong to the blockchain (yet), therefore they have no height.
+    Setting ``min_height`` or ``max_height`` arguments will **always exclude mempool
+    transactions**. If ``unconfirmed`` is also set to ``True``, a warning will be issued.
+
 .. _sending-payments:
 
 Sending payments
