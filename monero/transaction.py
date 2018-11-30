@@ -1,4 +1,5 @@
 import sys
+import warnings
 from .address import address
 from .numbers import PaymentID
 
@@ -160,7 +161,12 @@ class PaymentFilter(object):
         _payment_id = filterparams.pop('payment_id', None)
         if len(filterparams) > 0:
             raise ValueError("Excessive arguments for payment query: {}".format(filterparams))
-
+        if self.unconfirmed and (self.min_height is not None or self.max_height is not None):
+            warnings.warn("Height filtering (min_height/max_height) has been requested while "
+                    "also asking for unconfirmed transactions. These are mutually exclusive. "
+                    "As mempool transactions have no height at all, they will be excluded "
+                    "from the result.",
+                    RuntimeWarning)
         if _local_address is None:
             self.local_addresses = []
         else:
