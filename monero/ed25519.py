@@ -3,6 +3,7 @@
 #
 # Parts Copyright (c) 2016 The MoneroPy Developers. Released under the BSD 3-Clause
 
+from binascii import hexlify, unhexlify
 import hashlib
 import operator as _oper
 import sys as _sys
@@ -133,3 +134,10 @@ def scalarmultbase(e):
     if e & 1: Q = edwards(Q, B)
     return Q
 
+def public_from_secret(k):
+    keyInt = decodeint(k)
+    aG = scalarmultbase(keyInt)
+    return encodepoint(aG)
+
+def public_from_secret_hex(hk):
+    return hexlify(public_from_secret(unhexlify(hk))).decode()
