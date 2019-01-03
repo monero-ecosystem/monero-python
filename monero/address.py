@@ -1,11 +1,17 @@
 from binascii import hexlify, unhexlify
 import re
-import struct
 from sha3 import keccak_256
+import struct
+import sys
 
 from . import base58
 from . import ed25519
 from . import numbers
+
+if sys.version_info < (3,): # pragma: no cover
+    _str_types = (str, bytes, unicode)
+else:                       # pragma: no cover
+    _str_types = (str, bytes)
 
 _ADDR_REGEX = re.compile(r'^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{95}$')
 _IADDR_REGEX = re.compile(r'^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{106}$')
@@ -58,7 +64,7 @@ class BaseAddress(object):
     def __eq__(self, other):
         if isinstance(other, BaseAddress):
             return str(self) == str(other)
-        if isinstance(other, str):
+        if isinstance(other, _str_types):
             return str(self) == other
         return super(BaseAddress, self).__eq__(other)
 

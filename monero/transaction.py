@@ -86,9 +86,9 @@ class Transaction(object):
         return self.hash
 
 
-if sys.version_info < (3,):
+if sys.version_info < (3,): # pragma: no cover
     _str_types = (str, bytes, unicode)
-else:
+else:                       # pragma: no cover
     _str_types = (str, bytes)
 
 

@@ -9,7 +9,7 @@ import operator as _oper
 import sys as _sys
 
 # Set up byte handling for Python 2 or 3
-if _sys.version_info.major == 2:
+if _sys.version_info.major == 2:    # pragma: no cover
     int2byte = chr
     range = xrange
 
@@ -18,7 +18,7 @@ if _sys.version_info.major == 2:
 
     def intlist2bytes(l):
         return b"".join(chr(c) for c in l)
-else:
+else:                               # pragma: no cover
     indexbytes = _oper.getitem
     intlist2bytes = bytes
     int2byte = _oper.methodcaller("to_bytes", 1, "big")
@@ -26,9 +26,6 @@ else:
 b = 256
 q = 2**255 - 19
 l = 2**252 + 27742317777372353535851937790883648493
-
-def H(m):
-    return hashlib.sha512(m).digest()
 
 def expmod(b, e, m):
     if e == 0: return 1
@@ -103,16 +100,6 @@ def encodepoint(P):
 def bit(h, i):
     return (indexbytes(h, i//8) >> (i%8)) & 1
 
-def publickey(sk):
-    h = H(sk)
-    a = 2**(b-2) + sum(2**i * bit(h, i) for i in range(3, b-2))
-    A = scalarmult(B, a)
-    return encodepoint(A)
-
-def Hint(m):
-    h = H(m)
-    return sum(2**i * bit(h, i) for i in range(2*b))
-
 def isoncurve(P):
     x = P[0]
     y = P[1]
@@ -130,6 +117,19 @@ def decodepoint(s):
     return P
 
 # These are unused but let's keep them
+#def H(m):
+#    return hashlib.sha512(m).digest()
+#
+#def Hint(m):
+#    h = H(m)
+#    return sum(2**i * bit(h, i) for i in range(2*b))
+#
+#def publickey(sk):
+#    h = H(sk)
+#    a = 2**(b-2) + sum(2**i * bit(h, i) for i in range(3, b-2))
+#    A = scalarmult(B, a)
+#    return encodepoint(A)
+#
 #def signature(m, sk, pk):
 #    h = H(sk)
 #    a = 2**(b-2) + sum(2**i * bit(h, i) for i in range(3, b-2))
