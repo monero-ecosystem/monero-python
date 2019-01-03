@@ -67,6 +67,20 @@ We may use a subaddress too:
 These two classes, ``Address`` and ``SubAddress`` have similar functionality
 but one significant difference. Only the former may form *integrated address*.
 
+Generating subaddresses
+-----------------------
+
+It is possible to get subaddresses in two ways:
+
+ 1. Creating them in the wallet file by calling ``.new_address()`` on ``Account`` or ``Wallet``
+    instance.  In properly synced wallet this will return an address that is guaranteed to be fresh
+    and unused.  It is the right way if you plan to use one-time addresses to identify payments or
+    to improve your privacy by avoiding address reuse.
+ 2. Requesting arbitrary subaddress by calling ``Wallet.get_address(major, minor)`` where ``major``
+    is the account index and ``minor`` is the index of the address within an account. Addresses
+    obtained this way are not guaranteed to be fresh and **will not be saved as already generated
+    within the wallet file**. (Watch out for unintentional address reuse!)
+
 Payment IDs and integrated addresses
 ------------------------------------
 
