@@ -1,3 +1,10 @@
+from binascii import hexlify, unhexlify
+from sha3 import keccak_256
+import struct
+
+from . import address
+from . import base58
+from . import ed25519
 from . import prio
 from .transaction import Payment, PaymentManager
 
@@ -36,6 +43,7 @@ class Wallet(object):
         self.accounts = self.accounts or []
         idx = 0
         for _acc in self._backend.accounts():
+            _acc.wallet = self
             try:
                 if self.accounts[idx]:
                     continue
@@ -183,6 +191,38 @@ class Wallet(object):
         :rtype: :class:`SubAddress <monero.address.SubAddress>`
         """
         return self.accounts[0].new_address(label=label)
+
+    def get_address(self, major, minor):
+        """
+        Calculates sub-address for account index (`major`) and address index within
+        the account (`minor`).
+
+        :rtype: :class:`BaseAddress <monero.address.BaseAddress>`
+        """
+        master_address = self.address()
+        if major == minor == 0:
+            return master_address
+        master_svk = unhexlify(self.view_key())
+        master_psk = unhexlify(self.address().spend_key())
+        # m = Hs("SubAddr\0" || master_svk || major || minor)
+        hsdata = b''.join([
+                b'SubAddr\0', master_svk,
+                struct.pack('<I', major), struct.pack('<I', minor)])
+        m = keccak_256(hsdata).digest()
+        # TODO: OK, the hash is calculated correctly. What's missing here is ed25519 math
+        # to do the following:
+        # D = master_psk + m * B
+        D = ed25519.add_compressed(
+                ed25519.decodepoint(master_psk),
+                ed25519.scalarmult(ed25519.B, ed25519.decodeint(m)))
+        # C = master_svk * D
+        C = ed25519.scalarmult(D, ed25519.decodeint(master_svk))
+        netbyte = bytearray([
+                42 if master_address.is_mainnet() else \
+                63 if master_address.is_testnet() else 36])
+        data = netbyte + ed25519.encodepoint(D) + ed25519.encodepoint(C)
+        checksum = keccak_256(data).digest()[:4]
+        return address.SubAddress(base58.encode(hexlify(data + checksum)))
 
     def transfer(self, address, amount,
             priority=prio.NORMAL, payment_id=None, unlock_time=0,

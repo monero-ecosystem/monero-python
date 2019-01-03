@@ -1,4 +1,3 @@
-import warnings
 from . import prio
 from .transaction import PaymentManager
 
@@ -16,6 +15,7 @@ class Account(object):
     :param index: the account's index within the wallet
     """
     index = None
+    wallet = None
 
     def __init__(self, backend, index):
         self.index = index

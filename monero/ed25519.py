@@ -49,6 +49,13 @@ def xrecover(y):
     if x % 2 != 0: x = q-x
     return x
 
+def compress(P):
+    zinv = inv(P[2])
+    return (P[0] * zinv % q, P[1] * zinv % q)
+
+def decompress(P):
+    return (P[0], P[1], 1, P[0]*P[1] % q)
+
 By = 4 * inv(5)
 Bx = xrecover(By)
 B = [Bx%q, By%q]
@@ -61,6 +68,20 @@ def edwards(P, Q):
     x3 = (x1*y2+x2*y1) * inv(1+d*x1*x2*y1*y2)
     y3 = (y1*y2+x1*x2) * inv(1-d*x1*x2*y1*y2)
     return [x3%q, y3%q]
+
+def add(P, Q):
+    A = (P[1]-P[0])*(Q[1]-Q[0]) % q
+    B = (P[1]+P[0])*(Q[1]+Q[0]) % q
+    C = 2 * P[3] * Q[3] * d % q
+    D = 2 * P[2] * Q[2] % q
+    E = B-A
+    F = D-C
+    G = D+C
+    H = B+A
+    return (E*F, G*H, F*G, E*H)
+
+def add_compressed(P, Q):
+    return compress(add(decompress(P), decompress(Q)))
 
 def scalarmult(P, e):
     if e == 0: return [0, 1]
@@ -92,14 +113,6 @@ def Hint(m):
     h = H(m)
     return sum(2**i * bit(h, i) for i in range(2*b))
 
-def signature(m, sk, pk):
-    h = H(sk)
-    a = 2**(b-2) + sum(2**i * bit(h, i) for i in range(3, b-2))
-    r = Hint(intlist2bytes([indexbytes(h, j) for j in range(b//8, b//4)]) + m)
-    R = scalarmult(B, r)
-    S = (r + Hint(encodepoint(R)+pk+m) * a) % l
-    return encodepoint(R) + encodeint(S)
-
 def isoncurve(P):
     x = P[0]
     y = P[1]
@@ -116,28 +129,29 @@ def decodepoint(s):
     if not isoncurve(P): raise Exception("decoding point that is not on curve")
     return P
 
-def checkvalid(s, m, pk):
-    if len(s) != b//4: raise Exception("signature length is wrong")
-    if len(pk) != b//8: raise Exception("public-key length is wrong")
-    R = decodepoint(s[0:b//8])
-    A = decodepoint(pk)
-    S = decodeint(s[b//8:b//4])
-    h = Hint(encodepoint(R) + pk + m)
-    if scalarmult(B, S) != edwards(R, scalarmult(A, h)):
-        raise Exception("signature does not pass verification")
-
-# This is from https://github.com/monero-project/mininero by Shen Noether with The Monero Project
-def scalarmultbase(e):
-    if e == 0: return [0, 1]
-    Q = scalarmult(B, e//2)
-    Q = edwards(Q, Q)
-    if e & 1: Q = edwards(Q, B)
-    return Q
+# These are unused but let's keep them
+#def signature(m, sk, pk):
+#    h = H(sk)
+#    a = 2**(b-2) + sum(2**i * bit(h, i) for i in range(3, b-2))
+#    r = Hint(intlist2bytes([indexbytes(h, j) for j in range(b//8, b//4)]) + m)
+#    R = scalarmult(B, r)
+#    S = (r + Hint(encodepoint(R)+pk+m) * a) % l
+#    return encodepoint(R) + encodeint(S)
+#
+#def checkvalid(s, m, pk):
+#    if len(s) != b//4: raise Exception("signature length is wrong")
+#    if len(pk) != b//8: raise Exception("public-key length is wrong")
+#    R = decodepoint(s[0:b//8])
+#    A = decodepoint(pk)
+#    S = decodeint(s[b//8:b//4])
+#    h = Hint(encodepoint(R) + pk + m)
+#    if scalarmult(B, S) != edwards(R, scalarmult(A, h)):
+#        raise Exception("signature does not pass verification")
 
 def public_from_secret(k):
     keyInt = decodeint(k)
-    aG = scalarmultbase(keyInt)
-    return encodepoint(aG)
+    aB = scalarmult(B, keyInt)
+    return encodepoint(aB)
 
 def public_from_secret_hex(hk):
     return hexlify(public_from_secret(unhexlify(hk))).decode()
