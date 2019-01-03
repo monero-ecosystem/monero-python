@@ -27,9 +27,9 @@ Project homepage: https://github.com/emesik/monero-python
    seed
    misc
    exceptions
+   release_notes
    license
    authors
-
 
 Indices and tables
 ------------------
