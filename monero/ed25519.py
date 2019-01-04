@@ -2,6 +2,7 @@
 #     Source: https://ed25519.cr.yp.to/python/ed25519.py
 #
 # Parts Copyright (c) 2016 The MoneroPy Developers. Released under the BSD 3-Clause
+# Parts taken from https://github.com/monero-project/mininero/blob/master/ed25519ietf.py
 
 from binascii import hexlify, unhexlify
 import hashlib
