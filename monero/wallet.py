@@ -199,6 +199,11 @@ class Wallet(object):
 
         :rtype: :class:`BaseAddress <monero.address.BaseAddress>`
         """
+        # ensure indexes are within uint32
+        if major < 0 or major >= 2**32:
+            raise ValueError('major index {} is outside uint32 range'.format(major))
+        if minor < 0 or minor >= 2**32:
+            raise ValueError('minor index {} is outside uint32 range'.format(minor))
         master_address = self.address()
         if major == minor == 0:
             return master_address

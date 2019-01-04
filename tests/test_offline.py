@@ -38,6 +38,12 @@ class AddressTestCase(Tests, unittest.TestCase):
     svk = '6d9056aa2c096bfcd2f272759555e5764ba204dd362604a983fa3e0aafd35901'
     net = 'mainnet'
 
+    def test_subaddress_out_of_range(self):
+        self.assertRaises(ValueError, self.wallet.get_address, 0, -1)
+        self.assertRaises(ValueError, self.wallet.get_address, -1, 0)
+        self.assertRaises(ValueError, self.wallet.get_address, 1, 2**32)
+        self.assertRaises(ValueError, self.wallet.get_address, 2**32, 1)
+
 
 class TestnetAddressTestCase(Tests, unittest.TestCase):
     addr = '9wuKTHsxGiwEsMp2fYzJiVahyhU2aZi1oZ6R6fK5U64uRa1Pxi8diZh2S1GJFqYXRRhcbfzfWiPD819zKEZkXTMwP7hMs5N'
