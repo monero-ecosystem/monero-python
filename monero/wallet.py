@@ -214,8 +214,6 @@ class Wallet(object):
                 b'SubAddr\0', master_svk,
                 struct.pack('<I', major), struct.pack('<I', minor)])
         m = keccak_256(hsdata).digest()
-        # TODO: OK, the hash is calculated correctly. What's missing here is ed25519 math
-        # to do the following:
         # D = master_psk + m * B
         D = ed25519.add_compressed(
                 ed25519.decodepoint(master_psk),
