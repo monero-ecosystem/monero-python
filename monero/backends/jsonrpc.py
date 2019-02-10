@@ -247,7 +247,7 @@ class JSONRPCWallet(object):
         }
         if 'destinations' in data:
             result['destinations'] = [
-                {'address': address(x['address']), 'amount': from_atomic(data['amount'])}
+                (address(x['address']), from_atomic(data['amount']))
                 for x in data.get('destinations')
             ]
         return result
@@ -287,7 +287,7 @@ class JSONRPCWallet(object):
             {'signed_key_images': key_images})
         return (_data['height'], from_atomic(_data['spent']), from_atomic(_data['unspent']))
 
-    def transfer(self, destinations, priority, ringsize,
+    def transfer(self, destinations, priority,
             payment_id=None, unlock_time=0, account=0,
             relay=True):
         data = {
@@ -295,7 +295,6 @@ class JSONRPCWallet(object):
             'destinations': list(map(
                 lambda dst: {'address': str(address(dst[0])), 'amount': to_atomic(dst[1])},
                 destinations)),
-            'mixin': ringsize - 1,
             'priority': priority,
             'unlock_time': 0,
             'get_tx_keys': True,
@@ -369,7 +368,8 @@ _err2exc = {
     -16: exceptions.TransactionNotPossible,
     -17: exceptions.NotEnoughMoney,
     -20: exceptions.AmountIsZero,
-    -37: exceptions.NotEnoughUnlockedMoney, # PR pending: https://github.com/monero-project/monero/pull/3197
-    -38: exceptions.NoDaemonConnection, # PR 3197
+    -37: exceptions.NotEnoughUnlockedMoney,
+    -38: exceptions.NoDaemonConnection,
+    -43: exceptions.WalletIsNotDeterministic, # https://github.com/monero-project/monero/pull/4653
     -32601: MethodNotFound,
 }

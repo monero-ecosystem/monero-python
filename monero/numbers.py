@@ -3,10 +3,10 @@ import sys
 
 PICONERO = Decimal('0.000000000001')
 
-if sys.version_info < (3,):
+if sys.version_info < (3,): # pragma: no cover
     _integer_types = (int, long,)
     _str_types = (str, bytes, unicode)
-else:
+else:                       # pragma: no cover
     _integer_types = (int,)
     _str_types = (str, bytes)
 

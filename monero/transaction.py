@@ -1,4 +1,5 @@
 import sys
+import warnings
 from .address import address
 from .numbers import PaymentID
 
@@ -50,7 +51,7 @@ class OutgoingPayment(Payment):
     destinations = None
 
     def __init__(self, **kwargs):
-        self.destinations = kwargs.pop('destinations', self.destinations)
+        self.destinations = kwargs.pop('destinations', [])
         super(OutgoingPayment, self).__init__(**kwargs)
 
     _reprstr = "out: {} @ {} {:.12f} id={}"
@@ -85,9 +86,9 @@ class Transaction(object):
         return self.hash
 
 
-if sys.version_info < (3,):
+if sys.version_info < (3,): # pragma: no cover
     _str_types = (str, bytes, unicode)
-else:
+else:                       # pragma: no cover
     _str_types = (str, bytes)
 
 
@@ -112,6 +113,38 @@ class PaymentManager(object):
         return fetch(self.account_idx, PaymentFilter(**filterparams))
 
 
+class _ByHeight(object):
+    """A helper class used as key in sorting of payments by height.
+    Mempool goes on top, blockchain payments are ordered with descending block numbers.
+
+    **WARNING:** Integer sorting is reversed here.
+    """
+    def __init__(self, pmt):
+        self.pmt = pmt
+    def _cmp(self, other):
+        sh = self.pmt.transaction.height
+        oh = other.pmt.transaction.height
+        if sh is oh is None:
+            return 0
+        if sh is None:
+            return 1
+        if oh is None:
+            return -1
+        return (sh > oh) - (sh < oh)
+    def __lt__(self, other):
+        return self._cmp(other) > 0
+    def __le__(self, other):
+        return self._cmp(other) >= 0
+    def __eq__(self, other):
+        return self._cmp(other) == 0
+    def __ge__(self, other):
+        return self._cmp(other) <= 0
+    def __gt__(self, other):
+        return self._cmp(other) < 0
+    def __ne__(self, other):
+        return self._cmp(other) != 0
+
+
 class PaymentFilter(object):
     """
     A helper class that filters payments retrieved by the backend.
@@ -128,7 +161,12 @@ class PaymentFilter(object):
         _payment_id = filterparams.pop('payment_id', None)
         if len(filterparams) > 0:
             raise ValueError("Excessive arguments for payment query: {}".format(filterparams))
-
+        if self.unconfirmed and (self.min_height is not None or self.max_height is not None):
+            warnings.warn("Height filtering (min_height/max_height) has been requested while "
+                    "also asking for unconfirmed transactions. These are mutually exclusive. "
+                    "As mempool transactions have no height at all, they will be excluded "
+                    "from the result.",
+                    RuntimeWarning)
         if _local_address is None:
             self.local_addresses = []
         else:
@@ -176,4 +214,6 @@ class PaymentFilter(object):
         return True
 
     def filter(self, payments):
-        return filter(self.check, payments)
+        return sorted(
+            filter(self.check, payments),
+            key=_ByHeight)

@@ -4,7 +4,8 @@ import logging
 import operator
 import re
 
-from monero.backends.jsonrpc import JSONRPCWallet
+from monero import exceptions
+from monero.backends.jsonrpc import JSONRPCWallet, RPCError
 from monero.wallet import Wallet
 
 def url_data(url):
@@ -32,14 +33,20 @@ _TXHDR = "timestamp         height  id/hash                                     
         "         amount         fee           {dir:95s} payment_id"
 
 def pmt2str(pmt):
-    return "{time} {height:7d} {hash} {amount:17.12f} {fee:13.12f} {addr} {payment_id}".format(
+    res = ["{time} {height:7d} {hash} {amount:17.12f} {fee:13.12f} {addr} {payment_id}".format(
         time=pmt.timestamp.strftime("%d-%m-%y %H:%M:%S") if getattr(pmt, 'timestamp', None) else None,
         height=pmt.transaction.height or 0,
         hash=pmt.transaction.hash,
         amount=pmt.amount,
         fee=pmt.transaction.fee or 0,
         payment_id=pmt.payment_id,
-        addr=getattr(pmt, 'local_address', None) or '')
+        addr=getattr(pmt, 'local_address', None) or '')]
+    try:
+        for dest in pmt.destinations:
+            res.append("    {amount:17.12f} to {address}".format(address=dest[0], amount=dest[1]))
+    except AttributeError:
+        pass
+    return "\n".join(res)
 
 def a2str(a):
     return "{addr} {label}".format(
@@ -54,6 +61,10 @@ print(
         addr=a2str(masteraddr),
         total=w.balance(),
         unlocked=w.balance(unlocked=True)))
+try:
+    seed = w.seed()
+except (exceptions.WalletIsNotDeterministic, RPCError): # FIXME: Remove RPCError once PR#4563 is merged in monero
+    seed = '[--- wallet is not deterministic and has no seed ---]'
 print(
     "Keys:\n" \
     "  private spend: {ssk}\n" \
@@ -65,7 +76,7 @@ print(
         svk=w.view_key(),
         psk=masteraddr.spend_key(),
         pvk=masteraddr.view_key(),
-        seed=w.seed()
+        seed=seed
         ))
 
 if len(w.accounts) > 1:
@@ -91,6 +102,9 @@ if len(w.accounts) > 1:
             for tx in outs:
                 print(pmt2str(tx))
 else:
+    addresses = w.accounts[0].addresses()
+    print("{num:2d} address(es):".format(num=len(addresses)))
+    print("\n".join(map(a2str, addresses)))
     ins = w.incoming(unconfirmed=True)
     if ins:
         print("\nIncoming transactions:")

@@ -1,3 +1,5 @@
+import json
+import os
 import unittest
 
 from monero.address import Address, SubAddress, IntegratedAddress, address
@@ -78,6 +80,22 @@ class Tests(object):
 
         self.assertNotEqual(a, 0)
 
+    def test_check_private_view_key(self):
+        a = Address(self.addr)
+        self.assertFalse(a.check_private_view_key(self.ssk))
+        self.assertTrue(a.check_private_view_key(self.svk))
+        self.assertFalse(a.check_private_view_key(self.psk))
+        self.assertFalse(a.check_private_view_key(self.pvk))
+        self.assertFalse(a.check_private_view_key('0000000000000000000000000000000000000000000000000000000000000000'))
+
+    def test_check_private_spend_key(self):
+        a = Address(self.addr)
+        self.assertTrue(a.check_private_spend_key(self.ssk))
+        self.assertFalse(a.check_private_spend_key(self.svk))
+        self.assertFalse(a.check_private_spend_key(self.psk))
+        self.assertFalse(a.check_private_spend_key(self.pvk))
+        self.assertFalse(a.check_private_spend_key('0000000000000000000000000000000000000000000000000000000000000000'))
+
     def test_idempotence(self):
         a = Address(self.addr)
         a_idem = Address(a)
@@ -130,46 +148,53 @@ class Tests(object):
         sa = SubAddress(self.subaddr)
         self.assertRaises(TypeError, sa.with_payment_id, self.pid)
 
-class AddressTestCase(unittest.TestCase, Tests):
-    addr = '43aeKax1ts4BoEbSyzKVbbDRmc8nsnpZLUpQBYvhUxs3KVrodnaFaBEQMDp69u4VaiEG3LSQXA6M61mXPrztCLuh7PFUAmd'
-    psk = '33a7ceb933b793408d49e82c0a34664a4be7117243cb77a64ef280b866d8aa6e'
-    pvk = '96f70d63d9d3558b97a5dd200a170b4f45b3177a274aa90496ea683896ff6438'
+
+class AddressTestCase(Tests, unittest.TestCase):
+    addr = '47ewoP19TN7JEEnFKUJHAYhGxkeTRH82sf36giEp9AcNfDBfkAtRLX7A6rZz18bbNHPNV7ex6WYbMN3aKisFRJZ8Ebsmgef'
+    ssk = 'e0fe01d5794e240a26609250c0d7e01673219eececa3f499d5cfa20a75739b0a'
+    svk = '6d9056aa2c096bfcd2f272759555e5764ba204dd362604a983fa3e0aafd35901'
+    psk = '9f2a76d879aaf0670039dc8dbdca01f0ca26a2f6d93268e3674666bfdc5957e4'
+    pvk = '716cfc7da7e6ce366935c55747839a85be798037ab189c7dd0f10b7f1690cb78'
     pid = '4a6f686e47616c74'
-    subaddr = '83bK2pMxCQXdRyd6W1haNWYRsF6Qb3iGa8gxKEynm9U7cYoXrMHFwRrFFuxRSgnLtGe7LM8SmrPY6L3TVBa3UV3YLuVJ7Rw'
-    iaddr = '4DHKLPmWW8aBoEbSyzKVbbDRmc8nsnpZLUpQBYvhUxs3KVrodnaFaBEQMDp69u4VaiEG3LSQXA6M61mXPrztCLuhAR6GpL18QNwE8h3TuF'
+    iaddr = '4HMcpBpe4ddJEEnFKUJHAYhGxkeTRH82sf36giEp9AcNfDBfkAtRLX7A6rZz18bbNHPNV7ex6WYbMN3aKisFRJZ8M7yKhzQhKW3ECCLWQw'
+    subaddr = '84LooD7i35SFppgf4tQ453Vi3q5WexSUXaVgut69ro8MFnmHwuezAArEZTZyLr9fS6QotjqkSAxSF6d1aDgsPoX849izJ7m'
     mainnet = True
     testnet = False
     stagenet = False
-    addr_invalid = '43aeKax1ts4boEbSyzKVbbDRmc8nsnpZLUpQBYvhUxs3KVrodnaFaBEQMDp69u4VaiEG3LSQXA6M61mXPrztCLuh7PFUAmd'
-    iaddr_invalid = '4DHKLpmWW8aBoEbSyzKVbbDRmc8nsnpZLUpQBYvhUxs3KVrodnaFaBEQMDp69u4VaiEG3LSQXA6M61mXPrztCLuhAR6GpL18QNwE8h3TuF'
+    addr_invalid = '47ewoP19TN7JCEnFKUJHAYhGxkeTRH82sf36giEp9AcNfDBfkAtRLX7A6rZz18bbNHPNV7ex6WYbMN3aKisFRJZ8Ebsmgef'
+    iaddr_invalid = '4HMcpBpe4ddJEEnFKUJHAYhGxkyTRH82sf36giEp9AcNfDBfkAtRLX7A6rZz18bbNHPNV7ex6WYbMN3aKisFRJZ8M7yKhzQhKW3ECCLWQw'
 
 
-class TestnetAddressTestCase(AddressTestCase, Tests):
-    addr = '9vgV48wWAPTWik5QSUSoGYicdvvsbSNHrT9Arsx1XBTz6VrWPSgfmnUKSPZDMyX4Ms8R9TkhB4uFqK9s5LUBbV6YQN2Q9ag'
-    psk = '5cbcfbcea7cc62b1aeb76758ad8df5f8cbe0c63d40c8cd9c49377bbc9c9b9520'
-    pvk = 'de048ca310ff7d6e3b6714bccdebd62c56d680a10272846c875241fa2c5fc1cf'
+class TestnetAddressTestCase(Tests, unittest.TestCase):
+    addr = '9wuKTHsxGiwEsMp2fYzJiVahyhU2aZi1oZ6R6fK5U64uRa1Pxi8diZh2S1GJFqYXRRhcbfzfWiPD819zKEZkXTMwP7hMs5N'
+    ssk = '4f5b7af2c1942067ba33d34318b9735cb46ab5d50b75294844c82a9dd872c201'
+    svk = '60cf228f2bf7f6a70643afe9468fde254145dbd3aab4072ede14bf8bae914103'
+    psk = '7cf743dcfd23d452e9b2936caeb622c9849f1ff1ddfd62bfdfac64113c1a4e92'
+    pvk = 'e3924b14d99a9c088e5a45278d5218f2d053b1c03c480f00ed2ee3dce80806c4'
     pid = '4a6f686e47616c74'
-    iaddr = 'A6PA4wkzmeyWik5QSUSoGYicdvvsbSNHrT9Arsx1XBTz6VrWPSgfmnUKSPZDMyX4Ms8R9TkhB4uFqK9s5LUBbV6YbfyqvDecDn3E7cvp9b'
-    subaddr = 'BbBjyYoYNNwFfL8RRVRTMiZUofBLpjRxdNnd5E4LyGcAK5CEsnL3gmE5QkrDRta7RPficGHcFdR6rUwWcjnwZVvCE3tLxhJ'
+    subaddr = 'BaU3yLuDqdcETYzeF7vFSVEKNR4sSGxBV1Evrw5yNBf2VMiuAwfDmiF3RHqLHkaA5A6RGiNNRUqvtaqhMtdjA1SQ1tnQV8D'
+    iaddr = 'A7bzU6hSszTEsMp2fYzJiVahyhU2aZi1oZ6R6fK5U64uRa1Pxi8diZh2S1GJFqYXRRhcbfzfWiPD819zKEZkXTMwZqGSmLeBXqMEBnZVkh'
     mainnet = False
     testnet = True
     stagenet = False
-    addr_invalid = '9vgV48wWAPTWik5QSUSoGYicdvvsbSNHrT9Arsx1XBTz6VrWPSgfmnUKSPZDMyX4Ms8R9TkhB4uFqK9s5LUbbV6YQN2Q9ag'
-    iaddr_invalid = 'A6PA4wkzmeyWik5qSUSoGYicdvvsbSNHrT9Arsx1XBTz6VrWPSgfmnUKSPZDMyX4Ms8R9TkhB4uFqK9s5LUBbV6YbfyqvDecDn3E7cvp9b'
+    addr_invalid = '9wuKTHsxGiwEsMp3fYzJiVahyhU2aZi1oZ6R6fK5U64uRa1Pxi8diZh2S1GJFqYXRRhcbfzfWiPD819zKEZkXTMwP7hMs5N'
+    iaddr_invalid = 'A7bzU6hSszTEsMp2fYzJiVahyhU2aZi2oZ6R6fK5U64uRa1Pxi8diZh2S1GJFqYXRRhcbfzfWiPD819zKEZkXTMwZqGSmLeBXqMEBnZVkh'
 
 
-class StagenetAddressTestCase(AddressTestCase, Tests):
-    addr = '56cXYWG13YKaT9z1aEy2hb9TZNnxrW3zE9S4nTQVDux5Qq7UYsmjuux3Zstxkorj9HAufyWLU3FwHW4uERQF6tkeUVogGN3'
-    psk = '7e33891fe6ea30c7fd79d48e250906329104dc77407cf732699f41564df8ca8e'
-    pvk = '77a3720428f91f0f58a196bb374f703b3ca45fa55f0764adc81ff241c4c797f3'
+class StagenetAddressTestCase(Tests, unittest.TestCase):
+    addr = '52jzuBBUMty3xPL3JsQxGP74LDuV6E1LS8Zda1PbdqQjGzFmH6N9ep9McbFKMALujVT9S5mKpbEgC5VPhfoAiVj8LdAqbp6'
+    ssk = 'a8733c61797115db4ec8a5ce39fb811f81dd4ec163b880526683e059c7e62503'
+    svk = 'fd5c0d25f8f994268079a4f7844274dc870a7c2b88fbfc24ba318375e1d9430f'
+    psk = '180c1d7bbf7f2e11aa90d0f61bf49024370e01cd54f33f2d36bba0357c9c205f'
+    pvk = '94b66a81e646927b3da74392306f789c5024734b4ce6351ad74c4c7d7351b3ad'
     pid = '4a6f686e47616c74'
-    iaddr = '5GKCZK5VeoqaT9z1aEy2hb9TZNnxrW3zE9S4nTQVDux5Qq7UYsmjuux3Zstxkorj9HAufyWLU3FwHW4uERQF6tkehhE4RH8N7QfEAC8jMy'
-    subaddr = '7417qYoKBoYXCugU2KvJBZExmyjav4n1MVME74AeWNwxQ39wKtbWdyP6YGuMK6C7HkAjBuVcbUYmCWbxDLwk9GAX4qyb48U'
+    subaddr = '7AeQwvrLtPeYoXVPRkEu8oEL7N9wnqHjYKwSvTf6YKbHgYmw6AJMsjggzVLo21egMK9qcoV1mxCTfP4FbaGb7JEMDfpLetk'
+    iaddr = '5CSfuyzxyAV3xPL3JsQxGP74LDuV6E1LS8Zda1PbdqQjGzFmH6N9ep9McbFKMALujVT9S5mKpbEgC5VPhfoAiVj8Vz8ySmoqYgTE8dR1yS'
     mainnet = False
     testnet = False
     stagenet = True
-    addr_invalid ='7417qYoKBoYXCugU2KvJBZExmyjav4n1MVME74AeWNwxQ39wKtbWdyP6YGuMK6C7HkAjBuVcbUYmCWbyDLwk9GAX4qyb48U'
-    iaddr_invalid = '5GKCZK5VeuqaT9z1aEy2hb9TZNnxrW3zE9S4nTQVDux5Qq7UYsmjuux3Zstxkorj9HAufyWLU3FwHW4uERQF6tkehhE4RH8N7QfEAC8jMy'
+    addr_invalid = '52jzuBBUMty3xPL3JsQxGP74LDuV6H1LS8Zda1PbdqQjGzFmH6N9ep9McbFKMALujVT9S5mKpbEgC5VPhfoAiVj8LdAqbp6'
+    iaddr_invalid = '5CSfuyzxyAV3xPL3JsQxGP74LDuV6E1LS8Zda1PbdqQjGzFmH6N9ep9McbFKMALujVT9S5mKppEgC5VPhfoAiVj8Vz8ySmoqYgTE8dR1yS'
 
 
 class KnownBugsTest(unittest.TestCase):

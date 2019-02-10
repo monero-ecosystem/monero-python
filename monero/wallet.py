@@ -1,3 +1,10 @@
+from binascii import hexlify, unhexlify
+from sha3 import keccak_256
+import struct
+
+from . import address
+from . import base58
+from . import ed25519
 from . import prio
 from .transaction import Payment, PaymentManager
 
@@ -36,6 +43,7 @@ class Wallet(object):
         self.accounts = self.accounts or []
         idx = 0
         for _acc in self._backend.accounts():
+            _acc.wallet = self
             try:
                 if self.accounts[idx]:
                     continue
@@ -54,11 +62,14 @@ class Wallet(object):
 
     def spend_key(self):
         """
-        Returns private spend key.
+        Returns private spend key. None if wallet is view-only.
 
-        :rtype: str
+        :rtype: str or None
         """
-        return self._backend.spend_key()
+        key = self._backend.spend_key()
+        if key.strip('0') == '':
+            return None
+        return key
 
     def view_key(self):
         """
@@ -181,8 +192,43 @@ class Wallet(object):
         """
         return self.accounts[0].new_address(label=label)
 
+    def get_address(self, major, minor):
+        """
+        Calculates sub-address for account index (`major`) and address index within
+        the account (`minor`).
+
+        :rtype: :class:`BaseAddress <monero.address.BaseAddress>`
+        """
+        # ensure indexes are within uint32
+        if major < 0 or major >= 2**32:
+            raise ValueError('major index {} is outside uint32 range'.format(major))
+        if minor < 0 or minor >= 2**32:
+            raise ValueError('minor index {} is outside uint32 range'.format(minor))
+        master_address = self.address()
+        if major == minor == 0:
+            return master_address
+        master_svk = unhexlify(self.view_key())
+        master_psk = unhexlify(self.address().spend_key())
+        # m = Hs("SubAddr\0" || master_svk || major || minor)
+        hsdata = b''.join([
+                b'SubAddr\0', master_svk,
+                struct.pack('<I', major), struct.pack('<I', minor)])
+        m = keccak_256(hsdata).digest()
+        # D = master_psk + m * B
+        D = ed25519.add_compressed(
+                ed25519.decodepoint(master_psk),
+                ed25519.scalarmult(ed25519.B, ed25519.decodeint(m)))
+        # C = master_svk * D
+        C = ed25519.scalarmult(D, ed25519.decodeint(master_svk))
+        netbyte = bytearray([
+                42 if master_address.is_mainnet() else \
+                63 if master_address.is_testnet() else 36])
+        data = netbyte + ed25519.encodepoint(D) + ed25519.encodepoint(C)
+        checksum = keccak_256(data).digest()[:4]
+        return address.SubAddress(base58.encode(hexlify(data + checksum)))
+
     def transfer(self, address, amount,
-            priority=prio.NORMAL, ringsize=11, payment_id=None, unlock_time=0,
+            priority=prio.NORMAL, payment_id=None, unlock_time=0,
             relay=True):
         """
         Sends a transfer from the default account. Returns a list of resulting transactions.
@@ -192,7 +238,6 @@ class Wallet(object):
         :param priority: transaction priority, implies fee. The priority can be a number
                     from 1 to 4 (unimportant, normal, elevated, priority) or a constant
                     from `monero.prio`.
-        :param ringsize: the ring size (deprecated, will be gone in v0.5)
         :param payment_id: ID for the payment (must be None if
                         :class:`IntegratedAddress <monero.address.IntegratedAddress>`
                         is used as the destination)
@@ -206,13 +251,12 @@ class Wallet(object):
                 address,
                 amount,
                 priority=priority,
-                ringsize=ringsize,
                 payment_id=payment_id,
                 unlock_time=unlock_time,
                 relay=relay)
 
     def transfer_multiple(self, destinations,
-            priority=prio.NORMAL, ringsize=11, payment_id=None, unlock_time=0,
+            priority=prio.NORMAL, payment_id=None, unlock_time=0,
             relay=True):
         """
         Sends a batch of transfers from the default account. Returns a list of resulting
@@ -222,7 +266,6 @@ class Wallet(object):
         :param priority: transaction priority, implies fee. The priority can be a number
                     from 1 to 4 (unimportant, normal, elevated, priority) or a constant
                     from `monero.prio`.
-        :param ringsize: the ring size (deprecated, will be gone in v0.5)
         :param payment_id: ID for the payment (must be None if
                         :class:`IntegratedAddress <monero.address.IntegratedAddress>`
                         is used as a destination)
@@ -235,7 +278,6 @@ class Wallet(object):
         return self.accounts[0].transfer_multiple(
                 destinations,
                 priority=priority,
-                ringsize=ringsize,
                 payment_id=payment_id,
                 unlock_time=unlock_time,
                 relay=relay)
