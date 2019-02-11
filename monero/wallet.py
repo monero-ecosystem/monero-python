@@ -281,3 +281,12 @@ class Wallet(object):
                 payment_id=payment_id,
                 unlock_time=unlock_time,
                 relay=relay)
+
+    def get_transfer(self, txid):
+        """
+        Show information about a transfer to/from default account for the specified tx id.
+
+        :param txid: string with transaction ID used to find the transfer.
+        :rtype: instance of :class:`IncomingPayment <monero.Transaction.IncomingPayment>` or :class:`OutgoingPayment <monero.Transaction.OutgoingPayment>`
+        """
+        return self.accounts[0].get_transfer(txid)

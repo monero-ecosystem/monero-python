@@ -70,3 +70,7 @@ class OfflineWallet(object):
 
     def transfer(self, *args, **kwargs):
         raise WalletIsOffline()
+
+    def get_transfer_by_txid(self, account, txid):
+        raise WalletIsOffline()
+

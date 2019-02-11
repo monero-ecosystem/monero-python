@@ -247,7 +247,7 @@ class JSONRPCWallet(object):
         }
         if 'destinations' in data:
             result['destinations'] = [
-                (address(x['address']), from_atomic(data['amount']))
+                (address(x['address']), from_atomic(x['amount']))
                 for x in data.get('destinations')
             ]
         return result
@@ -347,6 +347,20 @@ class JSONRPCWallet(object):
                     "message: {message}".format(method=method, data=data, result=result, **err))
         return result['result']
 
+    def get_transfer_by_txid(self, account, txid):
+        pmt = self.raw_request(
+            'get_transfer_by_txid', {
+                'txid': txid,
+                'account_index': account,
+            }
+        )['transfer']
+
+        if pmt['type'] == 'out':
+            return self._outpayment(pmt)
+        elif pmt['type'] == 'in':
+            return self._inpayment(pmt)
+        else:
+            raise ValueError('Invalid transfer type')
 
 class RPCError(exceptions.BackendException):
     pass
