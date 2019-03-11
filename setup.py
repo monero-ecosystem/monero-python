@@ -29,7 +29,7 @@ setup(
     name = 'monero-python',
     version = version,
     description = 'A comprehensive Python module for handling Monero cryptocurrency',
-    url = 'https://github.com/emesik/monero-python/',
+    url = 'https://github.com/monero-ecosystem/monero-python/',
     long_description = open('README.rst', 'rb').read().decode('utf-8'),
     install_requires = open('requirements.txt', 'r').read().splitlines(),
     tests_require=open('test_requirements.txt', 'r').read().splitlines(),

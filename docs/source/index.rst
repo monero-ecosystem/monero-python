@@ -12,7 +12,7 @@ from the Monero environment, like wallets, accounts, addresses, transactions.
 Currently it operates over JSON RPC protocol, however other backends are
 planned as well.
 
-Project homepage: https://github.com/emesik/monero-python
+Project homepage: https://github.com/monero-ecosystem/monero-python
 
 .. toctree::
    :maxdepth: 2
