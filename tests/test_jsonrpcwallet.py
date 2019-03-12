@@ -1,11 +1,10 @@
 from datetime import datetime
 from decimal import Decimal
-import unittest
+import responses
 try:
     from unittest.mock import patch, Mock
 except ImportError:
     from mock import patch, Mock
-import warnings
 
 from monero.wallet import Wallet
 from monero.address import BaseAddress, Address
@@ -13,7 +12,10 @@ from monero.seed import Seed
 from monero.transaction import IncomingPayment, OutgoingPayment, Transaction
 from monero.backends.jsonrpc import JSONRPCWallet
 
-class SubaddrWalletTestCase(unittest.TestCase):
+from .base import JSONTestCase
+
+class JSONRPCWalletTestCase(JSONTestCase):
+    data_subdir = 'test_jsonrpcwallet'
     accounts_result = {'id': 0,
         'jsonrpc': '2.0',
         'result': {'subaddress_accounts': [{'account_index': 0,
@@ -924,6 +926,22 @@ class SubaddrWalletTestCase(unittest.TestCase):
             self.assertIsInstance(pmt.transaction, Transaction)
             self.assertIsInstance(pmt.transaction.fee, Decimal)
             self.assertIs(pmt.transaction.height, None)
+
+    @responses.activate
+    def test_multiple_destinations(self):
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_multiple_destinations-accounts.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_multiple_destinations-incoming.json'),
+            status=200)
+        self.wallet = Wallet(JSONRPCWallet())
+        out = self.wallet.outgoing()
+        self.assertEqual(len(out), 1)
+        pmt = out[0]
+        self.assertEqual(pmt.amount, 1)
+        self.assertEqual(len(pmt.destinations), 2)
+        self.assertEqual(pmt.destinations[0][1] + pmt.destinations[1][1], pmt.amount)
 
     @patch('monero.backends.jsonrpc.requests.post')
     def test_send_transfer(self, mock_post):
