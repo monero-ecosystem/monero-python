@@ -15,9 +15,10 @@ class Wallet(object):
 
     Provides interface to operate on a wallet.
 
-    Wallet consists of :class:`accounts <monero.account.Account>`. In Monero 0.11 and earlier the wallet has only a single account
-    with index 0. In later versions there might be multiple accounts, but a fresh wallet starts
-    with only one.
+    A wallet consists of :class:`accounts <monero.account.Account>`. Fresh wallets start
+    with only one account but you may create more. Although it's possible to combine funds
+    from different accounts, or even wallets, in a single transaction, this code closely
+    follows the idea of separation introduced in the original wallet software.
 
     The list of accounts will be initialized under the `accounts` attribute.
 

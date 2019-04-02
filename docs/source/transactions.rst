@@ -84,7 +84,7 @@ Or limit by both criteria at the same time:
     In [3]: wallet.incoming(payment_id='f75ad90e25d71a12', min_height=1087601)
     Out[3]: [in: f34b495cec77822a70f829ec8a5a7f1e727128d62e6b1438e9cb7799654d610e @ 1087601 3.000000000000 id=f75ad90e25d71a12]
 
-With Monero releases > 0.11.x you will be also able to filter payments by the address:
+You may also filter payments by the address:
 
 .. code-block:: python
 

@@ -130,7 +130,6 @@ class JSONRPCWallet(object):
         return self.raw_request('getheight')['height']
 
     def spend_key(self):
-        # NOTE: This will fail on 0.11.x, the method was missing
         return self.raw_request('query_key', {'key_type': 'spend_key'})['key']
 
     def view_key(self):
@@ -158,10 +157,6 @@ class JSONRPCWallet(object):
 
     def addresses(self, account=0):
         _addresses = self.raw_request('getaddress', {'account_index': account})
-        if 'addresses' not in _addresses:
-            # monero <= 0.11
-            _log.debug('Monero <= 0.11 found, assuming single address')
-            return [Address(_addresses['address'])]
         addresses = [None] * (max(map(operator.itemgetter('address_index'), _addresses['addresses'])) + 1)
         for _addr in _addresses['addresses']:
             addresses[_addr['address_index']] = address(
@@ -329,10 +324,6 @@ class JSONRPCWallet(object):
         if 'error' in result:
             err = result['error']
             _log.error(u"JSON RPC error:\n{result}".format(result=_ppresult))
-            # XXX: workaround for 0.11 bug throwing a wrong error code
-            if err['code'] == -4 and 'not enough money' in err['message']:
-                raise exceptions.NotEnoughMoney(err['message'])
-            #
             if err['code'] in _err2exc:
                 raise _err2exc[err['code']](err['message'])
             else:

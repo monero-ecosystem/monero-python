@@ -1,10 +1,8 @@
 Using wallet and accounts
 =========================
 
-The wallet, up to Monero 'Helium Hydra' (0.11.x) release, had only single
-address and no concept of accounts. This will change with the next version
-which is planned to be published in March 2018 and already is available for
-testing.
+Since Monero 'Helium Hydra' (0.11.x) the wallet handles accounts and deterministically
+generated addresses, known as *subaddresses*.
 
 The wallet
 ----------
@@ -26,15 +24,11 @@ addresses:
 Accounts and subaddresses
 -------------------------
 
-The following part may look strange if you are still using v0.11.x, because the
-concept of multiple accounts and subaddresses didn't exist back then.
-
 The accounts are stored in wallet's ``accounts`` attribute, which is a list.
 
 Regardless of the version, **the wallet by default operates on its account of
 index 0**, which makes it consistent with the behavior of the CLI wallet
-client. On v0.11 the following code will work, even though it doesn't make much
-sense.
+client.
 
 .. code-block:: python
 
@@ -57,8 +51,6 @@ Creating accounts and addresses
 Every wallet can have separate accounts and each account can have numerous
 addresses. The ``Wallet.new_account()`` and ``Account.new_address()`` will
 create new instances.
-
-(This snippet will fail on Monero v0.11.x)
 
 .. code-block:: python
 

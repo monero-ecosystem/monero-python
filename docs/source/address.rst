@@ -1,9 +1,6 @@
 Addresses and payment IDs
 =========================
 
-In Monero v0.11.x the wallet had only one address. This is changing now. A
-concept of **subaddress** has been introduced.
-
 The first, original address of the wallet is usually known as the *master
 address*. All others are just *subaddresses*, even if they represent a separate
 account within the wallet.
