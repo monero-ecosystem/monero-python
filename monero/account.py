@@ -13,12 +13,15 @@ class Account(object):
 
     :param backend: a wallet backend
     :param index: the account's index within the wallet
+    :param label: optional account label as `str`
     """
     index = None
     wallet = None
+    label = None
 
-    def __init__(self, backend, index):
+    def __init__(self, backend, index, label=None):
         self.index = index
+        self.label = label
         self._backend = backend
         self.incoming = PaymentManager(index, backend, 'in')
         self.outgoing = PaymentManager(index, backend, 'out')
@@ -60,6 +63,7 @@ class Account(object):
         """
         Creates a new address.
 
+        :param label: address label as `str`
         :rtype: :class:`SubAddress <monero.address.SubAddress>`
         """
         return self._backend.new_address(account=self.index, label=label)

@@ -1,0 +1,9 @@
+{
+  "id": 0,
+  "jsonrpc": "2.0",
+  "result": {
+    "balance": 0,
+    "multisig_import_needed": false,
+    "unlocked_balance": 0
+  }
+}

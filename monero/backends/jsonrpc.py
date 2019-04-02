@@ -2,7 +2,6 @@ from datetime import datetime
 import operator
 import json
 import logging
-import pprint
 import requests
 
 from .. import exceptions
@@ -61,14 +60,14 @@ class JSONRPCDaemon(object):
         hdr = {'Content-Type': 'application/json'}
         _log.debug(u"Request: {path}\nData: {data}".format(
             path=path,
-            data=pprint.pformat(data)))
+            data=json.dumps(data, indent=2, sort_keys=True)))
         rsp = requests.post(self.url + path, headers=hdr, data=json.dumps(data))
         if rsp.status_code != 200:
             raise RPCError("Invalid HTTP status {code} for path {path}.".format(
                 code=rsp.status_code,
                 path=path))
         result = rsp.json()
-        _ppresult = pprint.pformat(result)
+        _ppresult = json.dumps(result, indent=2, sort_keys=True)
         _log.debug(u"Result:\n{result}".format(result=_ppresult))
         return result
 
@@ -78,7 +77,7 @@ class JSONRPCDaemon(object):
         data = {'jsonrpc': '2.0', 'id': 0, 'method': method, 'params': params or {}}
         _log.debug(u"Method: {method}\nParams:\n{params}".format(
             method=method,
-            params=pprint.pformat(params)))
+            params=json.dumps(params, indent=2, sort_keys=True)))
         auth = requests.auth.HTTPDigestAuth(self.user, self.password)
         rsp = requests.post(self.url + '/json_rpc', headers=hdr, data=json.dumps(data), auth=auth)
         if rsp.status_code == 401:
@@ -88,7 +87,7 @@ class JSONRPCDaemon(object):
                 code=rsp.status_code,
                 method=method))
         result = rsp.json()
-        _ppresult = pprint.pformat(result)
+        _ppresult = json.dumps(result, indent=2, sort_keys=True)
         _log.debug(u"Result:\n{result}".format(result=_ppresult))
 
         if 'error' in result:
@@ -142,24 +141,20 @@ class JSONRPCWallet(object):
 
     def accounts(self):
         accounts = []
-        try:
-            _accounts = self.raw_request('get_accounts', squelch_error_logging=True)
-        except MethodNotFound:
-            # monero <= 0.11 : there's only one account and one address
-            _log.debug('Monero <= 0.11 found, no accounts')
-            self._master_address = self.addresses()[0]
-            return [Account(self, 0)]
+        _accounts = self.raw_request('get_accounts')
         idx = 0
         self._master_address = Address(_accounts['subaddress_accounts'][0]['base_address'])
         for _acc in _accounts['subaddress_accounts']:
             assert idx == _acc['account_index']
-            accounts.append(Account(self, _acc['account_index']))
+            accounts.append(Account(self, _acc['account_index'], label=_acc.get('label')))
             idx += 1
         return accounts
 
     def new_account(self, label=None):
         _account = self.raw_request('create_account', {'label': label})
-        return Account(self, _account['account_index']), SubAddress(_account['address'])
+        # NOTE: the following should re-read label by _account.get('label') but the RPC
+        # doesn't return that detail here
+        return Account(self, _account['account_index'], label=label), SubAddress(_account['address'])
 
     def addresses(self, account=0):
         _addresses = self.raw_request('getaddress', {'account_index': account})
@@ -318,7 +313,7 @@ class JSONRPCWallet(object):
         data = {'jsonrpc': '2.0', 'id': 0, 'method': method, 'params': params or {}}
         _log.debug(u"Method: {method}\nParams:\n{params}".format(
             method=method,
-            params=pprint.pformat(params)))
+            params=json.dumps(params, indent=2, sort_keys=True)))
         auth = requests.auth.HTTPDigestAuth(self.user, self.password)
         rsp = requests.post(self.url, headers=hdr, data=json.dumps(data), auth=auth)
         if rsp.status_code == 401:
@@ -328,13 +323,12 @@ class JSONRPCWallet(object):
                 code=rsp.status_code,
                 method=method))
         result = rsp.json()
-        _ppresult = pprint.pformat(result)
+        _ppresult = json.dumps(result, indent=2, sort_keys=True)
         _log.debug(u"Result:\n{result}".format(result=_ppresult))
 
         if 'error' in result:
             err = result['error']
-            if not squelch_error_logging:
-                _log.error(u"JSON RPC error:\n{result}".format(result=_ppresult))
+            _log.error(u"JSON RPC error:\n{result}".format(result=_ppresult))
             # XXX: workaround for 0.11 bug throwing a wrong error code
             if err['code'] == -4 and 'not enough money' in err['message']:
                 raise exceptions.NotEnoughMoney(err['message'])

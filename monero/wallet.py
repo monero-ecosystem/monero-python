@@ -91,6 +91,7 @@ class Wallet(object):
         """
         Creates new account, appends it to the :class:`Wallet`'s account list and returns it.
 
+        :param label: account label as `str`
         :rtype: :class:`Account`
         """
         acc, addr = self._backend.new_account(label=label)

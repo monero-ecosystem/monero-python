@@ -139,6 +139,32 @@ class JSONRPCWalletTestCase(JSONTestCase):
         self.assertEqual(a0addr.label, 'Primary account')
         self.assertEqual(len(self.wallet.accounts[0].addresses()), 8)
 
+    @responses.activate
+    def test_account_creation(self):
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_account_creation-00-get_accounts.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_account_creation-10-create_account.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_account_creation-20-getbalance.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_account_creation-30-get_accounts.json'),
+            status=200)
+        w = Wallet(JSONRPCWallet())
+        self.assertEqual(1, len(w.accounts))
+        w.new_account('account 1')
+        self.assertEqual(2, len(w.accounts))
+        self.assertEqual('account 1', w.accounts[1].label)
+        self.assertEqual(0, w.accounts[1].balance())
+        acc0, acc1 = w.accounts
+        w.refresh()
+        self.assertEqual(2, len(w.accounts))
+        self.assertEqual('account 1', w.accounts[1].label)
+        self.assertEqual([acc0, acc1], w.accounts)
+
     @patch('monero.backends.jsonrpc.requests.post')
     def test_incoming_confirmed(self, mock_post):
         mock_post.return_value.status_code = 200
