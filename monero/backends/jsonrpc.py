@@ -53,7 +53,8 @@ class JSONRPCDaemon(object):
             txs.append(Transaction(
                 hash=tx['id_hash'],
                 fee=from_atomic(tx['fee']),
-                timestamp=datetime.fromtimestamp(tx['receive_time'])))
+                timestamp=datetime.fromtimestamp(tx['receive_time']),
+                confirmations=0))
         return txs
 
     def raw_request(self, path, data):

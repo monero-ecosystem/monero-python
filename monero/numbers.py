@@ -2,6 +2,7 @@ from decimal import Decimal
 import sys
 
 PICONERO = Decimal('0.000000000001')
+EMPTY_KEY = '0' * 64
 
 if sys.version_info < (3,): # pragma: no cover
     _integer_types = (int, long,)

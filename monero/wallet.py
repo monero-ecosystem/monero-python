@@ -5,6 +5,7 @@ import struct
 from . import address
 from . import base58
 from . import ed25519
+from . import numbers
 from . import prio
 from .transaction import Payment, PaymentManager
 
@@ -68,7 +69,7 @@ class Wallet(object):
         :rtype: str or None
         """
         key = self._backend.spend_key()
-        if key.strip('0') == '':
+        if key == numbers.EMPTY_KEY:
             return None
         return key
 

@@ -1,6 +1,7 @@
 from .. import exceptions
 from ..account import Account
 from ..address import Address
+from ..numbers import EMPTY_KEY
 from ..seed import Seed
 
 
@@ -14,7 +15,7 @@ class OfflineWallet(object):
     """
     _address = None
     _svk = None
-    _ssk = None
+    _ssk = EMPTY_KEY
 
     def __init__(self, address, view_key=None, spend_key=None):
         self._address = Address(address)
@@ -42,7 +43,7 @@ class OfflineWallet(object):
     def addresses(self, account=0):
         if account == 0:
             return [self._address]
-        raise WalletIsOffline()
+        raise WalletIsOffline() # pragma: no cover (this should never happen)
 
     def new_address(self, account=0, label=None):
         raise WalletIsOffline()

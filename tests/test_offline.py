@@ -1,14 +1,43 @@
-from monero.backends.offline import OfflineWallet
+from monero.backends.offline import OfflineWallet, WalletIsOffline
 from monero.wallet import Wallet
+import unittest
 from .base import JSONTestCase
-from .utils import classproperty
+
+
+class OfflineTest(unittest.TestCase):
+    addr = '47ewoP19TN7JEEnFKUJHAYhGxkeTRH82sf36giEp9AcNfDBfkAtRLX7A6rZz18bbNHPNV7ex6WYbMN3aKisFRJZ8Ebsmgef'
+    svk = '6d9056aa2c096bfcd2f272759555e5764ba204dd362604a983fa3e0aafd35901'
+
+    def setUp(self):
+        self.wallet = Wallet(OfflineWallet(self.addr, view_key=self.svk))
+
+    def test_offline_exception(self):
+        self.assertRaises(WalletIsOffline, self.wallet.height)
+        self.assertRaises(WalletIsOffline, self.wallet.new_account)
+        self.assertRaises(WalletIsOffline, self.wallet.new_address)
+        self.assertRaises(WalletIsOffline, self.wallet.export_outputs)
+        self.assertRaises(WalletIsOffline, self.wallet.import_outputs, '')
+        self.assertRaises(WalletIsOffline, self.wallet.export_key_images)
+        self.assertRaises(WalletIsOffline, self.wallet.import_key_images, '')
+        self.assertRaises(WalletIsOffline, self.wallet.balances)
+        self.assertRaises(WalletIsOffline, self.wallet.balance)
+        self.assertRaises(WalletIsOffline, self.wallet.incoming)
+        self.assertRaises(WalletIsOffline, self.wallet.outgoing)
+        self.assertRaises(WalletIsOffline, self.wallet.transfer, self.wallet.get_address(1,0), 1)
+        self.assertRaises(WalletIsOffline, self.wallet.transfer_multiple,
+                [(self.wallet.get_address(1,0), 1), (self.wallet.get_address(1,1), 2)])
 
 
 class SubaddrTest(object):
     data_subdir = 'test_offline'
 
     def setUp(self):
-        self.wallet = Wallet(OfflineWallet(self.addr, view_key=self.svk))
+        self.wallet = Wallet(OfflineWallet(self.addr, view_key=self.svk, spend_key=self.ssk))
+
+    def test_keys(self):
+        self.assertEqual(self.wallet.spend_key(), self.ssk)
+        self.assertEqual(self.wallet.view_key(), self.svk)
+        self.assertEqual(25, len(self.wallet.seed().phrase.split(' ')))
 
     def test_subaddresses(self):
         major = 0
