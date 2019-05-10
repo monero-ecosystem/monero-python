@@ -20,6 +20,7 @@ def get_wallet():
         help="Wallet RPC URL [user[:password]@]host[:port]")
     argsparser.add_argument('-v', dest='verbosity', action='count', default=0,
         help="Verbosity (repeat to increase; -v for INFO, -vv for DEBUG")
+    argsparser.add_argument('-t', dest='timeout', type=int, default=30, help="Request timeout")
     args = argsparser.parse_args()
     level = logging.WARNING
     if args.verbosity == 1:
@@ -27,7 +28,7 @@ def get_wallet():
     elif args.verbosity > 1:
         level = logging.DEBUG
     logging.basicConfig(level=level, format="%(asctime)-15s %(message)s")
-    return Wallet(JSONRPCWallet(**args.wallet_rpc_url))
+    return Wallet(JSONRPCWallet(timeout=args.timeout, **args.wallet_rpc_url))
 
 _TXHDR = "timestamp         height  id/hash                                                     " \
         "         amount         fee           {dir:95s} payment_id"

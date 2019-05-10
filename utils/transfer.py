@@ -28,6 +28,7 @@ argsparser.add_argument('-v', dest='verbosity', action='count', default=0,
     help="Verbosity (repeat to increase; -v for INFO, -vv for DEBUG")
 argsparser.add_argument('wallet_rpc_url', nargs='?', type=url_data, default='127.0.0.1:18082',
     help="Daemon URL [user[:password]@]host[:port]")
+argsparser.add_argument('-t', dest='timeout', type=int, default=30, help="Request timeout")
 argsparser.add_argument('-a', dest='account', default=0, type=int, help="Source account index")
 argsparser.add_argument('-p', dest='prio',
     choices=['unimportant', 'normal', 'elevated', 'priority'],
@@ -50,7 +51,7 @@ elif args.verbosity > 1:
     level = logging.DEBUG
 logging.basicConfig(level=level, format="%(asctime)-15s %(message)s")
 
-w = Wallet(JSONRPCWallet(**args.wallet_rpc_url))
+w = Wallet(JSONRPCWallet(timeout=args.timeout, **args.wallet_rpc_url))
 txns = w.accounts[args.account].transfer_multiple(
     args.destinations, priority=prio, payment_id=args.payment_id,
     relay=args.outdir is None)
