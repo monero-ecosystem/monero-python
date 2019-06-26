@@ -106,8 +106,6 @@ class JSONRPCDaemon(object):
         return result['result']
 
 
-
-
 class JSONRPCWallet(object):
     """
     JSON RPC backend for Monero wallet (``monero-wallet-rpc``)
@@ -121,7 +119,6 @@ class JSONRPCWallet(object):
     :param timeout: request timeout
     """
     _master_address = None
-    _addresses = None
 
     def __init__(self, protocol='http', host='127.0.0.1', port=18088, path='/json_rpc',
             user='', password='', timeout=30):
@@ -312,6 +309,38 @@ class JSONRPCWallet(object):
         for d in _pertx:
             d['payment_id'] = payment_id
         return [self._tx(data) for data in _pertx]
+
+    def sweep_all(self, destination, priority, payment_id=None, subaddr_indices=None,
+            unlock_time=0, account=0, relay=True):
+        if not subaddr_indices:
+            # retrieve indices of all subaddresses with positive unlocked balance
+            bals = self.raw_request('get_balance', {'account_index': account})
+            subaddr_indices = []
+            for subaddr in bals['per_subaddress']:
+                if subaddr.get('unlocked_balance', 0):
+                    subaddr_indices.append(subaddr['address_index'])
+        data = {
+            'account_index': account,
+            'address': str(address(destination)),
+            'subaddr_indices': list(subaddr_indices),
+            'priority': priority,
+            'unlock_time': 0,
+            'get_tx_keys': True,
+            'get_tx_hex': True,
+            'do_not_relay': not relay,
+        }
+        if payment_id is not None:
+            data['payment_id'] = str(PaymentID(payment_id))
+        _transfers = self.raw_request('sweep_all', data)
+        _pertx = [dict(_tx) for _tx in map(
+            lambda vs: zip(('txid', 'amount', 'fee', 'key', 'blob', 'payment_id'), vs),
+            zip(*[_transfers[k] for k in (
+                'tx_hash_list', 'amount_list', 'fee_list', 'tx_key_list', 'tx_blob_list')]))]
+        for d in _pertx:
+            d['payment_id'] = payment_id
+        return list(zip(
+                [self._tx(data) for data in _pertx],
+                map(from_atomic, _transfers['amount_list'])))
 
     def raw_request(self, method, params=None, squelch_error_logging=False):
         hdr = {'Content-Type': 'application/json'}

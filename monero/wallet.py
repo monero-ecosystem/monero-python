@@ -242,12 +242,12 @@ class Wallet(object):
                     from 1 to 4 (unimportant, normal, elevated, priority) or a constant
                     from `monero.prio`.
         :param payment_id: ID for the payment (must be None if
-                        :class:`IntegratedAddress <monero.address.IntegratedAddress>`
-                        is used as the destination)
+                    :class:`IntegratedAddress <monero.address.IntegratedAddress>`
+                    is used as the destination)
         :param unlock_time: the extra unlock delay
         :param relay: if `True`, the wallet will relay the transaction(s) to the network
-                        immediately; when `False`, it will only return the transaction(s)
-                        so they might be broadcasted later
+                    immediately; when `False`, it will only return the transaction(s)
+                    so they might be broadcast later
         :rtype: list of :class:`Transaction <monero.transaction.Transaction>`
         """
         return self.accounts[0].transfer(
@@ -263,20 +263,21 @@ class Wallet(object):
             relay=True):
         """
         Sends a batch of transfers from the default account. Returns a list of resulting
-        transactions.
+        transactions and amounts.
 
         :param destinations: a list of destination and amount pairs: [(address, amount), ...]
         :param priority: transaction priority, implies fee. The priority can be a number
-                    from 1 to 4 (unimportant, normal, elevated, priority) or a constant
-                    from `monero.prio`.
+                from 1 to 4 (unimportant, normal, elevated, priority) or a constant
+                from `monero.prio`.
         :param payment_id: ID for the payment (must be None if
-                        :class:`IntegratedAddress <monero.address.IntegratedAddress>`
-                        is used as a destination)
+                :class:`IntegratedAddress <monero.address.IntegratedAddress>`
+                is used as a destination)
         :param unlock_time: the extra unlock delay
         :param relay: if `True`, the wallet will relay the transaction(s) to the network
-                        immediately; when `False`, it will only return the transaction(s)
-                        so they might be broadcasted later
-        :rtype: list of :class:`Transaction <monero.transaction.Transaction>`
+                immediately; when `False`, it will only return the transaction(s)
+                so they might be broadcast later
+        :rtype: list of transaction and amount pairs:
+                [(:class:`Transaction <monero.transaction.Transaction>`, `Decimal`), ...]
         """
         return self.accounts[0].transfer_multiple(
                 destinations,
@@ -284,3 +285,32 @@ class Wallet(object):
                 payment_id=payment_id,
                 unlock_time=unlock_time,
                 relay=relay)
+
+    def sweep_all(self, address, priority=prio.NORMAL, payment_id=None,
+            subaddr_indices=None, unlock_time=0, relay=True):
+        """
+        Sends all unlocked balance from the default account to an address.
+        Returns a list of resulting transactions.
+
+        :param address: destination :class:`Address <monero.address.Address>` or subtype
+        :param priority: transaction priority, implies fee. The priority can be a number
+                    from 1 to 4 (unimportant, normal, elevated, priority) or a constant
+                    from `monero.prio`.
+        :param payment_id: ID for the payment (must be None if
+                    :class:`IntegratedAddress <monero.address.IntegratedAddress>`
+                    is used as the destination)
+        :param subaddr_indices: a sequence of subaddress indices to sweep from. Empty sequence
+                    or `None` means sweep all positive balances.
+        :param unlock_time: the extra unlock delay
+        :param relay: if `True`, the wallet will relay the transaction(s) to the network
+                    immediately; when `False`, it will only return the transaction(s)
+                    so they might be broadcast later
+        :rtype: list of :class:`Transaction <monero.transaction.Transaction>`
+        """
+        return self.accounts[0].sweep_all(
+            address,
+            priority=priority,
+            payment_id=payment_id,
+            subaddr_indices=subaddr_indices,
+            unlock_time=unlock_time,
+            relay=relay)

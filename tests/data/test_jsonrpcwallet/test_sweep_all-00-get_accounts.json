@@ -1,0 +1,122 @@
+{
+  "id": 0,
+  "jsonrpc": "2.0",
+  "result": {
+    "subaddress_accounts": [
+      {
+        "account_index": 0,
+        "balance": 111141601989972,
+        "base_address": "56cXYWG13YKaT9z1aEy2hb9TZNnxrW3zE9S4nTQVDux5Qq7UYsmjuux3Zstxkorj9HAufyWLU3FwHW4uERQF6tkeUVogGN3",
+        "label": "Primary account",
+        "tag": "",
+        "unlocked_balance": 111141601989972
+      },
+      {
+        "account_index": 1,
+        "balance": 1000000000000,
+        "base_address": "79kTZg96pMf2Dt9rLEWnLzTUB8XC1wMhxaJyxa79hJu6bK9CfFnfbSL1GJNZbqhv9xPqJhRj2Yfb7QUWa2zeEw56H4KiUfN",
+        "label": "Untitled account",
+        "tag": "",
+        "unlocked_balance": 1000000000000
+      },
+      {
+        "account_index": 2,
+        "balance": 0,
+        "base_address": "73WHDaR3q9D6x8mpUrP8Ux5t2LhF5Mcq9URJ3nRjhkUfAwkLxLFVvkebG8baqxbsrMjHv549rPYsKc6nZGZo5wad1pGRr2J",
+        "label": "",
+        "tag": "",
+        "unlocked_balance": 0
+      },
+      {
+        "account_index": 3,
+        "balance": 0,
+        "base_address": "73BEwtAeC3pCJwK5cmJLAy4vwCkLLKmfgXW2XsCC7dsZPFwMtA7Sr7ZQWFTAYDFzQFXzcVNTm5jXGb4GqTzJGB7AE7DfwJn",
+        "label": "test",
+        "tag": "",
+        "unlocked_balance": 0
+      },
+      {
+        "account_index": 4,
+        "balance": 0,
+        "base_address": "75WFcdiyf3z9hvMDu1RDmMFVgRaes41p7GftarFtPet5A9srdWuJpoJCiJyNMAq2oMfyUHLhCDmw4g6Typks3rVw4ipBiK1",
+        "label": "",
+        "tag": "",
+        "unlocked_balance": 0
+      },
+      {
+        "account_index": 5,
+        "balance": 0,
+        "base_address": "79YfcwoWUBebbnR31sD4Q1FryHUrxExNqjAKukfAnvisLKtyZTVFqwtNcb33hsfrUF58esU7isA831SvWfx6PpDX2mpMPmR",
+        "label": "test",
+        "tag": "",
+        "unlocked_balance": 0
+      },
+      {
+        "account_index": 6,
+        "balance": 0,
+        "base_address": "79khAXM9X3g6wWv7PBJVsUWqA8kmgGwXiicTsN1856uo17V4ijXTGVfGA3stnB5ur6a3M5rm1Nvdjacj5wM4NzHA6WGyLCT",
+        "label": "",
+        "tag": "",
+        "unlocked_balance": 0
+      },
+      {
+        "account_index": 7,
+        "balance": 0,
+        "base_address": "78ZoiX5PoxHNLosKUbu8tv3nWSEhT6g1iam5weemsWvPCRPKGSpFJYRirbBz3hJs49R5QM7CpHSnwCwCPX9Qf4PGSachsDh",
+        "label": "test",
+        "tag": "",
+        "unlocked_balance": 0
+      },
+      {
+        "account_index": 8,
+        "balance": 0,
+        "base_address": "72RBtJcgdtcXWHoWUijK6qfBCRRw2LSJGAeCgfe1eAFZ1Bjtrwwu1GZTQSV3muhhtMjXsAnSYT8mg8CGSCM9B5cT9CeCP2t",
+        "label": "index 8",
+        "tag": "",
+        "unlocked_balance": 0
+      },
+      {
+        "account_index": 9,
+        "balance": 0,
+        "base_address": "77zDStiZ6XRGGMQ2nKhZi6ewQpaaJhWviQoz9pMrmRvd4yPRJhDurmB74B74pj2oLjcmpta56JFRaAYYBC2hzF8yCpQ7tXA",
+        "label": "index 9",
+        "tag": "",
+        "unlocked_balance": 0
+      },
+      {
+        "account_index": 10,
+        "balance": 0,
+        "base_address": "7B35hT7MnqUP1uQJaUEZSVWmkcZAUVxXzX3JqKDhhjGv4AVSVWw6AiTJ39a1AjtdWPgGCp1JkgPiDMKM9ktgU7Dx5pGfbdY",
+        "label": "index 10",
+        "tag": "",
+        "unlocked_balance": 0
+      },
+      {
+        "account_index": 11,
+        "balance": 0,
+        "base_address": "7BraWKhjmaW8ckBYVVmiVbQ3J3cFeKs5JBPTkGcECrHnAq8TwPDRoQe3iv4UDC3Woc7NvVTKZFVNeAQjJws9JEQeVHyoApz",
+        "label": "index 11",
+        "tag": "",
+        "unlocked_balance": 0
+      },
+      {
+        "account_index": 12,
+        "balance": 0,
+        "base_address": "7Bwqgh7k9w1Xujaxg6v2j4bc73UQKxPq6UiZnh5B7pir5zDws2RunYTN7p8mhbLX6s3M7umCmYvMKSGmfaL5ecMsMBtYFVW",
+        "label": "index 12",
+        "tag": "",
+        "unlocked_balance": 0
+      },
+      {
+        "account_index": 13,
+        "balance": 0,
+        "base_address": "73dhJABxD5sgcuAW3yiQbGLYQWx8SHxK4EmzmuCanRDBJpBR9Ste3BiZU2ZpPyqWbYer1a63N5NFdVWz7LxWxLoJFD9ozp1",
+        "label": "index 13",
+        "tag": "",
+        "unlocked_balance": 0
+      }
+    ],
+    "total_balance": 112141601989972,
+    "total_unlocked_balance": 112141601989972
+  }
+}

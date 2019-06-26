@@ -995,6 +995,26 @@ class JSONRPCWalletTestCase(JSONTestCase):
         self.assertEqual(txn.key,
             '7061d4d939b563a11e344c60938410e2e63ea72c43741fae81b8805cebe5570a')
 
+    @responses.activate
+    def test_sweep_all(self):
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_sweep_all-00-get_accounts.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_sweep_all-10-getbalance.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_sweep_all-20-sweep_all.json'),
+            status=200)
+        w = Wallet(JSONRPCWallet())
+        result = w.sweep_all(
+            '55LTR8KniP4LQGJSPtbYDacR7dz8RBFnsfAKMaMuwUNYX6aQbBcovzDPyrQF9KXF9tVU6Xk3K8no1BywnJX6GvZX8yJsXvt',
+            relay=False)
+        self.assertEqual(len(result), 1)
+        result = result[0]
+        self.assertIsInstance(result[0], Transaction)
+        self.assertEqual(Decimal('111.086545699972'), result[1])
+
     @patch('monero.backends.jsonrpc.requests.post')
     def test_dynamic_ring_size_deprecation(self, mock_post):
         mock_post.return_value.status_code = 200
