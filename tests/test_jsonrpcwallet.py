@@ -7,7 +7,7 @@ except ImportError:
     from mock import patch, Mock
 
 from monero.wallet import Wallet
-from monero.address import BaseAddress, Address
+from monero.address import BaseAddress, Address, SubAddress
 from monero.seed import Seed
 from monero.transaction import IncomingPayment, OutgoingPayment, Transaction
 from monero.backends.jsonrpc import JSONRPCWallet
@@ -164,6 +164,25 @@ class JSONRPCWalletTestCase(JSONTestCase):
         self.assertEqual(2, len(w.accounts))
         self.assertEqual('account 1', w.accounts[1].label)
         self.assertEqual([acc0, acc1], w.accounts)
+
+    @responses.activate
+    def test_new_address(self):
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_new_address-00-get_accounts.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_new_address-10-new_address_account_0.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_new_address-20-new_address_account_1.json'),
+            status=200)
+        w = Wallet(JSONRPCWallet())
+        subaddr, index = w.new_address()
+        self.assertIsInstance(subaddr, SubAddress)
+        self.assertIsInstance(index, int)
+        subaddr, index = w.accounts[1].new_address()
+        self.assertIsInstance(subaddr, SubAddress)
+        self.assertIsInstance(index, int)
 
     @patch('monero.backends.jsonrpc.requests.post')
     def test_incoming_confirmed(self, mock_post):

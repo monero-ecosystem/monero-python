@@ -6,6 +6,12 @@ Release Notes
 
 With version 0.6 the package name on PyPi has changed from `monero-python` to just `monero`.
 
+Backward-incompatible changes:
+
+ 1. The ``.new_address()`` method of both ``Wallet`` and ``Account`` returns a 2-element tuple of
+    (`subaddress`, `index`) where the additional element is the index of the subaddress within
+    current account.
+
 0.5
 ---
 

@@ -64,7 +64,8 @@ class Account(object):
         Creates a new address.
 
         :param label: address label as `str`
-        :rtype: :class:`SubAddress <monero.address.SubAddress>`
+        :rtype: tuple of subaddress, subaddress index (minor):
+                (:class:`SubAddress <monero.address.SubAddress>`, `int`)
         """
         return self._backend.new_address(account=self.index, label=label)
 

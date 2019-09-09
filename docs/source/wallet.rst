@@ -50,12 +50,13 @@ Creating accounts and addresses
 
 Every wallet can have separate accounts and each account can have numerous
 addresses. The ``Wallet.new_account()`` and ``Account.new_address()`` will
-create new instances.
+create new instances, then return a tuple consisting of the subaddress itself,
+and the subaddress index within the account.
 
 .. code-block:: python
 
     In [9]: w.new_address()
-    Out[9]: BenuGf8eyVhjZwdcxEJY1MHrUfqHjPvE3d7Pi4XY5vQz53VnVpB38bCBsf8AS5rJuZhuYrqdG9URc2eFoCNPwLXtLENT4R7
+    Out[9]: (BenuGf8eyVhjZwdcxEJY1MHrUfqHjPvE3d7Pi4XY5vQz53VnVpB38bCBsf8AS5rJuZhuYrqdG9URc2eFoCNPwLXtLENT4R7, 1)
 
     In [10]: w.get_addresses()
     Out[10]:
@@ -72,7 +73,7 @@ create new instances.
     Out[13]: Bhd3PRVCnq5T5jjNey2hDSM8DxUgFpNjLUrKAa2iYVhYX71RuCGTekDKZKXoJPAGL763kEXaDSAsvDYb8bV77YT7Jo19GKY
 
     In [14]: w.accounts[1].new_address()
-    Out[14]: Bbz5uCtnn3Gaj1YAizaHw1FPeJ6T7kk7uQoeY48SWjezEAyrWScozLxYbqGxsV5L6VJkvw5VwECAuLVJKQtHpA3GFXJNPYu
+    Out[14]: (Bbz5uCtnn3Gaj1YAizaHw1FPeJ6T7kk7uQoeY48SWjezEAyrWScozLxYbqGxsV5L6VJkvw5VwECAuLVJKQtHpA3GFXJNPYu, 1)
 
     In [15]: w.accounts[1].get_addresses()
     Out[15]:
