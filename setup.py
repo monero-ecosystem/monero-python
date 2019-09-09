@@ -26,7 +26,7 @@ def find_version(*parts):
 version = find_version('monero', '__init__.py')
 
 setup(
-    name = 'monero-python',
+    name = 'monero',
     version = version,
     description = 'A comprehensive Python module for handling Monero cryptocurrency',
     url = 'https://github.com/monero-ecosystem/monero-python/',

@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+0.6
+---
+
+With version 0.6 the package name on PyPi has changed from `monero-python` to just `monero`.
+
 0.5
 ---
 
