@@ -408,6 +408,7 @@ class MethodNotFound(RPCError):
 
 _err2exc = {
     -2: exceptions.WrongAddress,
+    -4: exceptions.GenericTransferError,
     -5: exceptions.WrongPaymentId,
     -8: exceptions.TransactionNotFound,
     -9: exceptions.SignatureCheckFailed,
