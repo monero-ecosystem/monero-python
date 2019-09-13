@@ -1,0 +1,70 @@
+{
+  "id": 0,
+  "jsonrpc": "2.0",
+  "result": {
+    "transfer": {
+      "address": "79kTZg96pMf2Dt9rLEWnLzTUB8XC1wMhxaJyxa79hJu6bK9CfFnfbSL1GJNZbqhv9xPqJhRj2Yfb7QUWa2zeEw56H4KiUfN",
+      "amount": 40000000000,
+      "confirmations": 0,
+      "destinations": [
+        {
+          "address": "72nfCSqpigFWaMeKyZYjKMQRvYFxWvJaf8Nnb1KxVndeTuL7avqoCF5NME4WGMqwmK58i8BnKxCz543mFoZhuUMpGhN1dcm",
+          "amount": 40000000000
+        }
+      ],
+      "double_spend_seen": false,
+      "fee": 979320000,
+      "height": 0,
+      "note": "",
+      "payment_id": "0000000000000000",
+      "subaddr_index": {
+        "major": 1,
+        "minor": 0
+      },
+      "subaddr_indices": [
+        {
+          "major": 1,
+          "minor": 0
+        }
+      ],
+      "suggested_confirmations_threshold": 1,
+      "timestamp": 1568413596,
+      "txid": "afaf04e5e40c6b60fc7cc928a88843fc96031ec2b567c310ee61abf3d00020da",
+      "type": "pending",
+      "unlock_time": 0
+    },
+    "transfers": [
+      {
+        "address": "79kTZg96pMf2Dt9rLEWnLzTUB8XC1wMhxaJyxa79hJu6bK9CfFnfbSL1GJNZbqhv9xPqJhRj2Yfb7QUWa2zeEw56H4KiUfN",
+        "amount": 40000000000,
+        "confirmations": 0,
+        "destinations": [
+          {
+            "address": "72nfCSqpigFWaMeKyZYjKMQRvYFxWvJaf8Nnb1KxVndeTuL7avqoCF5NME4WGMqwmK58i8BnKxCz543mFoZhuUMpGhN1dcm",
+            "amount": 40000000000
+          }
+        ],
+        "double_spend_seen": false,
+        "fee": 979320000,
+        "height": 0,
+        "note": "",
+        "payment_id": "0000000000000000",
+        "subaddr_index": {
+          "major": 1,
+          "minor": 0
+        },
+        "subaddr_indices": [
+          {
+            "major": 1,
+            "minor": 0
+          }
+        ],
+        "suggested_confirmations_threshold": 1,
+        "timestamp": 1568413596,
+        "txid": "afaf04e5e40c6b60fc7cc928a88843fc96031ec2b567c310ee61abf3d00020da",
+        "type": "pending",
+        "unlock_time": 0
+      }
+    ]
+  }
+}

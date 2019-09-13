@@ -1,0 +1,78 @@
+{
+  "id": 0,
+  "jsonrpc": "2.0",
+  "result": {
+    "transfer": {
+      "address": "79kTZg96pMf2Dt9rLEWnLzTUB8XC1wMhxaJyxa79hJu6bK9CfFnfbSL1GJNZbqhv9xPqJhRj2Yfb7QUWa2zeEw56H4KiUfN",
+      "amount": 520000000000,
+      "confirmations": 23,
+      "destinations": [
+        {
+          "address": "77yjHxBeLNq4mf4dhEB7ksD6WDaAEEguqHHvuFYyiLiMWwSrvYHftzT5c1HRS9iWa2UBn4MQLuz8jEiE6sPDfMzB81UMHaK",
+          "amount": 220000000000
+        },
+        {
+          "address": "787CXWuevtt2SdD9x6rB7hCk73pYVv7HYgAUAPsYQJ9zAmQN7Ksxr5KieQFXuEL6ZSMqMDNbbaUze365iF2DbkjB9bcL82t",
+          "amount": 300000000000
+        }
+      ],
+      "double_spend_seen": false,
+      "fee": 280650000,
+      "height": 409449,
+      "note": "",
+      "payment_id": "0000000000000000",
+      "subaddr_index": {
+        "major": 1,
+        "minor": 0
+      },
+      "subaddr_indices": [
+        {
+          "major": 1,
+          "minor": 1
+        }
+      ],
+      "suggested_confirmations_threshold": 1,
+      "timestamp": 1568408151,
+      "txid": "362c3a4e601d5847b3882c3debfd28a0ee31654e433c38498539677199c304c2",
+      "type": "out",
+      "unlock_time": 0
+    },
+    "transfers": [
+      {
+        "address": "79kTZg96pMf2Dt9rLEWnLzTUB8XC1wMhxaJyxa79hJu6bK9CfFnfbSL1GJNZbqhv9xPqJhRj2Yfb7QUWa2zeEw56H4KiUfN",
+        "amount": 520000000000,
+        "confirmations": 23,
+        "destinations": [
+          {
+            "address": "77yjHxBeLNq4mf4dhEB7ksD6WDaAEEguqHHvuFYyiLiMWwSrvYHftzT5c1HRS9iWa2UBn4MQLuz8jEiE6sPDfMzB81UMHaK",
+            "amount": 220000000000
+          },
+          {
+            "address": "787CXWuevtt2SdD9x6rB7hCk73pYVv7HYgAUAPsYQJ9zAmQN7Ksxr5KieQFXuEL6ZSMqMDNbbaUze365iF2DbkjB9bcL82t",
+            "amount": 300000000000
+          }
+        ],
+        "double_spend_seen": false,
+        "fee": 280650000,
+        "height": 409449,
+        "note": "",
+        "payment_id": "0000000000000000",
+        "subaddr_index": {
+          "major": 1,
+          "minor": 0
+        },
+        "subaddr_indices": [
+          {
+            "major": 1,
+            "minor": 1
+          }
+        ],
+        "suggested_confirmations_threshold": 1,
+        "timestamp": 1568408151,
+        "txid": "362c3a4e601d5847b3882c3debfd28a0ee31654e433c38498539677199c304c2",
+        "type": "out",
+        "unlock_time": 0
+      }
+    ]
+  }
+}

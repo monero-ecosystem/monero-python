@@ -1,0 +1,8 @@
+{
+  "error": {
+    "code": -8,
+    "message": "Transaction not found."
+  },
+  "id": 0,
+  "jsonrpc": "2.0"
+}

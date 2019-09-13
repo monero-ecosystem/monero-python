@@ -1,0 +1,108 @@
+{
+  "id": 0,
+  "jsonrpc": "2.0",
+  "result": {
+    "transfer": {
+      "address": "76SJ4sPWzgQKE3fBbAoRTC7HtewGAo37VEgMpmHPEfPMRssYQgdeVyfJt5rcEcHw9dJJ4cLSkZ9c5fPTnKFHKh43UKmJs25",
+      "amount": 1000000000000,
+      "confirmations": 208,
+      "double_spend_seen": false,
+      "fee": 292510000,
+      "height": 409227,
+      "note": "",
+      "payment_id": "0000000000000000",
+      "subaddr_index": {
+        "major": 0,
+        "minor": 8
+      },
+      "subaddr_indices": [
+        {
+          "major": 0,
+          "minor": 8
+        }
+      ],
+      "suggested_confirmations_threshold": 1,
+      "timestamp": 1568388430,
+      "txid": "7ab84fe2fb34467c590cde2f7d6ba7de5928a2db6c84c6ccfff8962eca0ad99c",
+      "type": "in",
+      "unlock_time": 0
+    },
+    "transfers": [
+      {
+        "address": "76SJ4sPWzgQKE3fBbAoRTC7HtewGAo37VEgMpmHPEfPMRssYQgdeVyfJt5rcEcHw9dJJ4cLSkZ9c5fPTnKFHKh43UKmJs25",
+        "amount": 1000000000000,
+        "confirmations": 208,
+        "double_spend_seen": false,
+        "fee": 292510000,
+        "height": 409227,
+        "note": "",
+        "payment_id": "0000000000000000",
+        "subaddr_index": {
+          "major": 0,
+          "minor": 8
+        },
+        "subaddr_indices": [
+          {
+            "major": 0,
+            "minor": 8
+          }
+        ],
+        "suggested_confirmations_threshold": 1,
+        "timestamp": 1568388430,
+        "txid": "7ab84fe2fb34467c590cde2f7d6ba7de5928a2db6c84c6ccfff8962eca0ad99c",
+        "type": "in",
+        "unlock_time": 0
+      },
+      {
+        "address": "75LwnK3zfQS5mEzxgEdyep8SSwnvGSKcMLnCpzUqCF4CMFHDNrSnCojfoTRV9EWy2Y3ejeFLMPH9tAjagMAim8F8EKWjHos",
+        "amount": 1000000000000,
+        "confirmations": 208,
+        "double_spend_seen": false,
+        "fee": 292510000,
+        "height": 409227,
+        "note": "",
+        "payment_id": "0000000000000000",
+        "subaddr_index": {
+          "major": 0,
+          "minor": 19
+        },
+        "subaddr_indices": [
+          {
+            "major": 0,
+            "minor": 19
+          }
+        ],
+        "suggested_confirmations_threshold": 1,
+        "timestamp": 1568388430,
+        "txid": "7ab84fe2fb34467c590cde2f7d6ba7de5928a2db6c84c6ccfff8962eca0ad99c",
+        "type": "in",
+        "unlock_time": 0
+      },
+      {
+        "address": "74sZRQ2sHs4YLh8PnW8fseUoUoM4bXQ3wQ6bfCr6YyxmK5QRawKLytF9CfRbuv581LEnXBj27Dwg6eNC4fhhrH9kUvpbWQ5",
+        "amount": 2000000000000,
+        "confirmations": 208,
+        "double_spend_seen": false,
+        "fee": 292510000,
+        "height": 409227,
+        "note": "",
+        "payment_id": "0000000000000000",
+        "subaddr_index": {
+          "major": 0,
+          "minor": 29
+        },
+        "subaddr_indices": [
+          {
+            "major": 0,
+            "minor": 29
+          }
+        ],
+        "suggested_confirmations_threshold": 1,
+        "timestamp": 1568388430,
+        "txid": "7ab84fe2fb34467c590cde2f7d6ba7de5928a2db6c84c6ccfff8962eca0ad99c",
+        "type": "in",
+        "unlock_time": 0
+      }
+    ]
+  }
+}

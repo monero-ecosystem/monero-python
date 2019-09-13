@@ -1,3 +1,4 @@
+import re
 import sys
 import warnings
 from .address import address
@@ -113,6 +114,13 @@ class PaymentManager(object):
         return fetch(self.account_idx, PaymentFilter(**filterparams))
 
 
+def _validate_tx_id(txid):
+    if not bool(re.compile('^[0-9a-f]{64}$').match(txid)):
+        raise ValueError("Transaction ID must be a 64-character hexadecimal string, not "
+            "'{}'".format(txid))
+    return txid
+
+
 class _ByHeight(object):
     """A helper class used as key in sorting of payments by height.
     Mempool goes on top, blockchain payments are ordered with descending block numbers.
@@ -158,6 +166,7 @@ class PaymentFilter(object):
         self.unconfirmed = filterparams.pop('unconfirmed', False)
         self.confirmed = filterparams.pop('confirmed', True)
         _local_address = filterparams.pop('local_address', None)
+        _tx_id = filterparams.pop('tx_id', None)
         _payment_id = filterparams.pop('payment_id', None)
         if len(filterparams) > 0:
             raise ValueError("Excessive arguments for payment query: {}".format(filterparams))
@@ -179,6 +188,18 @@ class PaymentFilter(object):
                 except TypeError:
                     local_addresses = [_local_address]
             self.local_addresses = list(map(address, local_addresses))
+        if _tx_id is None:
+            self.tx_ids = []
+        else:
+            if isinstance(_tx_id, _str_types):
+                tx_ids = [_tx_id]
+            else:
+                try:
+                    iter(_tx_id)
+                    tx_ids = _tx_id
+                except TypeError:
+                    tx_ids = [_tx_id]
+            self.tx_ids = list(map(_validate_tx_id, tx_ids))
         if _payment_id is None:
             self.payment_ids = []
         else:
@@ -208,6 +229,8 @@ class PaymentFilter(object):
             if self.max_height is not None and ht > self.max_height:
                 return False
         if self.payment_ids and payment.payment_id not in self.payment_ids:
+            return False
+        if self.tx_ids and payment.transaction.hash not in self.tx_ids:
             return False
         if self.local_addresses and payment.local_address not in self.local_addresses:
             return False

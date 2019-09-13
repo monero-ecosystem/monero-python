@@ -462,6 +462,7 @@ class JSONRPCWalletTestCase(JSONTestCase):
             self.assertIsInstance(pmt.transaction.fee, Decimal)
             self.assertIsInstance(pmt.transaction.height, (int, type(None)))
 
+
     @patch('monero.backends.jsonrpc.requests.post')
     def test_incoming_unconfirmed(self, mock_post):
         mock_post.return_value.status_code = 200
@@ -504,6 +505,165 @@ class JSONRPCWalletTestCase(JSONTestCase):
             self.assertIsInstance(pmt.transaction, Transaction)
             self.assertIsInstance(pmt.transaction.fee, Decimal)
             self.assertIs(pmt.transaction.height, None)
+
+    @responses.activate
+    def test_incoming_by_tx_id(self):
+        # 3 payments in one transaction
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_incoming_by_tx_id-00-get_accounts.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_incoming_by_tx_id-7ab84-get_transfer_by_txid.json'),
+            status=200)
+        self.wallet = Wallet(JSONRPCWallet())
+        pmts = self.wallet.incoming(tx_id='7ab84fe2fb34467c590cde2f7d6ba7de5928a2db6c84c6ccfff8962eca0ad99c')
+        self.assertEqual(len(pmts), 3)
+        self.assertEqual(pmts[0].amount, Decimal(1))
+        self.assertEqual(pmts[1].amount, Decimal(1))
+        self.assertEqual(pmts[2].amount, Decimal(2))
+
+    @responses.activate
+    def test_incoming_by_tx_id__with_min_height(self):
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_incoming_by_tx_id-00-get_accounts.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_incoming_by_tx_id-7ab84-get_transfer_by_txid.json'),
+            status=200)
+        self.wallet = Wallet(JSONRPCWallet())
+        pmts = self.wallet.incoming(min_height=409223,
+            tx_id='7ab84fe2fb34467c590cde2f7d6ba7de5928a2db6c84c6ccfff8962eca0ad99c')
+        self.assertEqual(len(pmts), 3)
+        self.assertEqual(pmts[0].amount, Decimal(1))
+        self.assertEqual(pmts[1].amount, Decimal(1))
+        self.assertEqual(pmts[2].amount, Decimal(2))
+
+    @responses.activate
+    def test_incoming_by_tx_id__with_max_height(self):
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_incoming_by_tx_id-00-get_accounts.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_incoming_by_tx_id-7ab84-get_transfer_by_txid.json'),
+            status=200)
+        self.wallet = Wallet(JSONRPCWallet())
+        pmts = self.wallet.incoming(max_height=409223,
+            tx_id='7ab84fe2fb34467c590cde2f7d6ba7de5928a2db6c84c6ccfff8962eca0ad99c')
+        self.assertEqual(len(pmts), 0)
+
+    @responses.activate
+    def test_incoming_by_tx_id__not_found(self):
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_incoming_by_tx_id-00-get_accounts.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_incoming_by_tx_id-e0b15-get_transfer_by_txid.json'),
+            status=200)
+        self.wallet = Wallet(JSONRPCWallet())
+        pmts = self.wallet.incoming(tx_id='e0b15ac819c94ed9ba81edb955a98c696f3216335960ccf90018d76a8dcb0e7e')
+        self.assertEqual(len(pmts), 0)
+
+    @responses.activate
+    def test_incoming_by_tx_id__multiple_ids(self):
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_incoming_by_tx_id-00-get_accounts.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_incoming_by_tx_id-7ab84-get_transfer_by_txid.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_incoming_by_tx_id-55e75-get_transfer_by_txid.json'),
+            status=200)
+        self.wallet = Wallet(JSONRPCWallet())
+        pmts = self.wallet.incoming(tx_id=[
+            '7ab84fe2fb34467c590cde2f7d6ba7de5928a2db6c84c6ccfff8962eca0ad99c',
+            '55e758d7d259bb316551ddcdd4808711de99c30b8b5c52de3e95e563fd92d156'])
+        self.assertEqual(len(pmts), 4)
+        self.assertEqual(pmts[0].amount, Decimal(4))
+        self.assertEqual(pmts[1].amount, Decimal(1))
+        self.assertEqual(pmts[2].amount, Decimal(1))
+        self.assertEqual(pmts[3].amount, Decimal(2))
+
+    @responses.activate
+    def test_incoming_by_tx_id__mempool(self):
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_incoming_by_tx_id-00-get_accounts.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_incoming_by_tx_id-31b52-get_transfer_by_txid.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_incoming_by_tx_id-31b52-get_transfer_by_txid.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_incoming_by_tx_id-31b52-get_transfer_by_txid.json'),
+            status=200)
+        self.wallet = Wallet(JSONRPCWallet())
+        pmts = self.wallet.incoming(
+            tx_id='31b527fb9c27e759d56892fef93136df1057186c5cf4e3c93c5298b70160f562')
+        self.assertEqual(len(pmts), 0)
+        pmts = self.wallet.incoming(
+            tx_id='31b527fb9c27e759d56892fef93136df1057186c5cf4e3c93c5298b70160f562',
+            unconfirmed=True)
+        self.assertEqual(len(pmts), 1)
+        pmts = self.wallet.incoming(
+            tx_id='31b527fb9c27e759d56892fef93136df1057186c5cf4e3c93c5298b70160f562',
+            confirmed=False)
+        self.assertEqual(len(pmts), 0)
+
+    @responses.activate
+    def test_outgoing_by_tx_id(self):
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_outgoing_by_tx_id-00-get_accounts.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_outgoing_by_tx_id-362c3-get_transfer_by_txid.json'),
+            status=200)
+        self.wallet = Wallet(JSONRPCWallet())
+        acc = self.wallet.accounts[1]
+        pmts = acc.outgoing(tx_id='362c3a4e601d5847b3882c3debfd28a0ee31654e433c38498539677199c304c2')
+        self.assertEqual(len(pmts), 1)
+        self.assertEqual(pmts[0].amount, Decimal('0.52'))
+
+    @responses.activate
+    def test_outgoing_by_tx_id__mempool(self):
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_outgoing_by_tx_id-00-get_accounts.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_outgoing_by_tx_id-afaf0-get_transfer_by_txid.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_outgoing_by_tx_id-afaf0-get_transfer_by_txid.json'),
+            status=200)
+        self.wallet = Wallet(JSONRPCWallet())
+        acc = self.wallet.accounts[1]
+        pmts = acc.outgoing(tx_id='afaf04e5e40c6b60fc7cc928a88843fc96031ec2b567c310ee61abf3d00020da')
+        self.assertEqual(len(pmts), 0)
+        pmts = acc.outgoing(
+            tx_id='afaf04e5e40c6b60fc7cc928a88843fc96031ec2b567c310ee61abf3d00020da',
+            unconfirmed=True)
+        self.assertEqual(len(pmts), 1)
+
+    @responses.activate
+    def test_outgoing_by_tx_id__multiple_ids(self):
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_outgoing_by_tx_id-00-get_accounts.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_outgoing_by_tx_id-362c3-get_transfer_by_txid.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_outgoing_by_tx_id-eda89-get_transfer_by_txid.json'),
+            status=200)
+        self.wallet = Wallet(JSONRPCWallet())
+        acc = self.wallet.accounts[1]
+        pmts = acc.outgoing(tx_id=[
+            '362c3a4e601d5847b3882c3debfd28a0ee31654e433c38498539677199c304c2',
+            'eda891adf76993f9066abd56a8a5aa5c51a7618298cab59ec37739f1c960596d'])
+        self.assertEqual(len(pmts), 2)
+        self.assertEqual(pmts[0].amount, Decimal('0.52'))
+        self.assertEqual(pmts[1].amount, Decimal('0.0212'))
 
     @patch('monero.backends.jsonrpc.requests.post')
     def test_incoming_by_payment_ids(self, mock_post):
