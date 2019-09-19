@@ -23,6 +23,7 @@ class JSONRPCDaemon(object):
     :param port: port number
     :param path: path for JSON RPC requests (should not be changed)
     :param timeout: request timeout
+    :param timeout: request verify
     """
     def __init__(self, protocol='http', host='127.0.0.1', port=18081, path='/json_rpc',
             user='', password='', timeout=30, verify=True):
@@ -118,6 +119,7 @@ class JSONRPCWallet(object):
     :param user: username to authenticate with over RPC
     :param password: password to authenticate with over RPC
     :param timeout: request timeout
+    :param verify: request verify
     """
     _master_address = None
 
