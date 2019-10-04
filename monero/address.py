@@ -71,6 +71,9 @@ class BaseAddress(object):
     def __hash__(self):
         return hash(str(self))
 
+    def __format__(self, spec):
+        return format(str(self), spec)
+
 
 class Address(BaseAddress):
     """Monero address.

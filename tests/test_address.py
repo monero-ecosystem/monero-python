@@ -14,6 +14,7 @@ class Tests(object):
     def test_from_and_to_string(self):
         a = Address(self.addr)
         self.assertEqual(str(a), self.addr)
+        self.assertEqual("{:s}".format(a), self.addr)
         self.assertEqual(a.spend_key(), self.psk)
         self.assertEqual(a.view_key(), self.pvk)
         self.assertEqual(hash(a), hash(self.addr))
@@ -21,12 +22,14 @@ class Tests(object):
         ia = IntegratedAddress(self.iaddr)
         self.assertEqual(ia.payment_id(), self.pid)
         self.assertEqual(str(ia), self.iaddr)
+        self.assertEqual("{:s}".format(ia), self.iaddr)
         self.assertEqual(ia.spend_key(), self.psk)
         self.assertEqual(ia.view_key(), self.pvk)
         self.assertEqual(ia.base_address(), a)
 
         sa = SubAddress(self.subaddr)
         self.assertEqual(str(sa), self.subaddr)
+        self.assertEqual("{:s}".format(sa), self.subaddr)
 
     def test_payment_id(self):
         a = Address(self.addr)
