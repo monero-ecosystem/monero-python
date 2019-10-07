@@ -44,3 +44,9 @@ class WalletIsNotDeterministic(MoneroException):
 
 class GenericTransferError(AccountException):
     pass
+
+class AccountIndexOutOfBound(AccountException):
+    pass
+
+class AddressIndexOutOfBound(AccountException):
+    pass

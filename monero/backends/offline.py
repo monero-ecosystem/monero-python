@@ -40,8 +40,8 @@ class OfflineWallet(object):
     def new_account(self, label=None):
         raise WalletIsOffline()
 
-    def addresses(self, account=0):
-        if account == 0:
+    def addresses(self, account=0, addr_indices=None):
+        if account == 0 and (addr_indices == [0] or addr_indices is None):
             return [self._address]
         raise WalletIsOffline() # pragma: no cover (this should never happen)
 

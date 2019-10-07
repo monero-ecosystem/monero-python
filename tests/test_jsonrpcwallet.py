@@ -90,54 +90,28 @@ class JSONRPCWalletTestCase(JSONTestCase):
         self.assertIsInstance(balances[1], Decimal)
         self.assertEqual(locked, Decimal('224.916129245183'))
 
-    @patch('monero.backends.jsonrpc.requests.post')
-    def test_address(self, mock_post):
-        mock_post.return_value.status_code = 200
-        mock_post.return_value.json.return_value = self.accounts_result
+    @responses.activate
+    def test_address(self):
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_address-00-get_accounts.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_address-10-getaddress.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_address-10-getaddress.json'),
+            status=200)
         self.wallet = Wallet(JSONRPCWallet())
-        mock_post.return_value.json.return_value = {'id': 0,
-            'jsonrpc': '2.0',
-            'result': {'address': '9vgV48wWAPTWik5QSUSoGYicdvvsbSNHrT9Arsx1XBTz6VrWPSgfmnUKSPZDMyX4Ms8R9TkhB4uFqK9s5LUBbV6YQN2Q9ag',
-                    'addresses': [{'address': '9vgV48wWAPTWik5QSUSoGYicdvvsbSNHrT9Arsx1XBTz6VrWPSgfmnUKSPZDMyX4Ms8R9TkhB4uFqK9s5LUBbV6YQN2Q9ag',
-                                   'address_index': 0,
-                                   'label': 'Primary account',
-                                   'used': True},
-                                  {'address': 'BbBjyYoYNNwFfL8RRVRTMiZUofBLpjRxdNnd5E4LyGcAK5CEsnL3gmE5QkrDRta7RPficGHcFdR6rUwWcjnwZVvCE3tLxhJ',
-                                   'address_index': 1,
-                                   'label': '',
-                                   'used': True},
-                                  {'address': 'BgzZVoJP6Vx5WP87r7NRCCRcFwiUha8uTgnjGGitHYTJEmRuz6Jq2oE9icDCGYMHXZcnR8T35Z8NoVXkfMnF9ikJNfcwwsy',
-                                   'address_index': 2,
-                                   'label': '(Untitled address)',
-                                   'used': False},
-                                  {'address': 'Bck7sYz1vvUghNNTR6rrpxfRDegswezggB9mWQkXgjwxKRTo1feiJopStdJAHtMJoSEdsYppWvQ6vbGbArWxP32xCG2TsVZ',
-                                   'address_index': 3,
-                                   'label': '(Untitled address)',
-                                   'used': True},
-                                  {'address': 'BYCcWM1gZHdCnh3Cb1KfWrAU1SjBWMV3KhUoeRy7V2Lw2F2hHeuzouP2NECBaTUgnyYAzEe8s5vpA7qmWYfjVfxeHoHWPnb',
-                                   'address_index': 4,
-                                   'label': '(Untitled address)',
-                                   'used': False},
-                                  {'address': 'BfJ5W7dZGaYih6J63YvhiDSKpVUUZbVrEhLRCY6L6TdnEfzJmwP6aUJZQQnzLQ2NMTKMAC8hiJsoiNC7jbEUZ8tmBoJcnN1',
-                                   'address_index': 5,
-                                   'label': '(Untitled address)',
-                                   'used': True},
-                                  {'address': 'BaJwiPYwnN6DV8yBeh4FjjCqRoPfdkWppSzVXTPBJo35fDyU8caxLchATGJg7TKB24Q8nM8P1iWSt4DMwec8Pg7bSbFDAir',
-                                   'address_index': 6,
-                                   'label': '(Untitled address)',
-                                   'used': False},
-                                  {'address': 'BbkS4mn6gcgUidn2znLa2J6eSBkbGjGX4doeDCKAzT2A3t1cjbquQGjhYgiMHiKTrY8ojk6Zjqi1ufvfuPwyKv4hNnMruro',
-                                   'address_index': 7,
-                                   'label': '(Untitled address)',
-                                   'used': True}]}}
         waddr = self.wallet.address()
         a0addr = self.wallet.accounts[0].address()
+        self.assertEqual(len(responses.calls), 3)
         self.assertEqual(waddr, a0addr)
+        self.assertIsInstance(waddr, Address)
         self.assertEqual(
             waddr,
-            '9vgV48wWAPTWik5QSUSoGYicdvvsbSNHrT9Arsx1XBTz6VrWPSgfmnUKSPZDMyX4Ms8R9TkhB4uFqK9s5LUBbV6YQN2Q9ag')
+            '596ETuuDVZSNox73YLctrHaAv72fBboxy3atbEMnP3QtdnGFS9KWuHYGuy831SKWLUVCgrRfWLCxuCZ2fbVGh14X7mFrefy')
+        self.assertEqual(waddr.label, 'Primary account')
         self.assertEqual(a0addr.label, 'Primary account')
-        self.assertEqual(len(self.wallet.accounts[0].addresses()), 8)
 
     @responses.activate
     def test_account_creation(self):

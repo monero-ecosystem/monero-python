@@ -176,7 +176,7 @@ class Wallet(object):
 
         :rtype: :class:`Address <monero.address.Address>`
         """
-        return self.accounts[0].addresses()[0]
+        return self.accounts[0].address()
 
     def addresses(self):
         """

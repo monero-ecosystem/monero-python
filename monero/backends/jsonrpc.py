@@ -162,8 +162,11 @@ class JSONRPCWallet(object):
         # doesn't return that detail here
         return Account(self, _account['account_index'], label=label), SubAddress(_account['address'])
 
-    def addresses(self, account=0):
-        _addresses = self.raw_request('getaddress', {'account_index': account})
+    def addresses(self, account=0, addr_indices=None):
+        qdata = {'account_index': account}
+        if addr_indices:
+            qdata['address_index'] = addr_indices
+        _addresses = self.raw_request('getaddress', qdata)
         addresses = [None] * (max(map(operator.itemgetter('address_index'), _addresses['addresses'])) + 1)
         for _addr in _addresses['addresses']:
             addresses[_addr['address_index']] = address(
@@ -412,6 +415,8 @@ _err2exc = {
     -5: exceptions.WrongPaymentId,
     -8: exceptions.TransactionNotFound,
     -9: exceptions.SignatureCheckFailed,
+    -14: exceptions.AccountIndexOutOfBound,
+    -15: exceptions.AddressIndexOutOfBound,
     -16: exceptions.TransactionNotPossible,
     -17: exceptions.NotEnoughMoney,
     -20: exceptions.AmountIsZero,

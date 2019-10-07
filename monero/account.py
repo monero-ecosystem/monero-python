@@ -49,7 +49,7 @@ class Account(object):
 
         :rtype: :class:`SubAddress <monero.address.SubAddress>`
         """
-        return self._backend.addresses(account=self.index)[0]
+        return self._backend.addresses(account=self.index, addr_indices=[0])[0]
 
     def addresses(self):
         """
