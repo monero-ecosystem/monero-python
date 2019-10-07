@@ -20,7 +20,7 @@ class BaseAddress(object):
     label = None
 
     def __init__(self, addr, label=None):
-        addr = str(addr)
+        addr = addr.decode() if isinstance(addr, bytes) else str(addr)
         if not _ADDR_REGEX.match(addr):
             raise ValueError("Address must be 95 characters long base58-encoded string, "
                 "is {addr} ({len} chars length)".format(addr=addr, len=len(addr)))
@@ -155,7 +155,7 @@ class IntegratedAddress(Address):
     # NOTE: _valid_netbytes order is (mainnet, testnet, stagenet)
 
     def __init__(self, address):
-        address = str(address)
+        address = address.decode() if isinstance(address, bytes) else str(address)
         if not _IADDR_REGEX.match(address):
             raise ValueError("Integrated address must be 106 characters long base58-encoded string, "
                 "is {addr} ({len} chars length)".format(addr=address, len=len(address)))
@@ -186,7 +186,7 @@ def address(addr, label=None):
 
     :rtype: :class:`Address`, :class:`SubAddress` or :class:`IntegratedAddress`
     """
-    addr = str(addr)
+    addr = addr.decode() if isinstance(addr, bytes) else str(addr)
     if _ADDR_REGEX.match(addr):
         netbyte = bytearray(unhexlify(base58.decode(addr)))[0]
         if netbyte in Address._valid_netbytes:

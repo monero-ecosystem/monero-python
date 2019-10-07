@@ -18,6 +18,10 @@ class Tests(object):
         self.assertEqual(a.spend_key(), self.psk)
         self.assertEqual(a.view_key(), self.pvk)
         self.assertEqual(hash(a), hash(self.addr))
+        ba = Address(self.addr.encode())
+        self.assertEqual(ba, a)
+        ba = address(self.addr.encode())
+        self.assertEqual(ba, a)
 
         ia = IntegratedAddress(self.iaddr)
         self.assertEqual(ia.payment_id(), self.pid)
@@ -26,10 +30,18 @@ class Tests(object):
         self.assertEqual(ia.spend_key(), self.psk)
         self.assertEqual(ia.view_key(), self.pvk)
         self.assertEqual(ia.base_address(), a)
+        ba = IntegratedAddress(self.iaddr.encode())
+        self.assertEqual(ba, ia)
+        ba = address(self.iaddr.encode())
+        self.assertEqual(ba, ia)
 
         sa = SubAddress(self.subaddr)
         self.assertEqual(str(sa), self.subaddr)
         self.assertEqual("{:s}".format(sa), self.subaddr)
+        ba = SubAddress(self.subaddr.encode())
+        self.assertEqual(ba, sa)
+        ba = address(self.subaddr.encode())
+        self.assertEqual(ba, sa)
 
     def test_payment_id(self):
         a = Address(self.addr)
