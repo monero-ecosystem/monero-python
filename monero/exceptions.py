@@ -50,3 +50,6 @@ class AccountIndexOutOfBound(AccountException):
 
 class AddressIndexOutOfBound(AccountException):
     pass
+
+class WalletIsWatchOnly(MoneroException):
+    pass
