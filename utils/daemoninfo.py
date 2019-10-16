@@ -39,7 +39,8 @@ print("Net: {net:>15s}net\n"
             else 'stage' if info['stagenet'] \
             else 'main' if info['mainnet'] else 'unknown',
         **info))
-for hdr in reversed(d.headers(info['height']-7, info['height']-1)):
+print("Last 6 blocks:")
+for hdr in reversed(d.headers(info['height']-6, info['height']-1)):
     print("{height:10d} {hash} {block_size_kb:6.2f} kB {num_txes:3d} txn(s) "
         "v{major_version:d}".format(
             block_size_kb=hdr['block_size']/1024.0, **hdr))
