@@ -60,6 +60,15 @@ class JSONRPCDaemon(object):
                 confirmations=0))
         return txs
 
+    def headers(self, start_height, end_height=None):
+        end_height = end_height or start_height
+        res = self.raw_jsonrpc_request('get_block_headers_range', {
+                'start_height': start_height,
+                'end_height': end_height})
+        if res['status'] == 'OK':
+            return res['headers']
+        raise Exception()
+
     def raw_request(self, path, data):
         hdr = {'Content-Type': 'application/json'}
         _log.debug(u"Request: {path}\nData: {data}".format(
@@ -75,7 +84,6 @@ class JSONRPCDaemon(object):
         _ppresult = json.dumps(result, indent=2, sort_keys=True)
         _log.debug(u"Result:\n{result}".format(result=_ppresult))
         return result
-
 
     def raw_jsonrpc_request(self, method, params=None):
         hdr = {'Content-Type': 'application/json'}

@@ -31,8 +31,15 @@ def get_daemon():
 
 d = get_daemon()
 info = d.info()
-print("Net: {net:>18s}\n"
+print("Net: {net:>15s}net\n"
     "Height:      {height:10d}\n"
-    "Difficulty:  {difficulty:10d}".format(
-        net='test' if info['testnet'] else 'live',
+    "Difficulty:  {difficulty:10d}\n"
+    "Alt blocks:  {alt_blocks_count:10d}\n".format(
+        net='test' if info['testnet'] \
+            else 'stage' if info['stagenet'] \
+            else 'main' if info['mainnet'] else 'unknown',
         **info))
+for hdr in reversed(d.headers(info['height']-7, info['height']-1)):
+    print("{height:10d} {hash} {block_size_kb:6.2f} kB {num_txes:3d} txn(s) "
+        "v{major_version:d}".format(
+            block_size_kb=hdr['block_size']/1024.0, **hdr))

@@ -41,3 +41,13 @@ class Daemon(object):
         :rtype: list of :class:`Transaction <monero.transaction.Transaction>`
         """
         return self._backend.mempool()
+
+
+    def headers(self, start_height, end_height=None):
+        """
+        Returns block headers for given height range.
+        If no :param end_height: is given, it's assumed to be equal to :param start_height:
+
+        :rtype: list of dict
+        """
+        return self._backend.headers(start_height, end_height)
