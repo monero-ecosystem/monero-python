@@ -23,9 +23,10 @@ class JSONRPCDaemon(object):
     :param port: port number
     :param path: path for JSON RPC requests (should not be changed)
     :param timeout: request timeout
+    :param verify_ssl_certs: verify ssl certs for request
     """
     def __init__(self, protocol='http', host='127.0.0.1', port=18081, path='/json_rpc',
-            user='', password='', timeout=30):
+            user='', password='', timeout=30, verify_ssl_certs=True):
         self.url = '{protocol}://{host}:{port}'.format(
                 protocol=protocol,
                 host=host,
@@ -34,6 +35,7 @@ class JSONRPCDaemon(object):
         self.user = user
         self.password = password
         self.timeout = timeout
+        self.verify_ssl_certs = verify_ssl_certs
 
     def info(self):
         info = self.raw_jsonrpc_request('get_info')
@@ -75,7 +77,8 @@ class JSONRPCDaemon(object):
             path=path,
             data=json.dumps(data, indent=2, sort_keys=True)))
         rsp = requests.post(
-            self.url + path, headers=hdr, data=json.dumps(data), timeout=self.timeout)
+            self.url + path, headers=hdr, data=json.dumps(data),
+            timeout=self.timeout, verify=self.verify_ssl_certs)
         if rsp.status_code != 200:
             raise RPCError("Invalid HTTP status {code} for path {path}.".format(
                 code=rsp.status_code,
@@ -94,7 +97,8 @@ class JSONRPCDaemon(object):
         auth = requests.auth.HTTPDigestAuth(self.user, self.password)
         rsp = requests.post(
             self.url + '/json_rpc', headers=hdr, data=json.dumps(data), auth=auth,
-            timeout=self.timeout)
+            timeout=self.timeout, verify=self.verify_ssl_certs)
+
         if rsp.status_code == 401:
             raise Unauthorized("401 Unauthorized. Invalid RPC user name or password.")
         elif rsp.status_code != 200:
@@ -125,11 +129,12 @@ class JSONRPCWallet(object):
     :param user: username to authenticate with over RPC
     :param password: password to authenticate with over RPC
     :param timeout: request timeout
+    :param verify_ssl_certs: verify ssl certs for request
     """
     _master_address = None
 
     def __init__(self, protocol='http', host='127.0.0.1', port=18088, path='/json_rpc',
-            user='', password='', timeout=30):
+            user='', password='', timeout=30, verify_ssl_certs=True):
         self.url = '{protocol}://{host}:{port}/json_rpc'.format(
                 protocol=protocol,
                 host=host,
@@ -138,6 +143,7 @@ class JSONRPCWallet(object):
         self.user = user
         self.password = password
         self.timeout = timeout
+        self.verify_ssl_certs = verify_ssl_certs
         _log.debug("JSONRPC wallet backend auth: '{user}'/'{stars}'".format(
             user=user, stars=('*' * len(password)) if password else ''))
 
@@ -381,7 +387,9 @@ class JSONRPCWallet(object):
             params=json.dumps(params, indent=2, sort_keys=True)))
         auth = requests.auth.HTTPDigestAuth(self.user, self.password)
         rsp = requests.post(
-            self.url, headers=hdr, data=json.dumps(data), auth=auth, timeout=self.timeout)
+            self.url, headers=hdr, data=json.dumps(data), auth=auth,
+            timeout=self.timeout, verify=self.verify_ssl_certs)
+
         if rsp.status_code == 401:
             raise Unauthorized("401 Unauthorized. Invalid RPC user name or password.")
         elif rsp.status_code != 200:
