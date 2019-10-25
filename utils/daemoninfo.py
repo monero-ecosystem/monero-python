@@ -44,3 +44,10 @@ for hdr in reversed(d.headers(info['height']-6, info['height']-1)):
     print("{height:10d} {hash} {block_size_kb:6.2f} kB {num_txes:3d} txn(s) "
         "v{major_version:d}".format(
             block_size_kb=hdr['block_size']/1024.0, **hdr))
+mempool = d.mempool()
+if mempool:
+    print("\n{:d} txn(s) in mempool:".format(len(mempool)))
+    for tx in d.mempool():
+        print("{:>10s} {:s}".format(tx.timestamp.strftime("%H:%M:%S"), tx.hash))
+else:
+    print("\nMempool is empty")
