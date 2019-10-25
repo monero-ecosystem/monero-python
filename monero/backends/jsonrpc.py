@@ -23,7 +23,7 @@ class JSONRPCDaemon(object):
     :param port: port number
     :param path: path for JSON RPC requests (should not be changed)
     :param timeout: request timeout
-    :param verify_ssl_certs: verify ssl certs for request
+    :param verify_ssl_certs: verify SSL certificates when connecting
     """
     def __init__(self, protocol='http', host='127.0.0.1', port=18081, path='/json_rpc',
             user='', password='', timeout=30, verify_ssl_certs=True):
