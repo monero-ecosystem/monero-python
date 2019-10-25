@@ -191,7 +191,8 @@ class Wallet(object):
         """
         Creates a new address in the default account.
 
-        :rtype: :class:`SubAddress <monero.address.SubAddress>`
+        :rtype: tuple of subaddress, subaddress index (minor):
+                (:class:`SubAddress <monero.address.SubAddress>`, `int`)
         """
         return self.accounts[0].new_address(label=label)
 
