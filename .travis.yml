@@ -1,12 +1,11 @@
 language: python
-dist: xenial # minimal version required for python 3.7 support
+sudo: false
 python:
   - "2.7"
   - "3.6"
+  - "3.7"
+  - "3.8"
 matrix:
-  include:
-    - python: 3.7 # https://github.com/travis-ci/travis-ci/issues/9069#issuecomment-425720905
-      sudo: true
   allow_failures:
     python: "nightly"
 
