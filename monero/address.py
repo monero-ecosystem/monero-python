@@ -27,6 +27,20 @@ class BaseAddress(object):
         self._decode(addr)
         self.label = label or self.label
 
+    def view_key(self):
+        """Returns public view key.
+
+        :rtype: str
+        """
+        return hexlify(self._decoded[33:65]).decode()
+
+    def spend_key(self):
+        """Returns public spend key.
+
+        :rtype: str
+        """
+        return hexlify(self._decoded[1:33]).decode()
+
     def is_mainnet(self):
         """Returns `True` if the address belongs to mainnet.
 
@@ -85,20 +99,6 @@ class Address(BaseAddress):
     """
     _valid_netbytes = (18, 53, 24)
     # NOTE: _valid_netbytes order is (mainnet, testnet, stagenet)
-
-    def view_key(self):
-        """Returns public view key.
-
-        :rtype: str
-        """
-        return hexlify(self._decoded[33:65]).decode()
-
-    def spend_key(self):
-        """Returns public spend key.
-
-        :rtype: str
-        """
-        return hexlify(self._decoded[1:33]).decode()
 
     def check_private_view_key(self, key):
         """Checks if private view key matches this address.
