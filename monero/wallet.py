@@ -219,9 +219,9 @@ class Wallet(object):
                 struct.pack('<I', major), struct.pack('<I', minor)])
         m = keccak_256(hsdata).digest()
         # D = master_psk + m * B
-        D = ed25519.add_compressed(
+        D = ed25519.edwards_add(
                 ed25519.decodepoint(master_psk),
-                ed25519.scalarmult(ed25519.B, ed25519.decodeint(m)))
+                ed25519.scalarmult_B(ed25519.decodeint(m)))
         # C = master_svk * D
         C = ed25519.scalarmult(D, ed25519.decodeint(master_svk))
         netbyte = bytearray([
