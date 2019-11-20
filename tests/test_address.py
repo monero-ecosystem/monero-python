@@ -64,6 +64,7 @@ class Tests(object):
         self.assertEqual(a2.is_mainnet(), self.mainnet)
         self.assertEqual(a2.is_testnet(), self.testnet)
         self.assertEqual(a2.is_stagenet(), self.stagenet)
+        self.assertEqual(a.get_net_type(), self.net_type)
 
         ia = IntegratedAddress(self.iaddr)
         ia2 = address(self.iaddr)
@@ -78,6 +79,7 @@ class Tests(object):
         self.assertEqual(ia2.is_mainnet(), self.mainnet)
         self.assertEqual(ia2.is_testnet(), self.testnet)
         self.assertEqual(ia2.is_stagenet(), self.stagenet)
+        self.assertEqual(ia2.get_net_type(), self.net_type)
         self.assertEqual(ia2.base_address(), a)
 
         self.assertEqual(ia.view_key(), a.view_key())
@@ -96,6 +98,7 @@ class Tests(object):
         self.assertEqual(sa2.is_mainnet(), self.mainnet)
         self.assertEqual(sa2.is_testnet(), self.testnet)
         self.assertEqual(sa2.is_stagenet(), self.stagenet)
+        self.assertEqual(sa.get_net_type(), self.net_type)
 
         self.assertNotEqual(a, 0)
 
@@ -180,6 +183,7 @@ class AddressTestCase(Tests, unittest.TestCase):
     mainnet = True
     testnet = False
     stagenet = False
+    net_type = 'mainnet'
     addr_invalid = '47ewoP19TN7JCEnFKUJHAYhGxkeTRH82sf36giEp9AcNfDBfkAtRLX7A6rZz18bbNHPNV7ex6WYbMN3aKisFRJZ8Ebsmgef'
     iaddr_invalid = '4HMcpBpe4ddJEEnFKUJHAYhGxkyTRH82sf36giEp9AcNfDBfkAtRLX7A6rZz18bbNHPNV7ex6WYbMN3aKisFRJZ8M7yKhzQhKW3ECCLWQw'
 
@@ -196,6 +200,7 @@ class TestnetAddressTestCase(Tests, unittest.TestCase):
     mainnet = False
     testnet = True
     stagenet = False
+    net_type = 'testnet'
     addr_invalid = '9wuKTHsxGiwEsMp3fYzJiVahyhU2aZi1oZ6R6fK5U64uRa1Pxi8diZh2S1GJFqYXRRhcbfzfWiPD819zKEZkXTMwP7hMs5N'
     iaddr_invalid = 'A7bzU6hSszTEsMp2fYzJiVahyhU2aZi2oZ6R6fK5U64uRa1Pxi8diZh2S1GJFqYXRRhcbfzfWiPD819zKEZkXTMwZqGSmLeBXqMEBnZVkh'
 
@@ -212,6 +217,7 @@ class StagenetAddressTestCase(Tests, unittest.TestCase):
     mainnet = False
     testnet = False
     stagenet = True
+    net_type = 'stagenet'
     addr_invalid = '52jzuBBUMty3xPL3JsQxGP74LDuV6H1LS8Zda1PbdqQjGzFmH6N9ep9McbFKMALujVT9S5mKpbEgC5VPhfoAiVj8LdAqbp6'
     iaddr_invalid = '5CSfuyzxyAV3xPL3JsQxGP74LDuV6E1LS8Zda1PbdqQjGzFmH6N9ep9McbFKMALujVT9S5mKppEgC5VPhfoAiVj8Vz8ySmoqYgTE8dR1yS'
 

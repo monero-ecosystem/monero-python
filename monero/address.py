@@ -62,6 +62,19 @@ class BaseAddress(object):
         """
         return self._decoded[0] == self._valid_netbytes[2]
 
+    def get_net_type(self):
+        """Returns a string of the Monero network the address is for.
+
+        :rtype: str
+        """
+        if self.is_mainnet():
+            net_type = 'mainnet'
+        elif self.is_testnet():
+            net_type = 'testnet'
+        elif self.is_stagenet():
+            net_type = 'stagenet'
+        return net_type
+
     def _decode(self, address):
         self._decoded = bytearray(unhexlify(base58.decode(address)))
         checksum = self._decoded[-4:]
