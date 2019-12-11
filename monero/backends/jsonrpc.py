@@ -69,7 +69,7 @@ class JSONRPCDaemon(object):
                 'end_height': end_height})
         if res['status'] == 'OK':
             return res['headers']
-        raise Exception()
+        raise exceptions.BackendException(res['status'])
 
     def raw_request(self, path, data):
         hdr = {'Content-Type': 'application/json'}
