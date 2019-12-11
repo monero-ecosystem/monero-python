@@ -76,8 +76,9 @@ class JSONRPCDaemon(object):
         _log.debug(u"Request: {path}\nData: {data}".format(
             path=path,
             data=json.dumps(data, indent=2, sort_keys=True)))
+        auth = requests.auth.HTTPDigestAuth(self.user, self.password)
         rsp = requests.post(
-            self.url + path, headers=hdr, data=json.dumps(data),
+            self.url + path, headers=hdr, data=json.dumps(data), auth=auth,
             timeout=self.timeout, verify=self.verify_ssl_certs)
         if rsp.status_code != 200:
             raise RPCError("Invalid HTTP status {code} for path {path}.".format(
