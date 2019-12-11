@@ -1,3 +1,5 @@
+import six
+
 class Daemon(object):
     """Monero daemon.
 
@@ -51,3 +53,13 @@ class Daemon(object):
         :rtype: list of dict
         """
         return self._backend.headers(start_height, end_height)
+
+    def transactions(self, hashes):
+        """
+        Returns transactions matching given hashes. Accepts single hash or a sequence.
+
+        :hashes: str or list of str
+        """
+        if isinstance(hashes, six.string_types):
+            hashes = [hashes]
+        return self._backend.transactions(hashes)

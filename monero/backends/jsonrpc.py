@@ -71,6 +71,22 @@ class JSONRPCDaemon(object):
             return res['headers']
         raise exceptions.BackendException(res['status'])
 
+    def transactions(self, hashes):
+        res = self.raw_request('/get_transactions', {
+                'txs_hashes': hashes,
+                'decode_as_json': True})
+        if res['status'] != 'OK':
+            raise exceptions.BackendException(res['status'])
+        txs = []
+        for tx in res.get('txs', []):
+            txs.append(Transaction(
+                hash=tx['tx_hash'],
+                height=None if tx['in_pool'] else tx['block_height'],
+                timestamp=datetime.fromtimestamp(tx['block_timestamp']) if 'block_timestamp' in tx else None,
+                blob=tx['as_hex'],
+                json=json.loads(tx['as_json'])))
+        return txs
+
     def raw_request(self, path, data):
         hdr = {'Content-Type': 'application/json'}
         _log.debug(u"Request: {path}\nData: {data}".format(

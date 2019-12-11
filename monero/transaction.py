@@ -72,7 +72,12 @@ class Transaction(object):
     timestamp = None
     key = None
     blob = None
+    json = None
     confirmations = None
+
+    @property
+    def size(self):
+        return len(self.blob)//2
 
     def __init__(self, **kwargs):
         self.hash = kwargs.get('hash', self.hash)
@@ -81,6 +86,7 @@ class Transaction(object):
         self.timestamp = kwargs.get('timestamp', self.timestamp)
         self.key = kwargs.get('key', self.key)
         self.blob = kwargs.get('blob', self.blob)
+        self.json = kwargs.get('json', self.json)
         self.confirmations = kwargs.get('confirmations', self.confirmations)
 
     def __repr__(self):
