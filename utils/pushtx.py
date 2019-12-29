@@ -21,6 +21,8 @@ argsparser.add_argument('daemon_rpc_url', nargs='?', type=url_data, default='127
     help="Daemon RPC URL [host[:port]]")
 argsparser.add_argument('-v', dest='verbosity', action='count', default=0,
     help="Verbosity (repeat to increase; -v for INFO, -vv for DEBUG")
+argsparser.add_argument('-p', dest='proxy_url', nargs='?', type=str, default=None,
+    help="Proxy URL")
 argsparser.add_argument('-t', dest='timeout', type=int, default=30, help="Request timeout")
 argsparser.add_argument('-i', dest='tx_filenames', nargs='+', default=None,
     help="Files with transaction data. Will read from stdin if not given.")
@@ -37,7 +39,7 @@ if args.tx_filenames:
     blobs = [(f, open(f, 'r').read()) for f in args.tx_filenames]
 else:
     blobs = [('transaction', sys.stdin.read())]
-d = Daemon(JSONRPCDaemon(timeout=args.timeout, **args.daemon_rpc_url))
+d = Daemon(JSONRPCDaemon(timeout=args.timeout, proxy_url=args.proxy_url, **args.daemon_rpc_url))
 for name, blob in blobs:
     logging.debug("Sending {}".format(name))
     tx = Transaction(blob=blob)

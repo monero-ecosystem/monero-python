@@ -27,7 +27,7 @@ argsparser = argparse.ArgumentParser(description="Transfer Monero")
 argsparser.add_argument('-v', dest='verbosity', action='count', default=0,
     help="Verbosity (repeat to increase; -v for INFO, -vv for DEBUG")
 argsparser.add_argument('wallet_rpc_url', nargs='?', type=url_data, default='127.0.0.1:18082',
-    help="Daemon URL [user[:password]@]host[:port]")
+    help="Wallet RPC URL [user[:password]@]host[:port]")
 argsparser.add_argument('-t', dest='timeout', type=int, default=30, help="Request timeout")
 argsparser.add_argument('-a', dest='account', default=0, type=int, help="Source account index")
 argsparser.add_argument('-p', dest='prio',

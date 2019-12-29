@@ -24,9 +24,10 @@ class JSONRPCDaemon(object):
     :param path: path for JSON RPC requests (should not be changed)
     :param timeout: request timeout
     :param verify_ssl_certs: verify SSL certificates when connecting
+    :param proxy_url: a proxy to use
     """
     def __init__(self, protocol='http', host='127.0.0.1', port=18081, path='/json_rpc',
-            user='', password='', timeout=30, verify_ssl_certs=True):
+            user='', password='', timeout=30, verify_ssl_certs=True, proxy_url=None):
         self.url = '{protocol}://{host}:{port}'.format(
                 protocol=protocol,
                 host=host,
@@ -36,6 +37,7 @@ class JSONRPCDaemon(object):
         self.password = password
         self.timeout = timeout
         self.verify_ssl_certs = verify_ssl_certs
+        self.proxies = {protocol: proxy_url}
 
     def info(self):
         info = self.raw_jsonrpc_request('get_info')
@@ -92,9 +94,10 @@ class JSONRPCDaemon(object):
         _log.debug(u"Request: {path}\nData: {data}".format(
             path=path,
             data=json.dumps(data, indent=2, sort_keys=True)))
+        auth = requests.auth.HTTPDigestAuth(self.user, self.password)
         rsp = requests.post(
-            self.url + path, headers=hdr, data=json.dumps(data),
-            timeout=self.timeout, verify=self.verify_ssl_certs)
+            self.url + path, headers=hdr, data=json.dumps(data), auth=auth,
+            timeout=self.timeout, verify=self.verify_ssl_certs, proxies=self.proxies)
         if rsp.status_code != 200:
             raise RPCError("Invalid HTTP status {code} for path {path}.".format(
                 code=rsp.status_code,
@@ -113,7 +116,7 @@ class JSONRPCDaemon(object):
         auth = requests.auth.HTTPDigestAuth(self.user, self.password)
         rsp = requests.post(
             self.url + '/json_rpc', headers=hdr, data=json.dumps(data), auth=auth,
-            timeout=self.timeout, verify=self.verify_ssl_certs)
+            timeout=self.timeout, verify=self.verify_ssl_certs, proxies=self.proxies)
 
         if rsp.status_code == 401:
             raise Unauthorized("401 Unauthorized. Invalid RPC user name or password.")
