@@ -17,6 +17,23 @@ wallet, the only available backend is JSON RPC.
 
 Also, the ``info()`` method will return a dictionary with details about the current daemon status.
 
+Connecting via proxy (or TOR)
+-----------------------------
+
+The backend also accepts optional ``proxy_url`` keyword. A prime example of use is to route
+your traffic via TOR:
+
+.. code-block:: python
+
+    In [3]: daemon = Daemon(JSONRPCDaemon(host='xmrag4hf5xlabmob.onion', proxy_url='socks5h://127.0.0.1:9050'))
+
+    In [4]: daemon.height()
+    Out[4]: 1999790
+
+Please refer to the docs of underlying `requests`_ library for more info on proxies.
+
+.. _`requests`: http://docs.python-requests.org/
+
 Sending prepared transactions
 -----------------------------
 
