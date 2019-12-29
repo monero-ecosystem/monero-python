@@ -17,6 +17,7 @@ def get_daemon():
     argsparser = argparse.ArgumentParser(description="Display daemon info")
     argsparser.add_argument('daemon_rpc_url', nargs='?', type=url_data, default='127.0.0.1:18081',
         help="Daemon RPC URL [host[:port]]")
+    argsparser.add_argument('-p', dest='proxy_url', nargs='?', type=str, default=None, help="Proxy URL")
     argsparser.add_argument('-t', dest='timeout', type=int, default=30, help="Request timeout")
     argsparser.add_argument('-v', dest='verbosity', action='count', default=0,
         help="Verbosity (repeat to increase; -v for INFO, -vv for DEBUG")
@@ -27,7 +28,7 @@ def get_daemon():
     elif args.verbosity > 1:
         level = logging.DEBUG
     logging.basicConfig(level=level, format="%(asctime)-15s %(message)s")
-    return Daemon(JSONRPCDaemon(timeout=args.timeout, **args.daemon_rpc_url))
+    return Daemon(JSONRPCDaemon(timeout=args.timeout, proxy_url=args.proxy_url, **args.daemon_rpc_url))
 
 d = get_daemon()
 info = d.info()
