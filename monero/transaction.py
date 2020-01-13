@@ -1,5 +1,5 @@
 import re
-import sys
+import six
 import warnings
 from .address import address
 from .numbers import PaymentID
@@ -93,12 +93,6 @@ class Transaction(object):
         return self.hash
 
 
-if sys.version_info < (3,): # pragma: no cover
-    _str_types = (str, bytes, unicode)
-else:                       # pragma: no cover
-    _str_types = (str, bytes)
-
-
 class PaymentManager(object):
     """
     A payment query manager, handling either incoming or outgoing payments of
@@ -185,7 +179,8 @@ class PaymentFilter(object):
         if _local_address is None:
             self.local_addresses = []
         else:
-            if isinstance(_local_address, _str_types):
+            if isinstance(_local_address, six.string_types) \
+                or isinstance(_local_address, six.text_type):
                 local_addresses = [_local_address]
             else:
                 try:
@@ -197,7 +192,7 @@ class PaymentFilter(object):
         if _tx_id is None:
             self.tx_ids = []
         else:
-            if isinstance(_tx_id, _str_types):
+            if isinstance(_tx_id, six.string_types) or isinstance(_tx_id, six.text_type):
                 tx_ids = [_tx_id]
             else:
                 try:
@@ -209,7 +204,7 @@ class PaymentFilter(object):
         if _payment_id is None:
             self.payment_ids = []
         else:
-            if isinstance(_payment_id, _str_types):
+            if isinstance(_payment_id, six.string_types) or isinstance(_payment_id, six.text_type):
                 payment_ids = [_payment_id]
             else:
                 try:

@@ -32,20 +32,14 @@ arithmetic, so we cannot handle secrets without risking their disclosure.
 """
 
 import binascii
-import operator
+import six
 import sys
 
 
 if sys.version_info >= (3,): # pragma: no cover
-    indexbytes = operator.getitem
     intlist2bytes = bytes
-    int2byte = operator.methodcaller("to_bytes", 1, "big")
 else:                       # pragma: no cover
-    int2byte = chr
     range = xrange
-
-    def indexbytes(buf, i):
-        return ord(buf[i])
 
     def intlist2bytes(l):
         return b"".join(chr(c) for c in l)
@@ -192,7 +186,7 @@ def scalarmult_B(e):
 def encodeint(y):
     bits = [(y >> i) & 1 for i in range(b)]
     return b''.join([
-        int2byte(sum([bits[i * 8 + j] << j for j in range(8)]))
+        six.int2byte(sum([bits[i * 8 + j] << j for j in range(8)]))
         for i in range(b//8)
     ])
 
@@ -204,13 +198,13 @@ def encodepoint(P):
     y = (y * zi) % q
     bits = [(y >> i) & 1 for i in range(b - 1)] + [x & 1]
     return b''.join([
-        int2byte(sum([bits[i * 8 + j] << j for j in range(8)]))
+        six.int2byte(sum([bits[i * 8 + j] << j for j in range(8)]))
         for i in range(b // 8)
     ])
 
 
 def bit(h, i):
-    return (indexbytes(h, i // 8) >> (i % 8)) & 1
+    return (six.indexbytes(h, i // 8) >> (i % 8)) & 1
 
 
 def isoncurve(P):
