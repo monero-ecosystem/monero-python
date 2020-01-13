@@ -31,8 +31,8 @@ Let's start with the master address:
 
     In [2]: a = address('A2GmyHHJ9jtUhPiwoAbR2tXU9LJu2U6fJjcsv3rxgkVRWU6tEYcn6C1NBc7wqCv5V7NW3zeYuzKf6RGGgZTFTpVC4QxAiAX')
 
-    In [3]: a.is_testnet()
-    Out[3]: True
+    In [3]: a.net
+    Out[3]: 'test'
 
     In [4]: a.spend_key()
     Out[4]: 'f0481b63cb937fa5960529247ebf6db627ff1b0bb88de9feccc3c504c16aa4b0'
@@ -49,8 +49,8 @@ We may use a subaddress too:
 
     In [7]: b = address('BenuGf8eyVhjZwdcxEJY1MHrUfqHjPvE3d7Pi4XY5vQz53VnVpB38bCBsf8AS5rJuZhuYrqdG9URc2eFoCNPwLXtLENT4R7')
 
-    In [8]: b.is_testnet()
-    Out[8]: True
+    In [8]: b.net
+    Out[8]: 'test'
 
     In [9]: b.spend_key()
     Out[9]: 'ae7e136f46f618fe7f4a6b323ed60864c20070bf110978d7e3868686d5677318'
@@ -163,17 +163,18 @@ Long payment IDs cannot be integrated:
     In [26]: a.with_payment_id(p3)
     ---------------------------------------------------------------------------
     TypeError                                 Traceback (most recent call last)
-    <ipython-input-31-7098746f0b69> in <module>()
+    <ipython-input-8-7098746f0b69> in <module>
     ----> 1 a.with_payment_id(p3)
 
     ~/devel/monero-python/monero/address.py in with_payment_id(self, payment_id)
-         73         payment_id = numbers.PaymentID(payment_id)
-         74         if not payment_id.is_short():
-    ---> 75             raise TypeError("Payment ID {0} has more than 64 bits and cannot be integrated".format(payment_id))
-         76         prefix = 54 if self.is_testnet() else 19
-         77         data = bytearray([prefix]) + self._decoded[1:65] + struct.pack('>Q', int(payment_id))
+        138         payment_id = numbers.PaymentID(payment_id)
+        139         if not payment_id.is_short():
+    --> 140             raise TypeError("Payment ID {0} has more than 64 bits and cannot be integrated".format(payment_id))
+        141         prefix = const.INTADDRR_NETBYTES[const.NETS.index(self.net)]
+        142         data = bytearray([prefix]) + self._decoded[1:65] + struct.pack('>Q', int(payment_id))
 
     TypeError: Payment ID 000000000000000000000000000000000000000000000001234567890abcdef0 has more than 64 bits and cannot be integrated
+
 
 API reference
 -------------
