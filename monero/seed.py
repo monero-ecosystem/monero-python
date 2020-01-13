@@ -35,13 +35,12 @@
 #   + simplified interface, changed exceptions (assertions -> explicit raise)
 #   + optimization
 
-from monero import wordlists
-from monero import ed25519
-from monero import base58
-from monero.address import address
 from binascii import hexlify, unhexlify
 from os import urandom
 from sha3 import keccak_256
+import warnings
+from . import base58, const, ed25519, wordlists
+from .address import address
 
 class Seed(object):
     """Creates a seed object either from local system randomness or an imported phrase.
@@ -151,17 +150,25 @@ class Seed(object):
         self._ed_pub_view_key = ed25519.public_from_secret_hex(self.secret_view_key())
         return self._ed_pub_view_key
 
-    def public_address(self, net='mainnet'):
+    def public_address(self, net=const.NET_MAIN):
         """Returns the master :class:`Address <monero.address.Address>` represented by the seed.
 
-        :param net: the network, one of 'mainnet', 'testnet', 'stagenet'. Default is 'mainnet'.
+        :param net: the network, one of `const.NET_*`; default is `const.NET_MAIN`
 
         :rtype: :class:`Address <monero.address.Address>`
         """
-        if net not in ('mainnet', 'testnet', 'stagenet'):
+        # backward compatibility
+        _net = net[:-3] if net.endswith('net') else net
+        if _net != net:
+            warnings.warn(
+                "Argument '{:s}' is deprecated and will not be accepted in 0.8, "
+                "use one of monero.const.NET_*".format(net),
+                DeprecationWarning)
+            net = _net
+        if net not in const.NETS:
             raise ValueError(
-                "Invalid net argument. Must be one of ('mainnet', 'testnet', 'stagenet').")
-        netbyte = 18 if net == 'mainnet' else 53 if net == 'testnet' else 24
+                "Invalid net argument '{:s}'. Must be one of monero.const.NET_*".format(net))
+        netbyte = (18, 53, 24)[const.NETS.index(net)]
         data = "{:x}{:s}{:s}".format(netbyte, self.public_spend_key(), self.public_view_key())
         h = keccak_256()
         h.update(unhexlify(data))

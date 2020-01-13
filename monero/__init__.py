@@ -1,3 +1,3 @@
-from . import address, account, daemon, wallet, numbers, prio, wordlists, seed
+from . import address, account, const, daemon, wallet, numbers, wordlists, seed
 
 __version__ = '0.7'

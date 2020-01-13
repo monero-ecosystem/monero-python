@@ -1,7 +1,7 @@
-import json
-import os
+import pytest
 import unittest
 
+from monero import const
 from monero.address import Address, SubAddress, IntegratedAddress, address
 from tests.utils import classproperty
 
@@ -50,6 +50,7 @@ class Tests(object):
         self.assertEqual(ia.payment_id(), self.pid)
         self.assertEqual(str(ia), self.iaddr)
 
+    @pytest.mark.filterwarnings("ignore::DeprecationWarning")
     def test_recognition_and_comparisons(self):
         a = Address(self.addr)
         a2 = address(self.addr)
@@ -58,12 +59,20 @@ class Tests(object):
         self.assertEqual(a, self.addr)
         self.assertEqual(self.addr, a)
         self.assertEqual(hash(a), hash(self.addr))
-        self.assertEqual(a.is_mainnet(), self.mainnet)
-        self.assertEqual(a.is_testnet(), self.testnet)
-        self.assertEqual(a.is_stagenet(), self.stagenet)
-        self.assertEqual(a2.is_mainnet(), self.mainnet)
-        self.assertEqual(a2.is_testnet(), self.testnet)
-        self.assertEqual(a2.is_stagenet(), self.stagenet)
+        self.assertEqual(a.net, self.net)
+        with pytest.deprecated_call():
+            self.assertEqual(a.is_mainnet(), self.net == const.NET_MAIN)
+        with pytest.deprecated_call():
+            self.assertEqual(a.is_testnet(), self.net == const.NET_TEST)
+        with pytest.deprecated_call():
+            self.assertEqual(a.is_stagenet(), self.net == const.NET_STAGE)
+        self.assertEqual(a2.net, self.net)
+        with pytest.deprecated_call():
+            self.assertEqual(a2.is_mainnet(), self.net == const.NET_MAIN)
+        with pytest.deprecated_call():
+            self.assertEqual(a2.is_testnet(), self.net == const.NET_TEST)
+        with pytest.deprecated_call():
+            self.assertEqual(a2.is_stagenet(), self.net == const.NET_STAGE)
 
         ia = IntegratedAddress(self.iaddr)
         ia2 = address(self.iaddr)
@@ -72,12 +81,20 @@ class Tests(object):
         self.assertEqual(ia, self.iaddr)
         self.assertEqual(self.iaddr, ia)
         self.assertEqual(hash(ia), hash(self.iaddr))
-        self.assertEqual(ia.is_mainnet(), self.mainnet)
-        self.assertEqual(ia.is_testnet(), self.testnet)
-        self.assertEqual(ia.is_stagenet(), self.stagenet)
-        self.assertEqual(ia2.is_mainnet(), self.mainnet)
-        self.assertEqual(ia2.is_testnet(), self.testnet)
-        self.assertEqual(ia2.is_stagenet(), self.stagenet)
+        self.assertEqual(ia.net, self.net)
+        with pytest.deprecated_call():
+            self.assertEqual(ia.is_mainnet(), self.net == const.NET_MAIN)
+        with pytest.deprecated_call():
+            self.assertEqual(ia.is_testnet(), self.net == const.NET_TEST)
+        with pytest.deprecated_call():
+            self.assertEqual(ia.is_stagenet(), self.net == const.NET_STAGE)
+        self.assertEqual(ia2.net, self.net)
+        with pytest.deprecated_call():
+            self.assertEqual(ia2.is_mainnet(), self.net == const.NET_MAIN)
+        with pytest.deprecated_call():
+            self.assertEqual(ia2.is_testnet(), self.net == const.NET_TEST)
+        with pytest.deprecated_call():
+            self.assertEqual(ia2.is_stagenet(), self.net == const.NET_STAGE)
         self.assertEqual(ia2.base_address(), a)
 
         self.assertEqual(ia.view_key(), a.view_key())
@@ -90,12 +107,20 @@ class Tests(object):
         self.assertEqual(sa, self.subaddr)
         self.assertEqual(self.subaddr, sa)
         self.assertEqual(hash(sa), hash(self.subaddr))
-        self.assertEqual(sa.is_mainnet(), self.mainnet)
-        self.assertEqual(sa.is_testnet(), self.testnet)
-        self.assertEqual(sa.is_stagenet(), self.stagenet)
-        self.assertEqual(sa2.is_mainnet(), self.mainnet)
-        self.assertEqual(sa2.is_testnet(), self.testnet)
-        self.assertEqual(sa2.is_stagenet(), self.stagenet)
+        self.assertEqual(sa.net, self.net)
+        with pytest.deprecated_call():
+            self.assertEqual(sa.is_mainnet(), self.net == const.NET_MAIN)
+        with pytest.deprecated_call():
+            self.assertEqual(sa.is_testnet(), self.net == const.NET_TEST)
+        with pytest.deprecated_call():
+            self.assertEqual(sa.is_stagenet(), self.net == const.NET_STAGE)
+        self.assertEqual(sa2.net, self.net)
+        with pytest.deprecated_call():
+            self.assertEqual(sa2.is_mainnet(), self.net == const.NET_MAIN)
+        with pytest.deprecated_call():
+            self.assertEqual(sa2.is_testnet(), self.net == const.NET_TEST)
+        with pytest.deprecated_call():
+            self.assertEqual(sa2.is_stagenet(), self.net == const.NET_STAGE)
 
         self.assertNotEqual(a, 0)
 
@@ -177,9 +202,7 @@ class AddressTestCase(Tests, unittest.TestCase):
     pid = '4a6f686e47616c74'
     iaddr = '4HMcpBpe4ddJEEnFKUJHAYhGxkeTRH82sf36giEp9AcNfDBfkAtRLX7A6rZz18bbNHPNV7ex6WYbMN3aKisFRJZ8M7yKhzQhKW3ECCLWQw'
     subaddr = '84LooD7i35SFppgf4tQ453Vi3q5WexSUXaVgut69ro8MFnmHwuezAArEZTZyLr9fS6QotjqkSAxSF6d1aDgsPoX849izJ7m'
-    mainnet = True
-    testnet = False
-    stagenet = False
+    net = const.NET_MAIN
     addr_invalid = '47ewoP19TN7JCEnFKUJHAYhGxkeTRH82sf36giEp9AcNfDBfkAtRLX7A6rZz18bbNHPNV7ex6WYbMN3aKisFRJZ8Ebsmgef'
     iaddr_invalid = '4HMcpBpe4ddJEEnFKUJHAYhGxkyTRH82sf36giEp9AcNfDBfkAtRLX7A6rZz18bbNHPNV7ex6WYbMN3aKisFRJZ8M7yKhzQhKW3ECCLWQw'
 
@@ -193,9 +216,7 @@ class TestnetAddressTestCase(Tests, unittest.TestCase):
     pid = '4a6f686e47616c74'
     subaddr = 'BaU3yLuDqdcETYzeF7vFSVEKNR4sSGxBV1Evrw5yNBf2VMiuAwfDmiF3RHqLHkaA5A6RGiNNRUqvtaqhMtdjA1SQ1tnQV8D'
     iaddr = 'A7bzU6hSszTEsMp2fYzJiVahyhU2aZi1oZ6R6fK5U64uRa1Pxi8diZh2S1GJFqYXRRhcbfzfWiPD819zKEZkXTMwZqGSmLeBXqMEBnZVkh'
-    mainnet = False
-    testnet = True
-    stagenet = False
+    net = const.NET_TEST
     addr_invalid = '9wuKTHsxGiwEsMp3fYzJiVahyhU2aZi1oZ6R6fK5U64uRa1Pxi8diZh2S1GJFqYXRRhcbfzfWiPD819zKEZkXTMwP7hMs5N'
     iaddr_invalid = 'A7bzU6hSszTEsMp2fYzJiVahyhU2aZi2oZ6R6fK5U64uRa1Pxi8diZh2S1GJFqYXRRhcbfzfWiPD819zKEZkXTMwZqGSmLeBXqMEBnZVkh'
 
@@ -209,9 +230,7 @@ class StagenetAddressTestCase(Tests, unittest.TestCase):
     pid = '4a6f686e47616c74'
     subaddr = '7AeQwvrLtPeYoXVPRkEu8oEL7N9wnqHjYKwSvTf6YKbHgYmw6AJMsjggzVLo21egMK9qcoV1mxCTfP4FbaGb7JEMDfpLetk'
     iaddr = '5CSfuyzxyAV3xPL3JsQxGP74LDuV6E1LS8Zda1PbdqQjGzFmH6N9ep9McbFKMALujVT9S5mKpbEgC5VPhfoAiVj8Vz8ySmoqYgTE8dR1yS'
-    mainnet = False
-    testnet = False
-    stagenet = True
+    net = const.NET_STAGE
     addr_invalid = '52jzuBBUMty3xPL3JsQxGP74LDuV6H1LS8Zda1PbdqQjGzFmH6N9ep9McbFKMALujVT9S5mKpbEgC5VPhfoAiVj8LdAqbp6'
     iaddr_invalid = '5CSfuyzxyAV3xPL3JsQxGP74LDuV6E1LS8Zda1PbdqQjGzFmH6N9ep9McbFKMALujVT9S5mKppEgC5VPhfoAiVj8Vz8ySmoqYgTE8dR1yS'
 

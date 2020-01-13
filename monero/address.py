@@ -3,8 +3,10 @@ import re
 from sha3 import keccak_256
 import six
 import struct
+import warnings
 
 from . import base58
+from . import const
 from . import ed25519
 from . import numbers
 
@@ -36,26 +38,42 @@ class BaseAddress(object):
         """
         return hexlify(self._decoded[1:33]).decode()
 
+    @property
+    def net(self):
+        return const.NETS[self._valid_netbytes.index(self._decoded[0])]
+
     def is_mainnet(self):
         """Returns `True` if the address belongs to mainnet.
 
         :rtype: bool
         """
-        return self._decoded[0] == self._valid_netbytes[0]
+        warnings.warn(".is_mainnet(), .is_testnet() and .is_stagenet() methods are deprecated "
+            "and will be gone in 0.8; use Address.net property and constants form monero.const "
+            "instead",
+            DeprecationWarning)
+        return self.net == const.NET_MAIN
 
     def is_testnet(self):
         """Returns `True` if the address belongs to testnet.
 
         :rtype: bool
         """
-        return self._decoded[0] == self._valid_netbytes[1]
+        warnings.warn(".is_mainnet(), .is_testnet() and .is_stagenet() methods are deprecated "
+            "and will be gone in 0.8; use Address.net property and constants form monero.const "
+            "instead",
+            DeprecationWarning)
+        return self.net == const.NET_TEST
 
     def is_stagenet(self):
         """Returns `True` if the address belongs to stagenet.
 
         :rtype: bool
         """
-        return self._decoded[0] == self._valid_netbytes[2]
+        warnings.warn(".is_mainnet(), .is_testnet() and .is_stagenet() methods are deprecated "
+            "and will be gone in 0.8; use Address.net property and constants form monero.const "
+            "instead",
+            DeprecationWarning)
+        return self.net == const.NET_STAGE
 
     def _decode(self, address):
         self._decoded = bytearray(unhexlify(base58.decode(address)))
@@ -92,8 +110,7 @@ class Address(BaseAddress):
     :param address: a Monero address as string-like object
     :param label: a label for the address (defaults to `None`)
     """
-    _valid_netbytes = (18, 53, 24)
-    # NOTE: _valid_netbytes order is (mainnet, testnet, stagenet)
+    _valid_netbytes = const.MASTERADDR_NETBYTES
 
     def check_private_view_key(self, key):
         """Checks if private view key matches this address.
@@ -121,7 +138,7 @@ class Address(BaseAddress):
         payment_id = numbers.PaymentID(payment_id)
         if not payment_id.is_short():
             raise TypeError("Payment ID {0} has more than 64 bits and cannot be integrated".format(payment_id))
-        prefix = 54 if self.is_testnet() else 25 if self.is_stagenet() else 19
+        prefix = const.INTADDRR_NETBYTES[const.NETS.index(self.net)]
         data = bytearray([prefix]) + self._decoded[1:65] + struct.pack('>Q', int(payment_id))
         checksum = bytearray(keccak_256(data).digest()[:4])
         return IntegratedAddress(base58.encode(hexlify(data + checksum)))
@@ -133,8 +150,7 @@ class SubAddress(BaseAddress):
     Any type of address which is not the master one for a wallet.
     """
 
-    _valid_netbytes = (42, 63, 36)
-    # NOTE: _valid_netbytes order is (mainnet, testnet, stagenet)
+    _valid_netbytes = const.SUBADDR_NETBYTES
 
     def with_payment_id(self, _):
         raise TypeError("SubAddress cannot be integrated with payment ID")
@@ -146,8 +162,7 @@ class IntegratedAddress(Address):
     A master address integrated with payment id (short one, max 64 bit).
     """
 
-    _valid_netbytes = (19, 54, 25)
-    # NOTE: _valid_netbytes order is (mainnet, testnet, stagenet)
+    _valid_netbytes = const.INTADDRR_NETBYTES
 
     def __init__(self, address):
         address = address.decode() if isinstance(address, bytes) else str(address)
@@ -167,7 +182,7 @@ class IntegratedAddress(Address):
         """Returns the base address without payment id.
         :rtype: :class:`Address`
         """
-        prefix = 53 if self.is_testnet() else 24 if self.is_stagenet() else 18
+        prefix = const.MASTERADDR_NETBYTES[const.NETS.index(self.net)]
         data = bytearray([prefix]) + self._decoded[1:65]
         checksum = keccak_256(data).digest()[:4]
         return Address(base58.encode(hexlify(data + checksum)))

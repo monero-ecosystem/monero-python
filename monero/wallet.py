@@ -4,9 +4,9 @@ import struct
 
 from . import address
 from . import base58
+from . import const
 from . import ed25519
 from . import numbers
-from . import prio
 from .transaction import Payment, PaymentManager
 
 
@@ -224,15 +224,13 @@ class Wallet(object):
                 ed25519.scalarmult_B(ed25519.decodeint(m)))
         # C = master_svk * D
         C = ed25519.scalarmult(D, ed25519.decodeint(master_svk))
-        netbyte = bytearray([
-                42 if master_address.is_mainnet() else \
-                63 if master_address.is_testnet() else 36])
+        netbyte = bytearray([const.SUBADDR_NETBYTES[const.NETS.index(master_address.net)]])
         data = netbyte + ed25519.encodepoint(D) + ed25519.encodepoint(C)
         checksum = keccak_256(data).digest()[:4]
         return address.SubAddress(base58.encode(hexlify(data + checksum)))
 
     def transfer(self, address, amount,
-            priority=prio.NORMAL, payment_id=None, unlock_time=0,
+            priority=const.PRIO_NORMAL, payment_id=None, unlock_time=0,
             relay=True):
         """
         Sends a transfer from the default account. Returns a list of resulting transactions.
@@ -241,7 +239,7 @@ class Wallet(object):
         :param amount: amount to send
         :param priority: transaction priority, implies fee. The priority can be a number
                     from 1 to 4 (unimportant, normal, elevated, priority) or a constant
-                    from `monero.prio`.
+                    from `monero.const.PRIO_*`.
         :param payment_id: ID for the payment (must be None if
                     :class:`IntegratedAddress <monero.address.IntegratedAddress>`
                     is used as the destination)
@@ -260,7 +258,7 @@ class Wallet(object):
                 relay=relay)
 
     def transfer_multiple(self, destinations,
-            priority=prio.NORMAL, payment_id=None, unlock_time=0,
+            priority=const.PRIO_NORMAL, payment_id=None, unlock_time=0,
             relay=True):
         """
         Sends a batch of transfers from the default account. Returns a list of resulting
@@ -269,7 +267,7 @@ class Wallet(object):
         :param destinations: a list of destination and amount pairs: [(address, amount), ...]
         :param priority: transaction priority, implies fee. The priority can be a number
                 from 1 to 4 (unimportant, normal, elevated, priority) or a constant
-                from `monero.prio`.
+                from `monero.const.PRIO_*`.
         :param payment_id: ID for the payment (must be None if
                 :class:`IntegratedAddress <monero.address.IntegratedAddress>`
                 is used as a destination)
@@ -287,7 +285,7 @@ class Wallet(object):
                 unlock_time=unlock_time,
                 relay=relay)
 
-    def sweep_all(self, address, priority=prio.NORMAL, payment_id=None,
+    def sweep_all(self, address, priority=const.PRIO_NORMAL, payment_id=None,
             subaddr_indices=None, unlock_time=0, relay=True):
         """
         Sends all unlocked balance from the default account to an address.
@@ -296,7 +294,7 @@ class Wallet(object):
         :param address: destination :class:`Address <monero.address.Address>` or subtype
         :param priority: transaction priority, implies fee. The priority can be a number
                     from 1 to 4 (unimportant, normal, elevated, priority) or a constant
-                    from `monero.prio`.
+                    from `monero.const.PRIO_*`.
         :param payment_id: ID for the payment (must be None if
                     :class:`IntegratedAddress <monero.address.IntegratedAddress>`
                     is used as the destination)

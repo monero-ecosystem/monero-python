@@ -78,9 +78,9 @@ class SeedTestCase(unittest.TestCase):
             '44cWztNFdAqNnycvZbUoj44vsbAEmKnx9aNgkjHdjtMsBrSeKiY8J4s2raH7EMawA2Fwo9utaRTV7Aw8EcTMNMxhH4YtKdH')
         self.assertIsInstance(seed.public_address(), Address)
         self.assertEqual(
-            seed.public_address(net='stagenet'),
+            seed.public_address(net='stage'),
             '54pZ5jHDGmwNnycvZbUoj44vsbAEmKnx9aNgkjHdjtMsBrSeKiY8J4s2raH7EMawA2Fwo9utaRTV7Aw8EcTMNMxhH6cuARW')
-        self.assertIsInstance(seed.public_address(net='stagenet'), Address)
+        self.assertIsInstance(seed.public_address(net='stage'), Address)
 
         seed = Seed("dwelt idols lopped blender haggled rabbits piloted value swagger taunts toolbox upgrade swagger")
         self.assertTrue(seed.is_mymonero())
@@ -100,7 +100,6 @@ class SeedTestCase(unittest.TestCase):
 
     def test_languages(self):
         for wordlist in list_wordlists():
-            print("Language: {}".format(wordlist))
             # Generate random seed
             seed = Seed(wordlist=wordlist)
 
