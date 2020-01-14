@@ -1,6 +1,26 @@
 Release Notes
 =============
 
+0.7
+---
+
+Backward-incompatible changes:
+
+ 1. The ``Transaction.blob`` changes from hexadecimal to raw binary data (``bytes`` in Python 3,
+    ``str`` in Python 2).
+
+Deprecations:
+
+ 1. ``monero.const`` has been introduced. Transaction priority consts will move to
+    ``monero.const.PRIO_*``. The ``monero.prio`` submodule has been deprecated and will be gone
+    in 0.8.
+ 2. Methods ``.is_mainnet()``, ``.is_testnet()``, ``.is_stagenet()`` have been deprecated and
+    new ``.net`` property has been added to all ``monero.address.Address`` instances. The values
+    are from among ``monero.const.NET_*`` and have string representation of ``"main"``, ``"test"``
+    and ``"stage"`` respectively. Likewise, ``monero.seed.Seed.public_address()`` accepts those
+    new values.
+    All deprecated uses will raise proper warnings in 0.7.x and will be gone with 0.8.
+
 0.6
 ---
 
