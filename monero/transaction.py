@@ -77,7 +77,7 @@ class Transaction(object):
 
     @property
     def size(self):
-        return len(self.blob)//2
+        return len(self.blob)
 
     def __init__(self, **kwargs):
         self.hash = kwargs.get('hash', self.hash)

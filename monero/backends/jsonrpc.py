@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+import binascii
 from datetime import datetime
 import operator
 import json
@@ -45,7 +47,7 @@ class JSONRPCDaemon(object):
 
     def send_transaction(self, blob, relay=True):
         res = self.raw_request('/sendrawtransaction', {
-            'tx_as_hex': blob,
+            'tx_as_hex': binascii.hexlify(blob),
             'do_not_relay': not relay})
         if res['status'] == 'OK':
             return res
@@ -85,7 +87,7 @@ class JSONRPCDaemon(object):
                 hash=tx['tx_hash'],
                 height=None if tx['in_pool'] else tx['block_height'],
                 timestamp=datetime.fromtimestamp(tx['block_timestamp']) if 'block_timestamp' in tx else None,
-                blob=tx['as_hex'],
+                blob=binascii.unhexlify(tx['as_hex']),
                 json=json.loads(tx['as_json'])))
         return txs
 
@@ -319,7 +321,7 @@ class JSONRPCWallet(object):
             'key': data.get('key'),
             'height': data.get('height', data.get('block_height')) or None,
             'timestamp': datetime.fromtimestamp(data['timestamp']) if 'timestamp' in data else None,
-            'blob': data.get('blob', None),
+            'blob': binascii.unhexlify(data.get('blob', '')),
             'confirmations': data.get('confirmations', None)
         })
 
