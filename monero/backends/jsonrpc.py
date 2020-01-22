@@ -9,6 +9,7 @@ import requests
 from .. import exceptions
 from ..account import Account
 from ..address import address, Address, SubAddress
+from ..const import NET_MAIN, NET_TEST, NET_STAGE
 from ..numbers import from_atomic, to_atomic, PaymentID
 from ..seed import Seed
 from ..transaction import Transaction, IncomingPayment, OutgoingPayment
@@ -28,6 +29,9 @@ class JSONRPCDaemon(object):
     :param verify_ssl_certs: verify SSL certificates when connecting
     :param proxy_url: a proxy to use
     """
+
+    _net = None
+
     def __init__(self, protocol='http', host='127.0.0.1', port=18081, path='/json_rpc',
             user='', password='', timeout=30, verify_ssl_certs=True, proxy_url=None):
         self.url = '{protocol}://{host}:{port}'.format(
@@ -41,9 +45,24 @@ class JSONRPCDaemon(object):
         self.verify_ssl_certs = verify_ssl_certs
         self.proxies = {protocol: proxy_url}
 
+    def _set_net(self, info):
+        if info['mainnet']:
+            self._net = NET_MAIN
+        if info['testnet']:
+            self._net = NET_TEST
+        if info['stagenet']:
+            self._net = NET_STAGE
+
     def info(self):
         info = self.raw_jsonrpc_request('get_info')
+        self._set_net(info)
         return info
+
+    def net(self):
+        if self._net:
+            return self._net
+        self.info()
+        return self._net
 
     def send_transaction(self, blob, relay=True):
         res = self.raw_request('/sendrawtransaction', {

@@ -1,9 +1,8 @@
-from binascii import hexlify
 import responses
 
+from monero.const import NET_STAGE
 from monero.daemon import Daemon
 from monero.backends.jsonrpc import JSONRPCDaemon
-from monero.transaction import Transaction
 
 from .base import JSONTestCase
 
@@ -26,6 +25,24 @@ class JSONRPCDaemonTestCase(JSONTestCase):
             status=200)
         self.assertTrue(self.daemon.info())
         self.assertEqual(self.daemon.height(), 294993)
+
+    @responses.activate
+    def test_net(self):
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_basic_info-get_info.json'),
+            status=200)
+        self.assertEqual(self.daemon.net, NET_STAGE)
+        self.daemon.net
+        self.assertEqual(len(responses.calls), 1, "net value has not been cached?")
+
+    @responses.activate
+    def test_info_then_net(self):
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_basic_info-get_info.json'),
+            status=200)
+        self.daemon.info()
+        self.assertEqual(self.daemon.net, NET_STAGE)
+        self.assertEqual(len(responses.calls), 1, "net value has not been cached?")
 
     @responses.activate
     def test_mempool(self):

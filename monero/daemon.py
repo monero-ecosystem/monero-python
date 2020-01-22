@@ -18,6 +18,10 @@ class Daemon(object):
         """
         return self._backend.info()
 
+    @property
+    def net(self):
+        return self._backend.net()
+
     def height(self):
         """
         Return daemon's chain height.
