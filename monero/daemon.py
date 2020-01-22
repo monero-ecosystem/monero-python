@@ -58,6 +58,19 @@ class Daemon(object):
         """
         return self._backend.headers(start_height, end_height)
 
+    def block(self, bhash=None, height=None):
+        """
+        Returns a block of specified height or hash.
+
+        :param str bhash: block hash, or
+        :param int height: block height
+
+        :rtype: :class:`Block <monero.block.Block>`
+        """
+        if not height and not bhash:
+            raise ValueError("Height or hash must be specified")
+        return self._backend.block(bhash=bhash, height=height)
+
     def transactions(self, hashes):
         """
         Returns transactions matching given hashes. Accepts single hash or a sequence.

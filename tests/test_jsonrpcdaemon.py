@@ -57,6 +57,29 @@ class JSONRPCDaemonTestCase(JSONTestCase):
         self.assertGreater(txs[1].fee, 0)
 
     @responses.activate
+    def test_block(self):
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read("test_block-423cd4d170c53729cf25b4243ea576d1e901d86e26c06d6a7f79815f3fcb9a89.json"),
+            status=200)
+        responses.add(responses.POST, self.transactions_url,
+            json=self._read("test_block-423cd4d170c53729cf25b4243ea576d1e901d86e26c06d6a7f79815f3fcb9a89-txns.json"),
+            status=200)
+        blk = self.daemon.block("423cd4d170c53729cf25b4243ea576d1e901d86e26c06d6a7f79815f3fcb9a89")
+        self.assertEqual(
+            blk.hash,
+            "423cd4d170c53729cf25b4243ea576d1e901d86e26c06d6a7f79815f3fcb9a89")
+        self.assertEqual(blk.height, 451992)
+
+        self.assertIn("24fb42f9f324082658524b29b4cf946a9f5fcfa82194070e2f17c1875e15d5d0", blk)
+        for tx in blk.transactions:
+            self.assertIn(tx, blk)
+
+        # tx not in block
+        self.assertNotIn("e3a3b8361777c8f4f1fd423b86655b5c775de0230b44aa5b82f506135a96c53a", blk)
+        # wrong arg type
+        self.assertRaises(ValueError, lambda txid: txid in blk, 1245)
+
+    @responses.activate
     def test_transactions(self):
         responses.add(responses.POST, self.transactions_url,
             json=self._read('test_transactions.json'),

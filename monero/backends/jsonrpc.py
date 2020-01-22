@@ -9,6 +9,7 @@ import requests
 from .. import exceptions
 from ..account import Account
 from ..address import address, Address, SubAddress
+from ..block import Block
 from ..const import NET_MAIN, NET_TEST, NET_STAGE
 from ..numbers import from_atomic, to_atomic, PaymentID
 from ..seed import Seed
@@ -92,6 +93,33 @@ class JSONRPCDaemon(object):
                 'end_height': end_height})
         if res['status'] == 'OK':
             return res['headers']
+        raise exceptions.BackendException(res['status'])
+
+    def block(self, bhash=None, height=None):
+        data = {}
+        if bhash:
+            data['hash'] = bhash
+        if height:
+            data['height'] = height
+        res = self.raw_jsonrpc_request('get_block', data)
+        if res['status'] == 'OK':
+            bhdr = res['block_header']
+            sub_json = json.loads(res['json'])
+            data = {
+                'blob': res['blob'],
+                'hash': bhdr['hash'],
+                'height': bhdr['height'],
+                'timestamp': datetime.fromtimestamp(bhdr['timestamp']),
+                'version': (bhdr['major_version'], bhdr['minor_version']),
+                'difficulty': bhdr['difficulty'],
+                'nonce': bhdr['nonce'],
+                'orphan': bhdr['orphan_status'],
+                'prev_hash': bhdr['prev_hash'],
+                'reward': bhdr['reward'],
+                'transactions': self.transactions(
+                    [bhdr['miner_tx_hash']] + sub_json['tx_hashes']),
+            }
+            return Block(**data)
         raise exceptions.BackendException(res['status'])
 
     def transactions(self, hashes):
