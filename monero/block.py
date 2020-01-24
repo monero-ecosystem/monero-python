@@ -25,10 +25,17 @@ class Block(object):
 
     def __init__(self, **kwargs):
         for k in ('hash', 'height', 'timestamp', 'version', 'difficulty', 'nonce', 'prev_hash', 'reward'):
-            setattr(self, k, kwargs[k])
-        self.orphan = kwargs['orphan']
-        self.transactions = kwargs['transactions']
-        self.blob = kwargs.get('blob', None)
+            setattr(self, k, kwargs.get(k, getattr(self, k)))
+        self.orphan = kwargs.get('orphan', self.orphan)
+        self.transactions = kwargs.get('transactions', self.transactions or [])
+        self.blob = kwargs.get('blob', self.blob)
+
+    def __eq__(self, other):
+        if isinstance(other, Block):
+            return self.hash == other.hash
+        elif isinstance(other, six.string_types):
+            return six.ensure_text(self.hash) == six.ensure_text(other)
+        return super(Block, self).__eq__(other)
 
     def __contains__(self, tx):
         if isinstance(tx, six.string_types):

@@ -1,3 +1,4 @@
+import decimal
 import responses
 
 from monero.const import NET_STAGE
@@ -69,6 +70,7 @@ class JSONRPCDaemonTestCase(JSONTestCase):
             blk.hash,
             "423cd4d170c53729cf25b4243ea576d1e901d86e26c06d6a7f79815f3fcb9a89")
         self.assertEqual(blk.height, 451992)
+        self.assertIsInstance(blk.reward, decimal.Decimal)
 
         self.assertIn("24fb42f9f324082658524b29b4cf946a9f5fcfa82194070e2f17c1875e15d5d0", blk)
         for tx in blk.transactions:

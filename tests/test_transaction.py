@@ -6,7 +6,7 @@ import unittest
 
 from monero.address import address
 from monero.numbers import PaymentID
-from monero.transaction import IncomingPayment, OutgoingPayment, Transaction, _ByHeight
+from monero.transaction import IncomingPayment, Transaction, _ByHeight
 
 class FiltersTestCase(unittest.TestCase):
     def setUp(self):

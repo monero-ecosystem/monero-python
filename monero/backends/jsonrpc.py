@@ -115,7 +115,7 @@ class JSONRPCDaemon(object):
                 'nonce': bhdr['nonce'],
                 'orphan': bhdr['orphan_status'],
                 'prev_hash': bhdr['prev_hash'],
-                'reward': bhdr['reward'],
+                'reward': from_atomic(bhdr['reward']),
                 'transactions': self.transactions(
                     [bhdr['miner_tx_hash']] + sub_json['tx_hashes']),
             }
