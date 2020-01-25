@@ -83,6 +83,8 @@ class JSONRPCDaemon(object):
                 hash=tx['id_hash'],
                 fee=from_atomic(tx['fee']),
                 timestamp=datetime.fromtimestamp(tx['receive_time']),
+                blob=binascii.unhexlify(tx['tx_blob']),
+                json=json.loads(tx['tx_json']),
                 confirmations=0))
         return txs
 
