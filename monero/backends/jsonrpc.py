@@ -200,11 +200,12 @@ class JSONRPCWallet(object):
     :param password: password to authenticate with over RPC
     :param timeout: request timeout
     :param verify_ssl_certs: verify ssl certs for request
+    :param proxy_url: a proxy to use
     """
     _master_address = None
 
     def __init__(self, protocol='http', host='127.0.0.1', port=18088, path='/json_rpc',
-            user='', password='', timeout=30, verify_ssl_certs=True):
+            user='', password='', timeout=30, verify_ssl_certs=True, proxy_url=None):
         self.url = '{protocol}://{host}:{port}/json_rpc'.format(
                 protocol=protocol,
                 host=host,
@@ -214,6 +215,7 @@ class JSONRPCWallet(object):
         self.password = password
         self.timeout = timeout
         self.verify_ssl_certs = verify_ssl_certs
+        self.proxies = {protocol: proxy_url}
         _log.debug("JSONRPC wallet backend auth: '{user}'/'{stars}'".format(
             user=user, stars=('*' * len(password)) if password else ''))
 
@@ -458,7 +460,7 @@ class JSONRPCWallet(object):
         auth = requests.auth.HTTPDigestAuth(self.user, self.password)
         rsp = requests.post(
             self.url, headers=hdr, data=json.dumps(data), auth=auth,
-            timeout=self.timeout, verify=self.verify_ssl_certs)
+            timeout=self.timeout, verify=self.verify_ssl_certs, proxies=self.proxies)
 
         if rsp.status_code == 401:
             raise Unauthorized("401 Unauthorized. Invalid RPC user name or password.")
