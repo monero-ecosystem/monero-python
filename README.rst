@@ -78,7 +78,7 @@ Development
 
 .. code-block:: bash
 
-    pip install -r requirements.txt -r test_requirements.txt
+    .venv/bin/pip install -r requirements.txt -r test_requirements.txt
 
 4. Do your thing
 
@@ -86,4 +86,4 @@ Development
 
 .. code-block:: bash
 
-    pytest
+    .venv/bin/pytest
