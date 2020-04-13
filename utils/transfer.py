@@ -63,6 +63,6 @@ for tx in txns:
     if args.outdir:
         outname = os.path.join(args.outdir, tx.hash + '.tx')
         outfile = open(outname, 'wb')
-        outfile.write(tx.blob.encode())
+        outfile.write(tx.blob)
         outfile.close()
         print(u"Transaction saved to {}".format(outname))

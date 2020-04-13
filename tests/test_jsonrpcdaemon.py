@@ -1,9 +1,11 @@
 import decimal
+import os
 import responses
 
 from monero.const import NET_STAGE
 from monero.daemon import Daemon
 from monero.backends.jsonrpc import JSONRPCDaemon
+from monero.transaction import Transaction
 
 from .base import JSONTestCase
 
@@ -11,6 +13,7 @@ class JSONRPCDaemonTestCase(JSONTestCase):
     jsonrpc_url = 'http://127.0.0.1:18081/json_rpc'
     mempool_url = 'http://127.0.0.1:18081/get_transaction_pool'
     transactions_url = 'http://127.0.0.1:18081/get_transactions'
+    sendrawtransaction_url = 'http://127.0.0.1:18081/sendrawtransaction'
     data_subdir = 'test_jsonrpcdaemon'
 
     def setUp(self):
@@ -110,3 +113,18 @@ class JSONRPCDaemonTestCase(JSONTestCase):
                 "035a1cfadd2f80124998f5af8c7bb6703743a4f322d0a20b7f7b502956ada59d")
         self.assertIsNone(txs[3].height)
         self.assertEqual(txs[3].size, 2724)
+
+    @responses.activate
+    def test_send_transaction(self):
+        path = os.path.join(
+            os.path.dirname(__file__),
+            "data",
+            self.data_subdir,
+            "0e8fa9202e0773333360e5b9e8fb8e94272c16a8a58b6fe7cf3b4327158e3a44.tx")
+        responses.add(responses.POST, self.sendrawtransaction_url,
+            json=self._read('test_send_transaction.json'),
+            status=200)
+        tx = Transaction(
+            blob=open(path, "rb").read())
+        rsp = self.daemon.send_transaction(tx)
+        self.assertEqual(rsp["status"], "OK")

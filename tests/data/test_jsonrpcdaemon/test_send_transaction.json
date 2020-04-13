@@ -1,0 +1,18 @@
+{
+  "credits": 0,
+  "double_spend": false,
+  "fee_too_low": false,
+  "invalid_input": false,
+  "invalid_output": false,
+  "low_mixin": false,
+  "not_rct": false,
+  "not_relayed": false,
+  "overspend": false,
+  "reason": "",
+  "sanity_check_failed": false,
+  "status": "OK",
+  "too_big": false,
+  "too_few_outputs": false,
+  "top_hash": "",
+  "untrusted": false
+}

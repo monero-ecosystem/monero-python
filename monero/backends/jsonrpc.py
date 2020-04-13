@@ -5,6 +5,7 @@ import operator
 import json
 import logging
 import requests
+import six
 
 from .. import exceptions
 from ..account import Account
@@ -67,7 +68,7 @@ class JSONRPCDaemon(object):
 
     def send_transaction(self, blob, relay=True):
         res = self.raw_request('/sendrawtransaction', {
-            'tx_as_hex': binascii.hexlify(blob),
+            'tx_as_hex': six.ensure_text(binascii.hexlify(blob)),
             'do_not_relay': not relay})
         if res['status'] == 'OK':
             return res
