@@ -133,12 +133,16 @@ class JSONRPCDaemon(object):
             raise exceptions.BackendException(res['status'])
         txs = []
         for tx in res.get('txs', []):
+            as_json = json.loads(tx['as_json'])
+            fee = as_json['rct_signatures'].get('txnFee')
             txs.append(Transaction(
                 hash=tx['tx_hash'],
+                fee=from_atomic(fee) if fee else None,
                 height=None if tx['in_pool'] else tx['block_height'],
-                timestamp=datetime.fromtimestamp(tx['block_timestamp']) if 'block_timestamp' in tx else None,
+                timestamp=datetime.fromtimestamp(
+                    tx['block_timestamp']) if 'block_timestamp' in tx else None,
                 blob=binascii.unhexlify(tx['as_hex']),
-                json=json.loads(tx['as_json'])))
+                json=as_json))
         return txs
 
     def raw_request(self, path, data):
