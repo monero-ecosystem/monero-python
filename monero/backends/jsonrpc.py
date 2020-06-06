@@ -134,7 +134,7 @@ class JSONRPCDaemon(object):
         txs = []
         for tx in res.get('txs', []):
             as_json = json.loads(tx['as_json'])
-            fee = as_json['rct_signatures'].get('txnFee')
+            fee = as_json.get('rct_signatures', {}).get('txnFee')
             txs.append(Transaction(
                 hash=tx['tx_hash'],
                 fee=from_atomic(fee) if fee else None,
