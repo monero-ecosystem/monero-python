@@ -101,18 +101,22 @@ class JSONRPCDaemonTestCase(JSONTestCase):
                 "050679bd5717cd4c3d0ed1db7dac4aa7e8a222ffc7661b249e5a595a3af37d3c")
         self.assertEqual(txs[0].height, 471570)
         self.assertEqual(txs[0].size, 2826)
+        self.assertEqual(txs[0].fee, decimal.Decimal('0.000331130000'))
         self.assertEqual(txs[1].hash,
                 "e3a3b8361777c8f4f1fd423b86655b5c775de0230b44aa5b82f506135a96c53a")
         self.assertEqual(txs[1].height, 451993)
         self.assertEqual(txs[1].size, 2596)
+        self.assertEqual(txs[1].fee, decimal.Decimal('0.000265330000'))
         self.assertEqual(txs[2].hash,
                 "e2871c4203e29433257219bc20fa58c68dc12efed8f05a86d59921969a2b97cc")
         self.assertEqual(txs[2].height, 472279)
         self.assertEqual(txs[2].size, 2796)
+        self.assertEqual(txs[2].fee, decimal.Decimal('0.000327730000'))
         self.assertEqual(txs[3].hash,
                 "035a1cfadd2f80124998f5af8c7bb6703743a4f322d0a20b7f7b502956ada59d")
         self.assertIsNone(txs[3].height)
         self.assertEqual(txs[3].size, 2724)
+        self.assertEqual(txs[3].fee, decimal.Decimal('0.000320650000'))
 
     @responses.activate
     def test_send_transaction(self):
