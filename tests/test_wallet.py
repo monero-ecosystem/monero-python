@@ -193,5 +193,94 @@ class FiltersTestCase(unittest.TestCase):
             self.assertEqual(len(pmts), 1)
             self.assertEqual(len(w), 2)
 
+    def test_filter_mempool_absent(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            pmts = self.wallet.incoming()
+            self.assertEqual(len(pmts), 7)
+            for p in pmts:
+                self.assertGreater(self.wallet.confirmations(p.transaction), 0)
+            pmts = self.wallet.incoming(unconfirmed=False)
+            self.assertEqual(len(pmts), 7)
+            pmts = self.wallet.incoming(confirmed=True)
+            self.assertEqual(len(pmts), 7)
+            pmts = self.wallet.incoming(confirmed=True, unconfirmed=False)
+            self.assertEqual(len(pmts), 7)
+            self.assertEqual(len(w), 0)
+
+    def test_filter_mempool_present(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            pmts = self.wallet.incoming(unconfirmed=True)
+            self.assertEqual(len(pmts), 8)
+            pmts = self.wallet.incoming(unconfirmed=True, confirmed=False)
+            self.assertEqual(len(pmts), 1)
+            self.assertEqual(
+                pmts[0].transaction.hash,
+                'd29264ad317e8fdb55ea04484c00420430c35be7b3fe6dd663f99aebf41a786c')
+            self.assertEqual(self.wallet.confirmations(pmts[0]), 0)
+            self.assertEqual(self.wallet.confirmations(pmts[0].transaction), 0)
+            self.assertEqual(len(w), 0)
+
+    def test_filter_mempool_filter_height(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            # mempool is always excluded and warnings are generated
+            pmts = self.wallet.incoming(unconfirmed=True, confirmed=False, min_height=1)
+            self.assertEqual(len(pmts), 0)
+            self.assertEqual(len(w), 1)
+            self.assertIs(w[0].category, RuntimeWarning)
+            pmts = self.wallet.incoming(unconfirmed=True, confirmed=False, max_height=99999999999999)
+            self.assertEqual(len(pmts), 0)
+            self.assertEqual(len(w), 2)
+            self.assertIs(w[1].category, RuntimeWarning)
+
+    def test_filter_mempool_filter_payment_id(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            # mempool excluded
+            pmts = self.wallet.incoming(payment_id='03f6649304ea4cb2')
+            self.assertEqual(len(pmts), 0)
+            # mempool included
+            pmts = self.wallet.incoming(unconfirmed=True, payment_id='03f6649304ea4cb2')
+            self.assertEqual(len(pmts), 1)
+            self.assertEqual(
+                pmts[0].transaction.hash,
+                'd29264ad317e8fdb55ea04484c00420430c35be7b3fe6dd663f99aebf41a786c')
+            self.assertEqual(len(w), 0)
+
+    def test_filter_mempool_filter_address(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            # mempool excluded
+            pmts = self.wallet.incoming(
+                local_address='9tQoHWyZ4yXUgbz9nvMcFZUfDy5hxcdZabQCxmNCUukKYicXegsDL7nQpcUa3A1pF6K3fhq3scsyY88tdB1MqucULcKzWZC')
+            self.assertEqual(len(pmts), 4)
+            # mempool included
+            pmts = self.wallet.incoming(
+                unconfirmed=True,
+                local_address='9tQoHWyZ4yXUgbz9nvMcFZUfDy5hxcdZabQCxmNCUukKYicXegsDL7nQpcUa3A1pF6K3fhq3scsyY88tdB1MqucULcKzWZC')
+            self.assertEqual(len(pmts), 5)
+            self.assertEqual(len(w), 0)
+
+    def test_filter_mempool_filter_address_and_payment_id(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            # mempool excluded
+            pmts = self.wallet.incoming(
+                local_address='9tQoHWyZ4yXUgbz9nvMcFZUfDy5hxcdZabQCxmNCUukKYicXegsDL7nQpcUa3A1pF6K3fhq3scsyY88tdB1MqucULcKzWZC',
+                payment_id='03f6649304ea4cb2')
+            self.assertEqual(len(pmts), 0)
+            # mempool included
+            pmts = self.wallet.incoming(
+                unconfirmed=True,
+                local_address='9tQoHWyZ4yXUgbz9nvMcFZUfDy5hxcdZabQCxmNCUukKYicXegsDL7nQpcUa3A1pF6K3fhq3scsyY88tdB1MqucULcKzWZC',
+                payment_id='03f6649304ea4cb2')
+            self.assertEqual(len(pmts), 1)
+            self.assertEqual(
+                pmts[0].transaction.hash,
+                'd29264ad317e8fdb55ea04484c00420430c35be7b3fe6dd663f99aebf41a786c')
+            self.assertEqual(len(w), 0)
+
     def test_filter_excessive(self):
         self.assertRaises(ValueError, self.wallet.incoming, excessive_argument='foo')
