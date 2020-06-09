@@ -282,5 +282,22 @@ class FiltersTestCase(unittest.TestCase):
                 'd29264ad317e8fdb55ea04484c00420430c35be7b3fe6dd663f99aebf41a786c')
             self.assertEqual(len(w), 0)
 
+    def test_filter_mempool_filter_txid(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            # mempool excluded
+            pmts = self.wallet.incoming(
+                tx_id='d29264ad317e8fdb55ea04484c00420430c35be7b3fe6dd663f99aebf41a786c')
+            self.assertEqual(len(pmts), 0)
+            # mempool included
+            pmts = self.wallet.incoming(
+                unconfirmed=True,
+                tx_id='d29264ad317e8fdb55ea04484c00420430c35be7b3fe6dd663f99aebf41a786c')
+            self.assertEqual(len(pmts), 1)
+            self.assertEqual(
+                pmts[0].transaction.hash,
+                'd29264ad317e8fdb55ea04484c00420430c35be7b3fe6dd663f99aebf41a786c')
+            self.assertEqual(len(w), 0)
+
     def test_filter_excessive(self):
         self.assertRaises(ValueError, self.wallet.incoming, excessive_argument='foo')
