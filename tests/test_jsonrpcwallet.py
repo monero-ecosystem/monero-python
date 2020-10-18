@@ -1229,3 +1229,15 @@ class JSONRPCWalletTestCase(JSONTestCase):
         self.assertEqual(
             self.wallet.import_key_images(kimgs),
             (125578, Decimal('322.437994530000'), Decimal('0')))
+
+    @responses.activate
+    def test_incoming_from_self__issue_71(self):
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_incoming_from_self__issue_71-00-get_accounts.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_incoming_from_self__issue_71-1a75f-get_transfer_by_txid.json'),
+            status=200)
+        self.wallet = Wallet(JSONRPCWallet())
+        pmts = self.wallet.incoming(tx_id='1a75f3aa57f7912313e90ab1188b7a102dbb619a324c3db51bb856a2f40503f1')
+        self.assertEqual(len(pmts), 1)

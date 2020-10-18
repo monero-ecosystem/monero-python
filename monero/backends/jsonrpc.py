@@ -310,6 +310,12 @@ class JSONRPCWallet(object):
                 except exceptions.TransactionNotFound:
                     continue
                 pmts.extend(_pmts['transfers'])
+                # Issue #71: incoming payments to self will have excess 'destinations' key. Remove.
+                for pmt in pmts:
+                    try:
+                        del pmt['destinations']
+                    except KeyError:
+                        pass
         else:
             # NOTE: the API uses (min, max] range which is confusing
             params['min_block_height'] = (pmtfilter.min_height or 1) - 1
