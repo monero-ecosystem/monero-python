@@ -16,7 +16,11 @@ from ..numbers import from_atomic, to_atomic, PaymentID
 from ..seed import Seed
 from ..transaction import Transaction, IncomingPayment, OutgoingPayment
 
+
 _log = logging.getLogger(__name__)
+
+
+RESTRICTED_MAX_TRANSACTIONS = 100
 
 
 class JSONRPCDaemon(object):
@@ -126,6 +130,18 @@ class JSONRPCDaemon(object):
         raise exceptions.BackendException(res['status'])
 
     def transactions(self, hashes):
+        """
+        Returns a list of transactions for given hashes. Automatically chunks the request
+        into amounts acceptable by a restricted RPC server.
+        """
+        hashes = list(hashes)
+        result = []
+        while len(hashes):
+            result.extend(self._do_get_transactions(hashes[:RESTRICTED_MAX_TRANSACTIONS]))
+            hashes = hashes[RESTRICTED_MAX_TRANSACTIONS:]
+        return result
+
+    def _do_get_transactions(self, hashes):
         res = self.raw_request('/get_transactions', {
                 'txs_hashes': hashes,
                 'decode_as_json': True})
