@@ -132,3 +132,18 @@ class JSONRPCDaemonTestCase(JSONTestCase):
             blob=open(path, "rb").read())
         rsp = self.daemon.send_transaction(tx)
         self.assertEqual(rsp["status"], "OK")
+
+    @responses.activate
+    def test_chunking(self):
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_chunking-10-block-693324.json'),
+            status=200)
+        responses.add(responses.POST, self.transactions_url,
+            json=self._read('test_chunking-20-get_transactions_1of2.json'),
+            status=200)
+        responses.add(responses.POST, self.transactions_url,
+            json=self._read('test_chunking-20-get_transactions_2of2.json'),
+            status=200)
+        blk = self.daemon.block(height=693324)
+        self.assertEqual(len(blk.transactions), 105)
+        self.assertEqual(len(set(blk.transactions)), 105)
