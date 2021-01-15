@@ -74,6 +74,7 @@ class Transaction(object):
     blob = None
     json = None
     confirmations = None
+    output_indices = None
 
     @property
     def size(self):
@@ -88,6 +89,7 @@ class Transaction(object):
         self.blob = kwargs.get('blob', self.blob)
         self.json = kwargs.get('json', self.json)
         self.confirmations = kwargs.get('confirmations', self.confirmations)
+        self.output_indices = kwargs.get('output_indices', self.output_indices)
 
     def __repr__(self):
         return self.hash
