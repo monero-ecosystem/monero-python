@@ -2,7 +2,7 @@ import re
 import six
 import warnings
 from .address import address
-from .numbers import PaymentID, PICONERO
+from .numbers import PaymentID, from_atomic
 
 class Payment(object):
     """
@@ -89,7 +89,7 @@ class Transaction(object):
         for i, vout in enumerate(self.json['vout']):
             outs.append(OneTimeOutput(
                 pubkey=vout['target']['key'],
-                amount=vout['amount'] * PICONERO,
+                amount=from_atomic(vout['amount']),
                 index=self.output_indices[i] if self.output_indices else None,
                 height=self.height,
                 txid=self.hash))
