@@ -94,6 +94,11 @@ class Transaction(object):
 
 class OneTimeOutput(object):
     """
+    A Monero one-time public output (A.K.A stealth address). Identified by `pubkey`, or `index` and `amount`
+    together, it can contain differing levels of information on an output.
+
+    This class is not intended to be turned into objects by the user,
+    it is used by backends.
     """
     pubkey = None
     amount = None
