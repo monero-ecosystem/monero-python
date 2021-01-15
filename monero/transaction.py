@@ -136,7 +136,7 @@ class OneTimeOutput(object):
         self.unlocked = kwargs.get('unlocked', self.unlocked)
 
     def __repr__(self):
-        # Try to represent output as (index, amount) pair if applicable because their is no RPC
+        # Try to represent output as (index, amount) pair if applicable because there is no RPC
         # daemon command to lookup outputs by their pubkey ;( 
         if self.pubkey:
             return self.pubkey
