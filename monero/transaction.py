@@ -147,7 +147,7 @@ class OneTimeOutput(object):
         # Try to compare pubkeys, then try to compare (index,amount) pairs, else raise error
         if self.pubkey and other.pubkey:
             return self.pubkey == other.pubkey
-        elif all(self.index, other.index, self.amount is not None, other.amount is not None):
+        elif all([self.index, other.index, self.amount is not None, other.amount is not None]):
             return self.index == other.index and self.amount == other.amount
         else:
             raise TypeError('one-time outputs are not comparable')
