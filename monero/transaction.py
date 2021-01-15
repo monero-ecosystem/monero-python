@@ -2,7 +2,7 @@ import re
 import six
 import warnings
 from .address import address
-from .numbers import PaymentID
+from .numbers import PaymentID, PICONERO
 
 class Payment(object):
     """
@@ -79,6 +79,22 @@ class Transaction(object):
     @property
     def size(self):
         return len(self.blob)
+
+    @property
+    def outputs(self):
+        if not self.json:
+            raise ValueError('.json attribute not set')
+
+        outs = []
+        for i, vout in enumerate(self.json['vout']):
+            outs.append(OneTimeOutput(
+                pubkey=vout['target']['key'],
+                amount=vout['amount'] * PICONERO,
+                index=self.output_indices[i] if self.output_indices else None,
+                height=self.height,
+                txid=self.hash))
+
+        return outs
 
     def __init__(self, **kwargs):
         self.hash = kwargs.get('hash', self.hash)
