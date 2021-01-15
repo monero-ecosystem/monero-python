@@ -141,7 +141,7 @@ class OneTimeOutput(object):
         if self.pubkey:
             return self.pubkey
         else:
-            return f'{{index={self.index},amount={self.amount})}}'
+            return '(index={},amount={})'.format(self.index, self.amount)
 
     def __eq__(self, other):
         # Try to compare pubkeys, then try to compare (index,amount) pairs, else raise error
