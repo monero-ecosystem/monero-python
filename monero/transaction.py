@@ -92,6 +92,45 @@ class Transaction(object):
     def __repr__(self):
         return self.hash
 
+class OneTimeOutput(object):
+    """
+    """
+    pubkey = None
+    amount = None
+    index = None
+    height = None
+    mask = None
+    txid = None
+    unlocked = None
+
+    def __init__(self, **kwargs):
+        self.pubkey = kwargs.get('pubkey', self.pubkey)
+        self.amount = kwargs.get('amount', self.amount)
+        self.index = kwargs.get('index', self.index)
+        self.height = kwargs.get('height', self.height)
+        self.mask = kwargs.get('mask', self.mask)
+        self.txid = kwargs.get('txid', self.txid)
+        self.unlocked = kwargs.get('unlocked', self.unlocked)
+
+    def __repr__(self):
+        # Try to represent output as (index, amount) pair if applicable because their is no RPC
+        # daemon command to lookup outputs by their pubkey ;( 
+        if self.pubkey:
+            return self.pubkey
+        else:
+            return f'\{index={self.index},amount={self.amount})\}'
+
+    def __eq__(self, other):
+        # Try to compare pubkeys, then try to compare (index,amount) pairs, else raise error
+        if self.pubkey and other.pubkey:
+            return self.pubkey == other.pubkey
+        elif all(self.index, other.index, self.amount is not None, other.amount is not None):
+            return self.index == other.index and self.amount == other.amount
+        else:
+            raise TypeError('one-time outputs are not comparable')
+
+    def __ne__(self, other):
+        return not(self == other)
 
 class PaymentManager(object):
     """
