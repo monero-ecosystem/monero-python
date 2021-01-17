@@ -1241,3 +1241,15 @@ class JSONRPCWalletTestCase(JSONTestCase):
         self.wallet = Wallet(JSONRPCWallet())
         pmts = self.wallet.incoming(tx_id='1a75f3aa57f7912313e90ab1188b7a102dbb619a324c3db51bb856a2f40503f1')
         self.assertEqual(len(pmts), 1)
+
+    @responses.activate
+    def test_init(self):
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_incoming_from_self__issue_71-00-get_accounts.json'),
+            status=200)
+
+        wallet1 = Wallet(host='127.0.0.1')
+        wallet2 = Wallet()
+
+        with self.assertRaises(ValueError):
+            wallet3 = Wallet(backend=JSONRPCWallet(), port=18089)
