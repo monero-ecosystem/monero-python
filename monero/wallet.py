@@ -3,12 +3,12 @@ from sha3 import keccak_256
 import struct
 
 from . import address
+from .backends.jsonrpc import JSONRPCWallet
 from . import base58
 from . import const
 from . import ed25519
 from . import numbers
 from .transaction import Payment, PaymentManager
-
 
 class Wallet(object):
     """
@@ -26,11 +26,15 @@ class Wallet(object):
     The wallet exposes a number of methods that operate on the default account (of index 0).
 
     :param backend: a wallet backend
+    :param \\**kwargs: arguments to initialize a JSONRPCWallet instance if no backend is given
     """
     accounts = None
 
-    def __init__(self, backend):
-        self._backend = backend
+    def __init__(self, backend=None, **kwargs):
+        if backend and len(kwargs):
+            raise ValueError('backend already given, other arguments are extraneous')
+
+        self._backend = backend if backend else JSONRPCWallet(**kwargs)
         self.incoming = PaymentManager(0, backend, 'in')
         self.outgoing = PaymentManager(0, backend, 'out')
         self.refresh()

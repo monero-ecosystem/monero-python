@@ -1,14 +1,20 @@
 import six
 
+from .backends.jsonrpc import JSONRPCDaemon
+
 class Daemon(object):
     """Monero daemon.
 
-    Provides interface do a daemon instance.
+    Provides interface to a daemon instance.
 
     :param backend: a daemon backend
+    :param \\**kwargs: arguments to initialize a JSONRPCDaemon instance if no backend is given
     """
-    def __init__(self, backend):
-        self._backend = backend
+    def __init__(self, backend=None, **kwargs):
+        if backend and len(kwargs):
+            raise ValueError('backend already given, other arguments are extraneous')
+
+        self._backend = backend if backend else JSONRPCDaemon(**kwargs)
 
     def info(self):
         """
