@@ -1,8 +1,9 @@
 Interacting with daemon
 =======================
 
-The module offers an interface to interact with Monero daemon. For the time being, like with
-wallet, the only available method to connnect to a daemon is by JSON RPC commands. The initializer
+The module offers an interface to interact with Monero daemon. For the time being, the only
+available method to connnect to a daemon is by JSON RPC commands but the module allows for
+providing a :doc:`custom backend <backends>`. The initializer
 accepts keywords including, but not limited to, ``host``, ``port``, ``user``, and ``password``.
 
 .. code-block:: python

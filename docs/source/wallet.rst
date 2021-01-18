@@ -1,14 +1,14 @@
 Using wallet and accounts
 =========================
 
-Since Monero 'Helium Hydra' (0.11.x) the wallet handles accounts and deterministically
-generated addresses, known as *subaddresses*.
+The Wallet class provides an abstraction layer to retrieve wallet information, manage accounts and
+subaddresses, and of course send transfers.
 
 The wallet
 ----------
 
 The following example shows how to create and retrieve wallet's accounts and
-addresses:
+addresses via the default JSON RPC backend:
 
 .. code-block:: python
 
