@@ -148,7 +148,7 @@ class JSONRPCDaemonTestCase(JSONTestCase):
         self.assertEqual(len(blk.transactions), 105)
         self.assertEqual(len(set(blk.transactions)), 105)
 
-    def test_init(self):
+    def test_init_default_backend(self):
         daemon1 = Daemon(host='localhost')
         daemon2 = Daemon()
 

@@ -1243,7 +1243,7 @@ class JSONRPCWalletTestCase(JSONTestCase):
         self.assertEqual(len(pmts), 1)
 
     @responses.activate
-    def test_init(self):
+    def test_init_default_backend(self):
         responses.add(responses.POST, self.jsonrpc_url,
             json=self._read('test_incoming_from_self__issue_71-00-get_accounts.json'),
             status=200)
