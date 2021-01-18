@@ -14,12 +14,10 @@ addresses:
 
     In [1]: from monero.wallet import Wallet
 
-    In [2]: from monero.backends.jsonrpc import JSONRPCWallet
+    In [2]: w = Wallet(port=28088)
 
-    In [3]: w = Wallet(JSONRPCWallet(port=28088))
-
-    In [4]: w.address()
-    Out[4]: A2GmyHHJ9jtUhPiwoAbR2tXU9LJu2U6fJjcsv3rxgkVRWU6tEYcn6C1NBc7wqCv5V7NW3zeYuzKf6RGGgZTFTpVC4QxAiAX
+    In [3]: w.address()
+    Out[3]: A2GmyHHJ9jtUhPiwoAbR2tXU9LJu2U6fJjcsv3rxgkVRWU6tEYcn6C1NBc7wqCv5V7NW3zeYuzKf6RGGgZTFTpVC4QxAiAX
 
 Accounts and subaddresses
 -------------------------
@@ -32,17 +30,17 @@ client.
 
 .. code-block:: python
 
-    In [5]: len(w.accounts)
-    Out[5]: 1
+    In [4]: len(w.accounts)
+    Out[4]: 1
 
-    In [6]: w.accounts[0]
-    Out[6]: <monero.account.Account at 0x7f78992d6898>
+    In [5]: w.accounts[0]
+    Out[5]: <monero.account.Account at 0x7f78992d6898>
 
-    In [7]: w.accounts[0].address()
-    Out[7]: A2GmyHHJ9jtUhPiwoAbR2tXU9LJu2U6fJjcsv3rxgkVRWU6tEYcn6C1NBc7wqCv5V7NW3zeYuzKf6RGGgZTFTpVC4QxAiAX
+    In [6]: w.accounts[0].address()
+    Out[6]: A2GmyHHJ9jtUhPiwoAbR2tXU9LJu2U6fJjcsv3rxgkVRWU6tEYcn6C1NBc7wqCv5V7NW3zeYuzKf6RGGgZTFTpVC4QxAiAX
 
-    In [8]: w.addresses()
-    Out[8]: [A2GmyHHJ9jtUhPiwoAbR2tXU9LJu2U6fJjcsv3rxgkVRWU6tEYcn6C1NBc7wqCv5V7NW3zeYuzKf6RGGgZTFTpVC4QxAiAX]
+    In [7]: w.addresses()
+    Out[7]: [A2GmyHHJ9jtUhPiwoAbR2tXU9LJu2U6fJjcsv3rxgkVRWU6tEYcn6C1NBc7wqCv5V7NW3zeYuzKf6RGGgZTFTpVC4QxAiAX]
 
 
 Creating accounts and addresses
@@ -55,28 +53,28 @@ and the subaddress index within the account.
 
 .. code-block:: python
 
-    In [9]: w.new_address()
-    Out[9]: (BenuGf8eyVhjZwdcxEJY1MHrUfqHjPvE3d7Pi4XY5vQz53VnVpB38bCBsf8AS5rJuZhuYrqdG9URc2eFoCNPwLXtLENT4R7, 1)
+    In [8]: w.new_address()
+    Out[8]: (BenuGf8eyVhjZwdcxEJY1MHrUfqHjPvE3d7Pi4XY5vQz53VnVpB38bCBsf8AS5rJuZhuYrqdG9URc2eFoCNPwLXtLENT4R7, 1)
 
-    In [10]: w.addresses()
-    Out[10]:
+    In [9]: w.addresses()
+    Out[9]:
     [A2GmyHHJ9jtUhPiwoAbR2tXU9LJu2U6fJjcsv3rxgkVRWU6tEYcn6C1NBc7wqCv5V7NW3zeYuzKf6RGGgZTFTpVC4QxAiAX,
      BenuGf8eyVhjZwdcxEJY1MHrUfqHjPvE3d7Pi4XY5vQz53VnVpB38bCBsf8AS5rJuZhuYrqdG9URc2eFoCNPwLXtLENT4R7]
 
-    In [11]: w.new_account()
-    Out[11]: <monero.account.Account at 0x7f7894dffbe0>
+    In [10]: w.new_account()
+    Out[10]: <monero.account.Account at 0x7f7894dffbe0>
 
-    In [12]: len(w.accounts)
-    Out[12]: 2
+    In [11]: len(w.accounts)
+    Out[11]: 2
 
-    In [13]: w.accounts[1].address()
-    Out[13]: Bhd3PRVCnq5T5jjNey2hDSM8DxUgFpNjLUrKAa2iYVhYX71RuCGTekDKZKXoJPAGL763kEXaDSAsvDYb8bV77YT7Jo19GKY
+    In [12]: w.accounts[1].address()
+    Out[12]: Bhd3PRVCnq5T5jjNey2hDSM8DxUgFpNjLUrKAa2iYVhYX71RuCGTekDKZKXoJPAGL763kEXaDSAsvDYb8bV77YT7Jo19GKY
 
-    In [14]: w.accounts[1].new_address()
-    Out[14]: (Bbz5uCtnn3Gaj1YAizaHw1FPeJ6T7kk7uQoeY48SWjezEAyrWScozLxYbqGxsV5L6VJkvw5VwECAuLVJKQtHpA3GFXJNPYu, 1)
+    In [13]: w.accounts[1].new_address()
+    Out[13]: (Bbz5uCtnn3Gaj1YAizaHw1FPeJ6T7kk7uQoeY48SWjezEAyrWScozLxYbqGxsV5L6VJkvw5VwECAuLVJKQtHpA3GFXJNPYu, 1)
 
-    In [15]: w.accounts[1].addresses()
-    Out[15]:
+    In [14]: w.accounts[1].addresses()
+    Out[14]:
     [Bhd3PRVCnq5T5jjNey2hDSM8DxUgFpNjLUrKAa2iYVhYX71RuCGTekDKZKXoJPAGL763kEXaDSAsvDYb8bV77YT7Jo19GKY,
      Bbz5uCtnn3Gaj1YAizaHw1FPeJ6T7kk7uQoeY48SWjezEAyrWScozLxYbqGxsV5L6VJkvw5VwECAuLVJKQtHpA3GFXJNPYu]
 

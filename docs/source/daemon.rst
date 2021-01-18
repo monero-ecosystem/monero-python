@@ -2,33 +2,32 @@ Interacting with daemon
 =======================
 
 The module offers an interface to interact with Monero daemon. For the time being, like with
-wallet, the only available backend is JSON RPC.
+wallet, the only available method to connnect to a daemon is by JSON RPC commands. The initializer
+accepts keywords including, but not limited to, ``host``, ``port``, ``user``, and ``password``.
 
 .. code-block:: python
 
     In [1]: from monero.daemon import Daemon
 
-    In [2]: from monero.backends.jsonrpc import JSONRPCDaemon
+    In [2]: daemon = Daemon(port=28081)
 
-    In [3]: daemon = Daemon(JSONRPCDaemon(port=28081))
-
-    In [4]: daemon.height()
-    Out[4]: 1099108
+    In [3]: daemon.height()
+    Out[3]: 1099108
 
 Also, the ``info()`` method will return a dictionary with details about the current daemon status.
 
 Connecting via proxy (or TOR)
 -----------------------------
 
-The backend also accepts optional ``proxy_url`` keyword. A prime example of use is to route
+``Daemon`` also accepts optional ``proxy_url`` keyword. A prime example of use is to route
 your traffic via TOR:
 
 .. code-block:: python
 
-    In [3]: daemon = Daemon(JSONRPCDaemon(host='xmrag4hf5xlabmob.onion', proxy_url='socks5h://127.0.0.1:9050'))
+    In [4]: daemon = Daemon(host='xmrag4hf5xlabmob.onion', proxy_url='socks5h://127.0.0.1:9050')
 
-    In [4]: daemon.height()
-    Out[4]: 1999790
+    In [5]: daemon.height()
+    Out[5]: 1999790
 
 Please refer to the docs of underlying `requests`_ library for more info on proxies.
 
@@ -46,27 +45,27 @@ The only difference is that now you want to add the ``relay=False`` argument.
 
 .. code-block:: python
 
-    In [5]: from monero.wallet import Wallet
+    In [6]: from monero.wallet import Wallet
 
-    In [6]: from monero.backends.jsonrpc import JSONRPCWallet
+    In [7]: from monero.backends.jsonrpc import JSONRPCWallet
 
-    In [7]: wallet = Wallet(JSONRPCWallet(port=28088))
+    In [8]: wallet = Wallet(JSONRPCWallet(port=28088))
 
-    In [8]: wallet.balance()
-    Out[8]: Decimal('17.642325205670')
+    In [9]: wallet.balance()
+    Out[9]: Decimal('17.642325205670')
 
-    In [9]: txs = wallet.transfer('Bg1nUjsEx6UUByxr68o6gXcQRF58BpQyKauoZSo2HwubGErEnz9x6AS9o5ybmk3QmgeUpX3Msgm74QkwZKx2CeVWFrrZZqt', 10, relay=False)
+    In [10]: txs = wallet.transfer('Bg1nUjsEx6UUByxr68o6gXcQRF58BpQyKauoZSo2HwubGErEnz9x6AS9o5ybmk3QmgeUpX3Msgm74QkwZKx2CeVWFrrZZqt', 10, relay=False)
 
 Now the return value is a list of resulting transactions (usually just one) which may be inspected
 and validated.
 
 .. code-block:: python
 
-    In [10]: txs
-    Out[10]: [38964a0c8c3be041051464b413996ad8d696223dc34925d98156848ed76a3ae3]
+    In [11]: txs
+    Out[11]: [38964a0c8c3be041051464b413996ad8d696223dc34925d98156848ed76a3ae3]
 
-    In [11]: txs[0].fee
-    Out[11]: Decimal('0.003766080000')
+    In [12]: txs[0].fee
+    Out[12]: Decimal('0.003766080000')
 
 If anything is not OK, just discard the transaction and create a new one. There's no need to clean
 up anything in the wallet.
@@ -75,10 +74,10 @@ Once you have the transaction accepted, it's time to post it to the daemon:
 
 .. code-block:: python
 
-    In [12]: result = daemon.send_transaction(txs[0])
+    In [13]: result = daemon.send_transaction(txs[0])
 
-    In [13]: result
-    Out[13]: 
+    In [14]: result
+    Out[14]: 
     {'double_spend': False,
      'fee_too_low': False,
      'invalid_input': False,
@@ -102,17 +101,17 @@ The following example shows such behavior:
 
 .. code-block:: python
 
-    In [14]: txs1 = wallet.transfer('BYSXsmmK44xdjNVMGprUW5Yau9tsc9SAMJrQsANjGgpk2RB83cvVhWjZAgYNwLgmhdPawATh5q1CTEoLGKZSeZqtThefV7D', 1, relay=False)
+    In [15]: txs1 = wallet.transfer('BYSXsmmK44xdjNVMGprUW5Yau9tsc9SAMJrQsANjGgpk2RB83cvVhWjZAgYNwLgmhdPawATh5q1CTEoLGKZSeZqtThefV7D', 1, relay=False)
 
-    In [15]: txs2 = wallet.transfer('Bd5m5wTjWdYSaLBKe4i2avJjuFLYMEUKpiiE86F83NFiDXKE7QseSRvS7efTtJu5xHiHm5XmxgB2mfLu7NFrG7e3UTYRzEf', 2, relay=False)
+    In [16]: txs2 = wallet.transfer('Bd5m5wTjWdYSaLBKe4i2avJjuFLYMEUKpiiE86F83NFiDXKE7QseSRvS7efTtJu5xHiHm5XmxgB2mfLu7NFrG7e3UTYRzEf', 2, relay=False)
 
-    In [16]: txs1, txs2
-    Out[16]: 
+    In [17]: txs1, txs2
+    Out[17]: 
     ([315901f250a1018e89e1fc2b3953bd5acfdfa759f843cf5a38306a2255de6d54],
      [2bd978172226b486badc8a9dcbafb04acb4760c3f2a5794c694fee8575739c6e])
 
-    In [17]: daemon.send_transaction(txs1[0])
-    Out[17]: 
+    In [18]: daemon.send_transaction(txs1[0])
+    Out[18]: 
     {'double_spend': False,
      'fee_too_low': False,
      'invalid_input': False,
@@ -125,7 +124,7 @@ The following example shows such behavior:
      'status': 'OK',
      'too_big': False}
 
-    In [18]: daemon.send_transaction(txs2[0])
+    In [19]: daemon.send_transaction(txs2[0])
     ---------------------------------------------------------------------------
     TransactionBroadcastError                 Traceback (most recent call last)
     <ipython-input-22-f24dc5d51c78> in <module>()
