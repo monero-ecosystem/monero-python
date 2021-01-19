@@ -8,7 +8,8 @@ class Daemon(object):
     Provides interface to a daemon instance.
 
     :param backend: a daemon backend
-    :param \\**kwargs: arguments to initialize a JSONRPCDaemon instance if no backend is given
+    :param \\**kwargs: arguments to initialize a :class:`JSONRPCDaemon <monero.backends.jsonrpc.JSONRPCDaemon>`
+                        instance if no backend is given
     """
     def __init__(self, backend=None, **kwargs):
         if backend and len(kwargs):

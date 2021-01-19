@@ -26,7 +26,8 @@ class Wallet(object):
     The wallet exposes a number of methods that operate on the default account (of index 0).
 
     :param backend: a wallet backend
-    :param \\**kwargs: arguments to initialize a JSONRPCWallet instance if no backend is given
+    :param \\**kwargs: arguments to initialize a :class:`JSONRPCWallet <monero.backends.jsonrpc.JSONRPCWallet>`
+                        instance if no backend is given
     """
     accounts = None
 

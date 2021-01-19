@@ -1,8 +1,9 @@
 Backends
 ========
 
-Backends are the protocols and methods used to communicate with the Monero daemon and interact with
-the wallet. As of the time of this writing, the only backends available in this library are:
+The module comes with possibility of replacing the underlying backend. Backends are the protocols
+and methods used to communicate with the Monero daemon or wallet. As of the time of this writing,
+the module offers the following options:
 
  * ``jsonrpc`` for the HTTP based RPC server,
  * ``offline`` for running the wallet without Internet connection and even without the wallet file.
@@ -17,6 +18,14 @@ where the daemon is running. Refer to the quickstart for general setup informati
 The Python `requests`_ library is used in order to facilitate HTTP requests to the JSON RPC
 interface. It makes POST requests and passes proper headers, parameters, and payload data as per
 the official `Wallet RPC`_ documentation.
+
+Also, ``jsonrpc`` backend is the default choice and both ``Wallet`` and ``Daemon`` classes
+can be invoked in a simple form with no ``backend`` argument given. They will assume connection to
+the default *mainnet* port on *localhost*, like below:
+
+.. code-block:: python
+
+    In [1]: wallet = Wallet()   # is equivalent to: wallet = Wallet(JSONRPCWallet(host='localhost', port=18081)
 
 .. _`requests`: http://docs.python-requests.org/
 
