@@ -6,6 +6,7 @@ import logging
 import requests
 import six
 
+from ... import exceptions
 from ...block import Block
 from ...const import NET_MAIN, NET_TEST, NET_STAGE
 from ...numbers import from_atomic
