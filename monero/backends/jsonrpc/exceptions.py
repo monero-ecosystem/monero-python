@@ -1,4 +1,4 @@
-from .. import exceptions
+from ... import exceptions
 
 class RPCError(exceptions.BackendException):
     pass

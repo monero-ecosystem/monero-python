@@ -6,13 +6,18 @@ import logging
 import requests
 import six
 
-from ..block import Block
-from ..const import NET_MAIN, NET_TEST, NET_STAGE, RESTRICTED_MAX_TRANSACTIONS
-from ..numbers import from_atomic
-from ..transaction import Transaction
-from .rpcexceptions import RPCError, Unauthorized
+from ...block import Block
+from ...const import NET_MAIN, NET_TEST, NET_STAGE
+from ...numbers import from_atomic
+from ...transaction import Transaction
+from .exceptions import RPCError, Unauthorized
+
 
 _log = logging.getLogger(__name__)
+
+
+RESTRICTED_MAX_TRANSACTIONS = 100
+
 
 class JSONRPCDaemon(object):
     """
