@@ -2,7 +2,7 @@ import re
 import six
 import warnings
 from .address import address
-from .numbers import PaymentID
+from .numbers import from_atomic, PaymentID
 
 class Payment(object):
     """
@@ -72,12 +72,29 @@ class Transaction(object):
     timestamp = None
     key = None
     blob = None
-    json = None
     confirmations = None
+    output_indices = None
+    json = None
 
     @property
     def size(self):
         return len(self.blob)
+
+    @property
+    def outputs(self):
+        if not self.json:
+            raise ValueError('.json attribute not set')
+
+        outs = []
+        for i, vout in enumerate(self.json['vout']):
+            outs.append(OneTimeOutput(
+                pubkey=vout['target']['key'],
+                amount=from_atomic(vout['amount']),
+                index=self.output_indices[i] if self.output_indices else None,
+                height=self.height,
+                txid=self.hash))
+
+        return outs
 
     def __init__(self, **kwargs):
         self.hash = kwargs.get('hash', self.hash)
@@ -86,11 +103,58 @@ class Transaction(object):
         self.timestamp = kwargs.get('timestamp', self.timestamp)
         self.key = kwargs.get('key', self.key)
         self.blob = kwargs.get('blob', self.blob)
-        self.json = kwargs.get('json', self.json)
         self.confirmations = kwargs.get('confirmations', self.confirmations)
+        self.output_indices = kwargs.get('output_indices', self.output_indices)
+        self.json = kwargs.get('json', self.json)
 
     def __repr__(self):
         return self.hash
+
+
+class OneTimeOutput(object):
+    """
+    A Monero one-time public output (A.K.A stealth address). Identified by `pubkey`, or `index` and `amount`
+    together, it can contain differing levels of information on an output.
+
+    This class is not intended to be turned into objects by the user,
+    it is used by backends.
+    """
+    pubkey = None
+    amount = None
+    index = None
+    height = None
+    mask = None
+    txid = None
+    unlocked = None
+
+    def __init__(self, **kwargs):
+        self.pubkey = kwargs.get('pubkey', self.pubkey)
+        self.amount = kwargs.get('amount', self.amount)
+        self.index = kwargs.get('index', self.index)
+        self.height = kwargs.get('height', self.height)
+        self.mask = kwargs.get('mask', self.mask)
+        self.txid = kwargs.get('txid', self.txid)
+        self.unlocked = kwargs.get('unlocked', self.unlocked)
+
+    def __repr__(self):
+        # Try to represent output as (index, amount) pair if applicable because there is no RPC
+        # daemon command to lookup outputs by their pubkey ;( 
+        if self.pubkey:
+            return self.pubkey
+        else:
+            return '(index={},amount={})'.format(self.index, self.amount)
+
+    def __eq__(self, other):
+        # Try to compare pubkeys, then try to compare (index,amount) pairs, else raise error
+        if self.pubkey and other.pubkey:
+            return self.pubkey == other.pubkey
+        elif None not in (self.index, other.index, self.amount, other.amount):
+            return self.index == other.index and self.amount == other.amount
+        else:
+            raise TypeError('one-time outputs are not comparable')
+
+    def __ne__(self, other):
+        return not(self == other)
 
 
 class PaymentManager(object):
