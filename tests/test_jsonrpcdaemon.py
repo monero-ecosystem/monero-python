@@ -1,10 +1,11 @@
 import decimal
+import logging
 import os
 import responses
 
 from monero.const import NET_STAGE
 from monero.daemon import Daemon
-from monero.backends.jsonrpc import JSONRPCDaemon
+from monero.backends.jsonrpc import JSONRPCDaemon, RPCError
 from monero.transaction import Transaction
 
 from .base import JSONTestCase
@@ -18,6 +19,9 @@ class JSONRPCDaemonTestCase(JSONTestCase):
 
     def setUp(self):
         self.daemon = Daemon(JSONRPCDaemon())
+
+        # this is disabled b/c raw_request logs errors
+        logging.getLogger('monero.backends.jsonrpc.daemon').disabled = True
 
     @responses.activate
     def test_basic_info(self):
@@ -84,6 +88,10 @@ class JSONRPCDaemonTestCase(JSONTestCase):
         # wrong arg type
         self.assertRaises(ValueError, lambda txid: txid in blk, 1245)
 
+        # block or hash not specified
+        with self.assertRaises(ValueError):
+            self.daemon.block()
+
     @responses.activate
     def test_transactions(self):
         responses.add(responses.POST, self.transactions_url,
@@ -119,6 +127,16 @@ class JSONRPCDaemonTestCase(JSONTestCase):
         self.assertEqual(txs[3].fee, decimal.Decimal('0.000320650000'))
 
     @responses.activate
+    def test_transactions_single(self):
+        responses.add(responses.POST, self.transactions_url,
+            json=self._read('test_transactions_single.json'),
+            status=200)
+
+        tx = self.daemon.transactions('bbc10f5944cc3e88be576d2ab9f4f5ab5a2b46d95a7cab1027bc15c17393102c')[0]
+
+        self.assertEqual(tx.height, 2279770)
+
+    @responses.activate
     def test_send_transaction(self):
         path = os.path.join(
             os.path.dirname(__file__),
@@ -128,10 +146,11 @@ class JSONRPCDaemonTestCase(JSONTestCase):
         responses.add(responses.POST, self.sendrawtransaction_url,
             json=self._read('test_send_transaction.json'),
             status=200)
-        tx = Transaction(
-            blob=open(path, "rb").read())
-        rsp = self.daemon.send_transaction(tx)
-        self.assertEqual(rsp["status"], "OK")
+
+        with open(path, "rb") as blob_file:
+            tx = Transaction(blob=blob_file.read())
+            rsp = self.daemon.send_transaction(tx)
+            self.assertEqual(rsp["status"], "OK")
 
     @responses.activate
     def test_chunking(self):
@@ -147,6 +166,24 @@ class JSONRPCDaemonTestCase(JSONTestCase):
         blk = self.daemon.block(height=693324)
         self.assertEqual(len(blk.transactions), 105)
         self.assertEqual(len(set(blk.transactions)), 105)
+
+    @responses.activate
+    def test_headers(self):
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_headers_2279790_2279799.json'),
+            status=200)
+        headers = self.daemon.headers(2279790, 2279799)
+        self.assertEqual(len(headers), 10)
+        self.assertEqual(headers[0]['hash'], '2763e0b9738c46317602a8e338b6b3ece893be4b9e1c4586824beb4f33286992')
+        self.assertEqual(headers[9]['nonce'], 275623)
+
+    @responses.activate
+    def test_invalid_param(self):
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_invalid_param.json'),
+            status=200)
+        with self.assertRaises(RPCError):
+            blk = self.daemon.block(height=-1)
 
     def test_init_default_backend(self):
         daemon1 = Daemon(host='localhost')
