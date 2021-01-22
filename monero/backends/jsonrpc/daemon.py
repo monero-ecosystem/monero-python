@@ -141,7 +141,8 @@ class JSONRPCDaemon(object):
     def _do_get_transactions(self, hashes):
         res = self.raw_request('/get_transactions', {
                 'txs_hashes': hashes,
-                'decode_as_json': True})
+                'decode_as_json': True,
+                'prune': True})
         if res['status'] != 'OK':
             raise exceptions.BackendException(res['status'])
         txs = []
