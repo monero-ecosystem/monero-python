@@ -126,7 +126,7 @@ class JSONRPCDaemon(object):
             return Block(**data)
         raise exceptions.BackendException(res['status'])
 
-    def transactions(self, hashes):
+    def transactions(self, hashes, prune=False):
         """
         Returns a list of transactions for given hashes. Automatically chunks the request
         into amounts acceptable by a restricted RPC server.
@@ -134,15 +134,15 @@ class JSONRPCDaemon(object):
         hashes = list(hashes)
         result = []
         while len(hashes):
-            result.extend(self._do_get_transactions(hashes[:RESTRICTED_MAX_TRANSACTIONS]))
+            result.extend(self._do_get_transactions(hashes[:RESTRICTED_MAX_TRANSACTIONS], prune=prune))
             hashes = hashes[RESTRICTED_MAX_TRANSACTIONS:]
         return result
 
-    def _do_get_transactions(self, hashes):
+    def _do_get_transactions(self, hashes, prune):
         res = self.raw_request('/get_transactions', {
                 'txs_hashes': hashes,
                 'decode_as_json': True,
-                'prune': True})
+                'prune': prune})
         if res['status'] != 'OK':
             raise exceptions.BackendException(res['status'])
         txs = []
