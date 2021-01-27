@@ -36,8 +36,8 @@ class Wallet(object):
             raise ValueError('backend already given, other arguments are extraneous')
 
         self._backend = backend if backend else JSONRPCWallet(**kwargs)
-        self.incoming = PaymentManager(0, backend, 'in')
-        self.outgoing = PaymentManager(0, backend, 'out')
+        self.incoming = PaymentManager(0, self._backend, 'in')
+        self.outgoing = PaymentManager(0, self._backend, 'out')
         self.refresh()
 
     def refresh(self):
