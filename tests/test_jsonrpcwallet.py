@@ -1244,12 +1244,30 @@ class JSONRPCWalletTestCase(JSONTestCase):
 
     @responses.activate
     def test_init_default_backend(self):
+        """Test default backend initialization.
+        Also test for bug #88 where invalid backend value was passed to PaymentManager."""
         responses.add(responses.POST, self.jsonrpc_url,
             json=self._read('test_incoming_from_self__issue_71-00-get_accounts.json'),
             status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_incoming_by_tx_id-7ab84-get_transfer_by_txid.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_incoming_from_self__issue_71-00-get_accounts.json'),
+            status=200)
+        responses.add(responses.POST, self.jsonrpc_url,
+            json=self._read('test_incoming_by_tx_id-7ab84-get_transfer_by_txid.json'),
+            status=200)
 
         wallet1 = Wallet(host='127.0.0.1')
+        self.assertEqual(type(wallet1._backend), JSONRPCWallet)
+        pmts = wallet1.incoming(tx_id='7ab84fe2fb34467c590cde2f7d6ba7de5928a2db6c84c6ccfff8962eca0ad99c')
+        self.assertEqual(len(pmts), 3)
+
         wallet2 = Wallet()
+        self.assertEqual(type(wallet2._backend), JSONRPCWallet)
+        pmts = wallet2.incoming(tx_id='7ab84fe2fb34467c590cde2f7d6ba7de5928a2db6c84c6ccfff8962eca0ad99c')
+        self.assertEqual(len(pmts), 3)
 
         with self.assertRaises(ValueError):
             wallet3 = Wallet(backend=JSONRPCWallet(), port=18089)
