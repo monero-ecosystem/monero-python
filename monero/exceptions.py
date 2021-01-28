@@ -53,3 +53,9 @@ class AddressIndexOutOfBound(AccountException):
 
 class WalletIsWatchOnly(MoneroException):
     pass
+
+class TransactionIncomplete(MoneroException):
+    pass
+
+class TransactionWithoutBlob(TransactionIncomplete):
+    pass

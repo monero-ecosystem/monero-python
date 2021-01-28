@@ -3,6 +3,7 @@ import six
 import warnings
 from .address import address
 from .numbers import PaymentID
+from . import exceptions
 
 class Payment(object):
     """
@@ -77,6 +78,10 @@ class Transaction(object):
 
     @property
     def size(self):
+        if not self.blob:
+            raise exceptions.TransactionWithoutBlob(
+                "Transaction has no blob, hence the size cannot be determined. "
+                "Perhaps the backend prunes transaction data?")
         return len(self.blob)
 
     def __init__(self, **kwargs):

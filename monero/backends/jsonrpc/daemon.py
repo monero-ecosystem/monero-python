@@ -31,12 +31,15 @@ class JSONRPCDaemon(object):
     :param timeout: request timeout
     :param verify_ssl_certs: verify SSL certificates when connecting
     :param proxy_url: a proxy to use
+    :param prune_transactions: whether to prune transaction data. Saves bandwidth but you may want
+                            to enable it when you need to retrieve transaction binary blobs.
     """
 
     _net = None
 
     def __init__(self, protocol='http', host='127.0.0.1', port=18081, path='/json_rpc',
-            user='', password='', timeout=30, verify_ssl_certs=True, proxy_url=None):
+            user='', password='', timeout=30, verify_ssl_certs=True, proxy_url=None,
+            prune_transactions=True):
         self.url = '{protocol}://{host}:{port}'.format(
                 protocol=protocol,
                 host=host,
@@ -47,6 +50,7 @@ class JSONRPCDaemon(object):
         self.timeout = timeout
         self.verify_ssl_certs = verify_ssl_certs
         self.proxies = {protocol: proxy_url}
+        self.prune_transactions = prune_transactions
 
     def _set_net(self, info):
         if info['mainnet']:
@@ -126,7 +130,7 @@ class JSONRPCDaemon(object):
             return Block(**data)
         raise exceptions.BackendException(res['status'])
 
-    def transactions(self, hashes, prune=False):
+    def transactions(self, hashes):
         """
         Returns a list of transactions for given hashes. Automatically chunks the request
         into amounts acceptable by a restricted RPC server.
@@ -134,7 +138,10 @@ class JSONRPCDaemon(object):
         hashes = list(hashes)
         result = []
         while len(hashes):
-            result.extend(self._do_get_transactions(hashes[:RESTRICTED_MAX_TRANSACTIONS], prune=prune))
+            result.extend(
+                self._do_get_transactions(
+                    hashes[:RESTRICTED_MAX_TRANSACTIONS],
+                    prune=self.prune_transactions))
             hashes = hashes[RESTRICTED_MAX_TRANSACTIONS:]
         return result
 
@@ -155,7 +162,7 @@ class JSONRPCDaemon(object):
                 height=None if tx['in_pool'] else tx['block_height'],
                 timestamp=datetime.fromtimestamp(
                     tx['block_timestamp']) if 'block_timestamp' in tx else None,
-                blob=binascii.unhexlify(tx['as_hex']),
+                blob=binascii.unhexlify(tx['as_hex']) or None,
                 json=as_json))
         return txs
 

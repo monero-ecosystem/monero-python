@@ -78,13 +78,12 @@ class Daemon(object):
             raise ValueError("Height or hash must be specified")
         return self._backend.block(bhash=bhash, height=height)
 
-    def transactions(self, hashes, prune=False):
+    def transactions(self, hashes):
         """
         Returns transactions matching given hashes. Accepts single hash or a sequence.
 
         :param hashes: str or list of str
-        :param bool prune: prune option for /get_transactions, defaults to False
         """
         if isinstance(hashes, six.string_types):
             hashes = [hashes]
-        return self._backend.transactions(hashes, prune=prune)
+        return self._backend.transactions(hashes)

@@ -6,6 +6,7 @@ import responses
 from monero.const import NET_STAGE
 from monero.daemon import Daemon
 from monero.backends.jsonrpc import JSONRPCDaemon, RPCError
+from monero.exceptions import TransactionWithoutBlob
 from monero.transaction import Transaction
 
 from .base import JSONTestCase
@@ -95,7 +96,7 @@ class JSONRPCDaemonTestCase(JSONTestCase):
     @responses.activate
     def test_transactions(self):
         responses.add(responses.POST, self.transactions_url,
-            json=self._read('test_transactions.json'),
+            json=self._read('test_transactions_pruned.json'),
             status=200)
         txs = self.daemon.transactions([
             "050679bd5717cd4c3d0ed1db7dac4aa7e8a222ffc7661b249e5a595a3af37d3c",     # @471570
@@ -108,33 +109,53 @@ class JSONRPCDaemonTestCase(JSONTestCase):
         self.assertEqual(txs[0].hash,
                 "050679bd5717cd4c3d0ed1db7dac4aa7e8a222ffc7661b249e5a595a3af37d3c")
         self.assertEqual(txs[0].height, 471570)
-        self.assertEqual(txs[0].size, 2826)
+        with self.assertRaises(TransactionWithoutBlob):
+            txs[0].size
         self.assertEqual(txs[0].fee, decimal.Decimal('0.000331130000'))
+        self.assertIsNone(txs[0].blob)
         self.assertEqual(txs[1].hash,
                 "e3a3b8361777c8f4f1fd423b86655b5c775de0230b44aa5b82f506135a96c53a")
         self.assertEqual(txs[1].height, 451993)
-        self.assertEqual(txs[1].size, 2596)
+        with self.assertRaises(TransactionWithoutBlob):
+            txs[1].size
         self.assertEqual(txs[1].fee, decimal.Decimal('0.000265330000'))
+        self.assertIsNone(txs[1].blob)
         self.assertEqual(txs[2].hash,
                 "e2871c4203e29433257219bc20fa58c68dc12efed8f05a86d59921969a2b97cc")
         self.assertEqual(txs[2].height, 472279)
-        self.assertEqual(txs[2].size, 2796)
+        with self.assertRaises(TransactionWithoutBlob):
+            txs[2].size
         self.assertEqual(txs[2].fee, decimal.Decimal('0.000327730000'))
+        self.assertIsNone(txs[2].blob)
         self.assertEqual(txs[3].hash,
                 "035a1cfadd2f80124998f5af8c7bb6703743a4f322d0a20b7f7b502956ada59d")
         self.assertIsNone(txs[3].height)
-        self.assertEqual(txs[3].size, 2724)
+        with self.assertRaises(TransactionWithoutBlob):
+            txs[3].size
         self.assertEqual(txs[3].fee, decimal.Decimal('0.000320650000'))
+        self.assertIsNone(txs[3].blob)
 
     @responses.activate
     def test_transactions_single(self):
         responses.add(responses.POST, self.transactions_url,
-            json=self._read('test_transactions_single.json'),
+            json=self._read('test_transactions_single_pruned.json'),
             status=200)
 
         tx = self.daemon.transactions('bbc10f5944cc3e88be576d2ab9f4f5ab5a2b46d95a7cab1027bc15c17393102c')[0]
 
         self.assertEqual(tx.height, 2279770)
+        self.assertIsNone(tx.blob)
+
+    @responses.activate
+    def test_transaction_not_pruned(self):
+        daemon_no_prune = Daemon(JSONRPCDaemon(prune_transactions=False))
+        responses.add(responses.POST, self.transactions_url,
+            json=self._read('test_transactions_single.json'),
+            status=200)
+
+        tx = daemon_no_prune.transactions('bbc10f5944cc3e88be576d2ab9f4f5ab5a2b46d95a7cab1027bc15c17393102c')[0]
+        self.assertIsNotNone(tx.blob)
+        self.assertIs(type(tx.blob), bytes)
 
     @responses.activate
     def test_send_transaction(self):
