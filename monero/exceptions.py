@@ -59,3 +59,6 @@ class TransactionIncomplete(MoneroException):
 
 class TransactionWithoutBlob(TransactionIncomplete):
     pass
+
+class TransactionWithoutJSON(TransactionIncomplete):
+    pass

@@ -7,6 +7,7 @@ import unittest
 from monero.address import address
 from monero.numbers import PaymentID
 from monero.transaction import IncomingPayment, Transaction, OneTimeOutput, _ByHeight
+from monero import exceptions
 
 class FiltersTestCase(unittest.TestCase):
     def setUp(self):
@@ -48,13 +49,15 @@ class FiltersTestCase(unittest.TestCase):
 
     def test_outputs(self):
         out1, out2 = self.tx2.outputs
+        self.assertEqual(out1.transaction, self.tx2)
+        self.assertEqual(out2.transaction, self.tx2)
         self.assertIn(self.json1['vout'][0]['target']['key'], repr(out1))
         self.assertFalse(out2 != OneTimeOutput(pubkey=self.json1['vout'][1]['target']['key']))
         self.assertIn('(index=25973289,amount=0E-12)', repr(self.oto1))
         self.assertEqual(self.oto1, OneTimeOutput(index=25973289, amount=Decimal('0.000000000000')))
 
-        with self.assertRaises(ValueError):
-            failed_outs = self.tx1.outputs
+        with self.assertRaises(exceptions.TransactionWithoutJSON):
+            self.tx1.outputs
 
         with self.assertRaises(TypeError):
             self.oto1 == self.oto2

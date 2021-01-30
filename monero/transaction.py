@@ -88,7 +88,8 @@ class Transaction(object):
     @property
     def outputs(self):
         if not self.json:
-            raise ValueError('.json attribute not set')
+            raise exceptions.TransactionWithoutJSON(
+                'Tx {:s} has no .json attribute'.format(self.hash))
 
         outs = []
         for i, vout in enumerate(self.json['vout']):
@@ -97,7 +98,7 @@ class Transaction(object):
                 amount=from_atomic(vout['amount']),
                 index=self.output_indices[i] if self.output_indices else None,
                 height=self.height,
-                txid=self.hash))
+                transaction=self))
 
         return outs
 
@@ -129,7 +130,7 @@ class OneTimeOutput(object):
     index = None
     height = None
     mask = None
-    txid = None
+    transaction = None
     unlocked = None
 
     def __init__(self, **kwargs):
@@ -138,7 +139,7 @@ class OneTimeOutput(object):
         self.index = kwargs.get('index', self.index)
         self.height = kwargs.get('height', self.height)
         self.mask = kwargs.get('mask', self.mask)
-        self.txid = kwargs.get('txid', self.txid)
+        self.transaction = kwargs.get('transaction', self.transaction)
         self.unlocked = kwargs.get('unlocked', self.unlocked)
 
     def __repr__(self):
@@ -156,7 +157,7 @@ class OneTimeOutput(object):
         elif None not in (self.index, other.index, self.amount, other.amount):
             return self.index == other.index and self.amount == other.amount
         else:
-            raise TypeError('one-time outputs are not comparable')
+            raise TypeError('Given one-time outputs (%r,%r) are not comparable'.format(self, other))
 
     def __ne__(self, other):
         return not(self == other)
