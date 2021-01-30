@@ -48,7 +48,7 @@ class FiltersTestCase(unittest.TestCase):
             repr(self.pm1))
 
     def test_outputs(self):
-        out1, out2 = self.tx2.outputs
+        out1, out2 = self.tx2.outputs()
         self.assertEqual(out1.transaction, self.tx2)
         self.assertEqual(out2.transaction, self.tx2)
         self.assertIn(self.json1['vout'][0]['target']['key'], repr(out1))
@@ -57,7 +57,7 @@ class FiltersTestCase(unittest.TestCase):
         self.assertEqual(self.oto1, OneTimeOutput(index=25973289, amount=Decimal('0.000000000000')))
 
         with self.assertRaises(exceptions.TransactionWithoutJSON):
-            self.tx1.outputs
+            self.tx1.outputs()
 
         with self.assertRaises(TypeError):
             self.oto1 == self.oto2

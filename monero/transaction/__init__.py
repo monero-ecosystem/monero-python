@@ -1,9 +1,16 @@
+import binascii
+import itertools
+import operator
 import re
+import sha3
 import six
+import varint
 import warnings
-from .address import address
-from .numbers import from_atomic, PaymentID
-from . import exceptions
+from ..address import address
+from ..numbers import from_atomic, PaymentID
+from .. import ed25519
+from .. import exceptions
+from .extra import ExtraParser
 
 class Payment(object):
     """
@@ -76,6 +83,16 @@ class Transaction(object):
     confirmations = None
     output_indices = None
     json = None
+    version = None
+    pubkeys = None
+
+    @property
+    def is_coinbase(self):
+        if self.json:
+            return "gen" in self.json['vin'][0]
+        raise exceptions.TransactionWithoutJSON(
+            "Tx {:s} has no .json attribute and it cannot be determined "
+            "if it's coinbase tx.".format(self.hash))
 
     @property
     def size(self):
@@ -84,23 +101,6 @@ class Transaction(object):
                 "Transaction has no blob, hence the size cannot be determined. "
                 "Perhaps the backend prunes transaction data?")
         return len(self.blob)
-
-    @property
-    def outputs(self):
-        if not self.json:
-            raise exceptions.TransactionWithoutJSON(
-                'Tx {:s} has no .json attribute'.format(self.hash))
-
-        outs = []
-        for i, vout in enumerate(self.json['vout']):
-            outs.append(OneTimeOutput(
-                pubkey=vout['target']['key'],
-                amount=from_atomic(vout['amount']),
-                index=self.output_indices[i] if self.output_indices else None,
-                height=self.height,
-                transaction=self))
-
-        return outs
 
     def __init__(self, **kwargs):
         self.hash = kwargs.get('hash', self.hash)
@@ -112,6 +112,88 @@ class Transaction(object):
         self.confirmations = kwargs.get('confirmations', self.confirmations)
         self.output_indices = kwargs.get('output_indices', self.output_indices)
         self.json = kwargs.get('json', self.json)
+        self.pubkeys = self.pubkeys or []
+        if self.json:
+            if "rct_signatures" in self.json:
+                self.version = 2
+            else:
+                self.version = 1
+
+    def outputs(self, wallet=None):
+        """
+        Returns a list of outputs. If wallet is given, decodes destinations and amounts
+        for outputs directed to the wallet, provided that matching subaddresses have been
+        already generated.
+        """
+        if not self.json:
+            raise exceptions.TransactionWithoutJSON(
+                'Tx {:s} has no .json attribute'.format(self.hash))
+
+        if wallet:
+            ep = ExtraParser(self.json["extra"])
+            extra = ep.parse()
+            self.pubkeys = extra.get("pubkeys", [])
+            svk = wallet.view_key()
+        outs = []
+        for idx, vout in enumerate(self.json['vout']):
+            try:
+                extra_pubkey = self.pubkeys[idx]
+            except IndexError:
+                extra_pubkey = None
+            if self.version == 2 and not self.is_coinbase:
+                encamount = binascii.unhexlify(
+                    self.json["rct_signatures"]["ecdhInfo"][idx]["amount"]
+                )
+            amount = from_atomic(vout['amount'])
+            if wallet:
+                for addr in itertools.chain(map(
+                            operator.methodcaller('addresses', wallet.accounts))):
+                    psk = addr.spend_key()
+                    svk = binascii.unhexlify(addr.wallet.svk)
+                    for keyidx, tx_key in enumerate(self.pubkeys):
+                        hsdata = b"".join(
+                            [
+                                ed25519.encodepoint(
+                                    ed25519.scalarmult(
+                                        ed25519.decodepoint(tx_key), ed25519.decodeint(svk) * 8
+                                    )
+                                ),
+                                varint.encode(idx),
+                            ]
+                        )
+                        Hs_ur = sha3.keccak_256(hsdata).digest()
+
+                        # sc_reduce32:
+                        Hsint_ur = ed25519.decodeint(Hs_ur)
+                        Hsint = Hsint_ur % ed25519.l
+                        Hs = ed25519.encodeint(Hsint)
+
+                        k = ed25519.encodepoint(
+                            ed25519.edwards_add(
+                                ed25519.scalarmult_B(Hsint), ed25519.decodepoint(psk),
+                            )
+                        )
+                        if k != vout['target']['key']:
+                            continue
+                        if not encamount:
+                            # Tx ver 1
+                            break
+                        amount_hs = sha3.keccak_256(b"amount" + Hs).digest()
+                        xormask = amount_hs[:len(encamount)]
+                        dec_amount = bytes(a ^ b for a, b in zip(encamount, xormask))
+                        int_amount = int.from_bytes(
+                            dec_amount, byteorder="little", signed=False
+                        )
+                        amount = from_atomic(int_amount)
+                        break
+            outs.append(OneTimeOutput(
+                pubkey=vout['target']['key'],
+                extra_pubkey=extra_pubkey,
+                amount=amount,
+                index=self.output_indices[idx] if self.output_indices else None,
+                height=self.height,
+                transaction=self))
+        return outs
 
     def __repr__(self):
         return self.hash
@@ -126,6 +208,7 @@ class OneTimeOutput(object):
     it is used by backends.
     """
     pubkey = None
+    extra_pubkey = None
     amount = None
     index = None
     height = None
@@ -135,6 +218,7 @@ class OneTimeOutput(object):
 
     def __init__(self, **kwargs):
         self.pubkey = kwargs.get('pubkey', self.pubkey)
+        self.extra_pubkey = kwargs.get('extra_pubkey', self.extra_pubkey)
         self.amount = kwargs.get('amount', self.amount)
         self.index = kwargs.get('index', self.index)
         self.height = kwargs.get('height', self.height)
