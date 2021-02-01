@@ -125,6 +125,49 @@ class Transaction(object):
         for outputs directed to the wallet, provided that matching subaddresses have been
         already generated.
         """
+        def _scan_pubkeys(svk, psk, stealth_address):
+            for keyidx, tx_key in enumerate(self.pubkeys):
+                hsdata = b"".join(
+                    [
+                        ed25519.encodepoint(
+                            ed25519.scalarmult(
+                                ed25519.decodepoint(tx_key), ed25519.decodeint(svk) * 8
+                            )
+                        ),
+                        varint.encode(idx),
+                    ]
+                )
+                Hs_ur = sha3.keccak_256(hsdata).digest()
+
+                # sc_reduce32:
+                Hsint_ur = ed25519.decodeint(Hs_ur)
+                Hsint = Hsint_ur % ed25519.l
+                Hs = ed25519.encodeint(Hsint)
+
+                k = ed25519.encodepoint(
+                    ed25519.edwards_add(
+                        ed25519.scalarmult_B(Hsint), ed25519.decodepoint(psk),
+                    )
+                )
+                if k != stealth_address:
+                    continue
+                if not encamount:
+                    # Tx ver 1
+                    break
+                amount_hs = sha3.keccak_256(b"amount" + Hs).digest()
+                xormask = amount_hs[:len(encamount)]
+                dec_amount = bytes(a ^ b for a, b in zip(encamount, xormask))
+                int_amount = int.from_bytes(
+                    dec_amount, byteorder="little", signed=False
+                )
+                amount = from_atomic(int_amount)
+                return Payment(
+                        amount=amount,
+                        timestamp=self.timestamp,
+                        transaction=self,
+                        local_address=addr)
+
+
         if not self.json:
             raise exceptions.TransactionWithoutJSON(
                 'Tx {:s} has no .json attribute'.format(self.hash))
@@ -133,66 +176,32 @@ class Transaction(object):
             ep = ExtraParser(self.json["extra"])
             extra = ep.parse()
             self.pubkeys = extra.get("pubkeys", [])
-            svk = wallet.view_key()
+            svk = binascii.unhexlify(wallet.view_key())
+            # fetch before loop to save on calls; cast to list to preserve over multiple iterations
+            addresses = list(
+                itertools.chain(*map(operator.methodcaller("addresses"), wallet.accounts)))
         outs = []
         for idx, vout in enumerate(self.json['vout']):
-            try:
-                extra_pubkey = self.pubkeys[idx]
-            except IndexError:
-                extra_pubkey = None
+            stealth_address = binascii.unhexlify(vout['target']['key'])
             if self.version == 2 and not self.is_coinbase:
                 encamount = binascii.unhexlify(
                     self.json["rct_signatures"]["ecdhInfo"][idx]["amount"]
                 )
+            payment = None
             amount = from_atomic(vout['amount'])
             if wallet:
-                for addr in itertools.chain(map(
-                            operator.methodcaller('addresses', wallet.accounts))):
-                    psk = addr.spend_key()
-                    svk = binascii.unhexlify(addr.wallet.svk)
-                    for keyidx, tx_key in enumerate(self.pubkeys):
-                        hsdata = b"".join(
-                            [
-                                ed25519.encodepoint(
-                                    ed25519.scalarmult(
-                                        ed25519.decodepoint(tx_key), ed25519.decodeint(svk) * 8
-                                    )
-                                ),
-                                varint.encode(idx),
-                            ]
-                        )
-                        Hs_ur = sha3.keccak_256(hsdata).digest()
-
-                        # sc_reduce32:
-                        Hsint_ur = ed25519.decodeint(Hs_ur)
-                        Hsint = Hsint_ur % ed25519.l
-                        Hs = ed25519.encodeint(Hsint)
-
-                        k = ed25519.encodepoint(
-                            ed25519.edwards_add(
-                                ed25519.scalarmult_B(Hsint), ed25519.decodepoint(psk),
-                            )
-                        )
-                        if k != vout['target']['key']:
-                            continue
-                        if not encamount:
-                            # Tx ver 1
-                            break
-                        amount_hs = sha3.keccak_256(b"amount" + Hs).digest()
-                        xormask = amount_hs[:len(encamount)]
-                        dec_amount = bytes(a ^ b for a, b in zip(encamount, xormask))
-                        int_amount = int.from_bytes(
-                            dec_amount, byteorder="little", signed=False
-                        )
-                        amount = from_atomic(int_amount)
+                for addridx, addr in enumerate(addresses):
+                    psk = binascii.unhexlify(addr.spend_key())
+                    payment = _scan_pubkeys(svk, psk, stealth_address)
+                    if payment:
                         break
             outs.append(OneTimeOutput(
-                pubkey=vout['target']['key'],
-                extra_pubkey=extra_pubkey,
-                amount=amount,
+                stealth_address=vout['target']['key'],
+                amount=payment.amount if payment else amount,
                 index=self.output_indices[idx] if self.output_indices else None,
                 height=self.height,
-                transaction=self))
+                transaction=self,
+                payment=payment))
         return outs
 
     def __repr__(self):
@@ -201,43 +210,44 @@ class Transaction(object):
 
 class OneTimeOutput(object):
     """
-    A Monero one-time public output (A.K.A stealth address). Identified by `pubkey`, or `index` and `amount`
+    A Monero one-time public output (A.K.A stealth address).
+    Identified by `stealth_address`, or `index` and `amount`
     together, it can contain differing levels of information on an output.
 
     This class is not intended to be turned into objects by the user,
     it is used by backends.
     """
-    pubkey = None
-    extra_pubkey = None
+    stealth_address = None
     amount = None
     index = None
     height = None
     mask = None
     transaction = None
+    payment = None
     unlocked = None
 
     def __init__(self, **kwargs):
-        self.pubkey = kwargs.get('pubkey', self.pubkey)
-        self.extra_pubkey = kwargs.get('extra_pubkey', self.extra_pubkey)
+        self.stealth_address = kwargs.get('stealth_address', self.stealth_address)
         self.amount = kwargs.get('amount', self.amount)
         self.index = kwargs.get('index', self.index)
         self.height = kwargs.get('height', self.height)
         self.mask = kwargs.get('mask', self.mask)
         self.transaction = kwargs.get('transaction', self.transaction)
+        self.payment = kwargs.get('payment', self.payment)
         self.unlocked = kwargs.get('unlocked', self.unlocked)
 
     def __repr__(self):
         # Try to represent output as (index, amount) pair if applicable because there is no RPC
-        # daemon command to lookup outputs by their pubkey ;( 
-        if self.pubkey:
-            return self.pubkey
+        # daemon command to lookup outputs by their stealth_address ;( 
+        if self.stealth_address:
+            return self.stealth_address
         else:
             return '(index={},amount={})'.format(self.index, self.amount)
 
     def __eq__(self, other):
-        # Try to compare pubkeys, then try to compare (index,amount) pairs, else raise error
-        if self.pubkey and other.pubkey:
-            return self.pubkey == other.pubkey
+        # Try to compare stealth_addresses, then try to compare (index,amount) pairs, else raise error
+        if self.stealth_address and other.stealth_address:
+            return self.stealth_address == other.stealth_address
         elif None not in (self.index, other.index, self.amount, other.amount):
             return self.index == other.index and self.amount == other.amount
         else:

@@ -1,0 +1,15 @@
+{
+  "id": 0,
+  "jsonrpc": "2.0",
+  "result": {
+    "address": "7BC3q5ogPCfTkBHZajDdkhSLxN3wSSULEN52Q2XzGebeetyG4oumiCHJjPpSyNvP6qR2idCYiUEqmHjKwc66fmcKN4dxW5u",
+    "addresses": [
+      {
+        "address": "7BC3q5ogPCfTkBHZajDdkhSLxN3wSSULEN52Q2XzGebeetyG4oumiCHJjPpSyNvP6qR2idCYiUEqmHjKwc66fmcKN4dxW5u",
+        "address_index": 0,
+        "label": "(Untitled account)",
+        "used": true
+      }
+    ]
+  }
+}
