@@ -1,13 +1,16 @@
 from decimal import Decimal
+import json
 try:
     from unittest.mock import patch, Mock
 except ImportError:
     from mock import patch, Mock
 import responses
 
-from monero.daemon import Daemon
-from monero.wallet import Wallet
 from monero.backends.jsonrpc import JSONRPCDaemon, JSONRPCWallet
+from monero.backends.offline import OfflineWallet
+from monero.daemon import Daemon
+from monero.transaction import Transaction
+from monero.wallet import Wallet
 
 from .base import JSONTestCase
 
@@ -79,3 +82,45 @@ class OutputTestCase(JSONTestCase):
         self.assertEqual(
                 outs[4].payment.local_address,
                 "7BJxHKTa4p5USJ9Z5GY15ZARXL6Qe84qT3FnWkMbSJSoEj9ugGjnpQ1N9H1jqkjsTzLiN5VTbCP8f4MYYVPAcXhr36bHXzP")
+
+    def test_coinbase_no_own_output(self):
+        txdata = self._read("test_coinbase_no_own_output-26dcb5.json")
+        tx = Transaction(
+            hash="26dcb55c3c93a2176949fd9ec4e20a9d97ece7c420408d9353c390a909e9a7c1",
+            height=766459,
+            output_indices=txdata["output_indices"],
+            json=json.loads(txdata["as_json"]))
+        self.assertTrue(tx.is_coinbase)
+        wallet = Wallet(OfflineWallet(
+            address="56eDKfprZtQGfB4y6gVLZx5naKVHw6KEKLDoq2WWtLng9ANuBvsw67wfqyhQECoLmjQN4cKAdvMp2WsC5fnw9seKLcCSfjj",
+            view_key="e507923516f52389eae889b6edc182ada82bb9354fb405abedbe0772a15aea0a"))
+        outs = tx.outputs(wallet=wallet)
+        self.assertEqual(len(outs), 1)
+        self.assertIsNone(outs[0].payment)
+        self.assertEqual(outs[0].amount, Decimal("8.415513145431"))
+        self.assertEqual(outs[0].index, 3129279)
+
+    def test_coinbase_own_output(self):
+        txdata = self._read("test_coinbase_own_output-dc0861.json")
+        tx = Transaction(
+            hash="dc08610685b8a55dc7d64454ecbe12868e4e73c766e2d19ee092885a06fc092d",
+            height=518147,
+            json=txdata)
+        self.assertTrue(tx.is_coinbase)
+        wallet = Wallet(OfflineWallet(
+            address="56eDKfprZtQGfB4y6gVLZx5naKVHw6KEKLDoq2WWtLng9ANuBvsw67wfqyhQECoLmjQN4cKAdvMp2WsC5fnw9seKLcCSfjj",
+            view_key="e507923516f52389eae889b6edc182ada82bb9354fb405abedbe0772a15aea0a"))
+        outs = tx.outputs(wallet=wallet)
+        self.assertEqual(len(outs), 1)
+        self.assertIsNotNone(outs[0].payment)
+        self.assertEqual(
+            outs[0].payment.local_address,
+            "56eDKfprZtQGfB4y6gVLZx5naKVHw6KEKLDoq2WWtLng9ANuBvsw67wfqyhQECoLmjQN4cKAdvMp2WsC5fnw9seKLcCSfjj")
+        self.assertEqual(outs[0].amount, outs[0].payment.amount)
+        self.assertEqual(outs[0].payment.amount, Decimal("13.515927959357"))
+
+    # TODO add test of v1 transaction
+    # TODO add test of ExtraParser initialized with str and bytes
+    # TODO add test of extra with TX_EXTRA_TAG_PADDING
+    # TODO add test of extra with TX_EXTRA_TAG_EXTRA_NONCE
+    # TODO add test of extra with unknown tag, e.g. 0x03

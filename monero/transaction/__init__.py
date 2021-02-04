@@ -125,7 +125,7 @@ class Transaction(object):
         for outputs directed to the wallet, provided that matching subaddresses have been
         already generated.
         """
-        def _scan_pubkeys(svk, psk, stealth_address):
+        def _scan_pubkeys(svk, psk, stealth_address, amount, encamount):
             for keyidx, tx_key in enumerate(self.pubkeys):
                 hsdata = b"".join(
                     [
@@ -153,7 +153,11 @@ class Transaction(object):
                     continue
                 if not encamount:
                     # Tx ver 1
-                    break
+                    return Payment(
+                        amount=amount,
+                        timestamp=self.timestamp,
+                        transaction=self,
+                        local_address=addr)
                 amount_hs = sha3.keccak_256(b"amount" + Hs).digest()
                 xormask = amount_hs[:len(encamount)]
                 dec_amount = bytes(a ^ b for a, b in zip(encamount, xormask))
@@ -183,6 +187,7 @@ class Transaction(object):
         outs = []
         for idx, vout in enumerate(self.json['vout']):
             stealth_address = binascii.unhexlify(vout['target']['key'])
+            encamount = None
             if self.version == 2 and not self.is_coinbase:
                 encamount = binascii.unhexlify(
                     self.json["rct_signatures"]["ecdhInfo"][idx]["amount"]
@@ -192,7 +197,7 @@ class Transaction(object):
             if wallet:
                 for addridx, addr in enumerate(addresses):
                     psk = binascii.unhexlify(addr.spend_key())
-                    payment = _scan_pubkeys(svk, psk, stealth_address)
+                    payment = _scan_pubkeys(svk, psk, stealth_address, amount, encamount)
                     if payment:
                         break
             outs.append(OneTimeOutput(

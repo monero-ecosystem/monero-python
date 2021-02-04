@@ -1,0 +1,15 @@
+{
+  "as_hex": "",
+  "as_json": "{\n  \"version\": 2, \n  \"unlock_time\": 766519, \n  \"vin\": [ {\n      \"gen\": {\n        \"height\": 766459\n      }\n    }\n  ], \n  \"vout\": [ {\n      \"amount\": 8415513145431, \n      \"target\": {\n        \"key\": \"6c4a7168678f9d5c504e72c54d55a1cfc118cce9af944b6ecca10556541af056\"\n      }\n    }\n  ], \n  \"extra\": [ 1, 128, 93, 146, 154, 55, 1, 170, 165, 76, 172, 184, 227, 115, 121, 76, 30, 233, 193, 8, 228, 133, 96, 186, 122, 30, 54, 92, 179, 188, 229, 65, 243\n  ], \n  \"rct_signatures\": {\n    \"type\": 0\n  }\n}",
+  "block_height": 766459,
+  "block_timestamp": 1612470441,
+  "double_spend_seen": false,
+  "in_pool": false,
+  "output_indices": [
+    3129279
+  ],
+  "prunable_as_hex": "",
+  "prunable_hash": "c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+  "pruned_as_hex": "02b7e42e01fffbe32e01d7e0af9df6f401026c4a7168678f9d5c504e72c54d55a1cfc118cce9af944b6ecca10556541af0562101805d929a3701aaa54cacb8e373794c1ee9c108e48560ba7a1e365cb3bce541f300",
+  "tx_hash": "26dcb55c3c93a2176949fd9ec4e20a9d97ece7c420408d9353c390a909e9a7c1"
+}
