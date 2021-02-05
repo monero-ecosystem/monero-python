@@ -1,4 +1,5 @@
 import binascii
+import six
 import varint
 
 
@@ -34,7 +35,7 @@ class ExtraParser(object):
         return extra
 
     def _pop_pubkey(self, extra):
-        key = bytes(extra[:32])
+        key = bytes(bytearray(extra[:32]))      # bytearray() is for py2 compatibility
         if len(key) < 32:
             raise ValueError(
                 "offset {:d}: only {:d} bytes of key data, expected 32".format(
@@ -58,7 +59,7 @@ class ExtraParser(object):
             elif extra[0] == self.TX_EXTRA_TAG_ADDITIONAL_PUBKEYS:
                 extra = extra[1:]
                 self.offset += 1
-                keycount = varint.decode_bytes(bytes(extra))
+                keycount = varint.decode_bytes(bytearray(extra))
                 valen = len(varint.encode(keycount))
                 extra = extra[valen:]
                 self.offset += valen
@@ -76,7 +77,7 @@ class ExtraParser(object):
                     "offset {:d}: extra nonce exceeds field size".format(self.offset)
                 )
                 return []
-            nonce = bytes(extra[:noncelen])
+            nonce = bytearray(extra[:noncelen])
             if "nonces" in self.data:
                 self.data["nonces"].append(nonce)
             else:

@@ -4,6 +4,7 @@ import operator
 import re
 import sha3
 import six
+import struct
 import varint
 import warnings
 from ..address import address
@@ -160,10 +161,8 @@ class Transaction(object):
                         local_address=addr)
                 amount_hs = sha3.keccak_256(b"amount" + Hs).digest()
                 xormask = amount_hs[:len(encamount)]
-                dec_amount = bytes(a ^ b for a, b in zip(encamount, xormask))
-                int_amount = int.from_bytes(
-                    dec_amount, byteorder="little", signed=False
-                )
+                dec_amount = bytearray(a ^ b for a, b in zip(*map(bytearray, (encamount, xormask))))
+                int_amount = struct.unpack("<Q", dec_amount)[0]
                 amount = from_atomic(int_amount)
                 return Payment(
                         amount=amount,
