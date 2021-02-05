@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import codecs
 import os
 import re
+import sys
 from distutils.core import setup
 
 from setuptools import find_packages
@@ -33,7 +34,9 @@ setup(
     url = 'https://github.com/monero-ecosystem/monero-python/',
     long_description = open('README.rst', 'rb').read().decode('utf-8'),
     install_requires = open('requirements.txt', 'r').read().splitlines(),
-    tests_require=open('test_requirements.txt', 'r').read().splitlines(),
+    tests_require=open(
+        'test_requirements_py{:d}.txt'.format(sys.version_info.major),
+        'r').read().splitlines(),
     setup_requires=[
         'pytest-runner',
     ],
