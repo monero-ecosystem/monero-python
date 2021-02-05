@@ -1,0 +1,7 @@
+coverage~=5.3
+coveralls~=1.11
+pip>=9
+pytest-cov~=2.10
+pytest-runner~=5.2
+pytest~=4.6
+responses~=0.12
