@@ -14,7 +14,7 @@ before_install:
   - rm -rf dist && python setup.py sdist # prep package distribution
 install:
   - pip install dist/*.tar.gz # install dependencies as specified in setup.py
-  - pip install -r test_requirements.txt
+  - pip install -r test_requirements_py`echo $TRAVIS_PYTHON_VERSION | cut -f 1 -d .`.txt
 script:
   - pytest
 after_success:
