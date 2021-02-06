@@ -119,7 +119,68 @@ class OutputTestCase(JSONTestCase):
         self.assertEqual(outs[0].amount, outs[0].payment.amount)
         self.assertEqual(outs[0].payment.amount, Decimal("13.515927959357"))
 
-    # TODO add test of v1 transaction
+    def test_v1_tx(self):
+        tx1 = Transaction(
+            hash="2634445086cc48b89f1cd241e89e6f37195008807264684d8fad4a16f479c45a",
+            height=2022660,
+            json=self._read("test_v1_tx-263444.json"))
+        tx2 = Transaction(
+            hash="3586a81f051bcb265a45c99f11b19fc4b55bb2abb3332c515a8b88a559cd9f7b",
+            height=2022660,
+            json=self._read("test_v1_tx-3586a8.json"))
+        outs1 = tx1.outputs()
+        self.assertEqual(len(outs1), 14)
+        self.assertEqual(outs1[0].stealth_address, "b1ef76960fe245f73131be22e9b548e861f93b727ab8a2a3ff64d86521512382")
+        self.assertEqual(outs1[0].amount, Decimal("0.000000000300"))
+        self.assertEqual(outs1[1].stealth_address, "dcd66bbcb6e72602dd876e1dad65a3464a2bd831f09ec7c8131147315152e29b")
+        self.assertEqual(outs1[1].amount, Decimal("0.000008000000"))
+        self.assertEqual(outs1[2].stealth_address, "71efdb68dfd33f5c89a5fa8312ec6e346681f6f60fb406e9426231a5f230351a")
+        self.assertEqual(outs1[2].amount, Decimal("0.007000000000"))
+        self.assertEqual(outs1[3].stealth_address, "499fb727f61f2ce0fbc3419b309601f2cbf672eeef2cc827aef423b0b70e2529")
+        self.assertEqual(outs1[3].amount, Decimal("0.000000010000"))
+        self.assertEqual(outs1[4].stealth_address, "297ef9bb654dd6e26472a4f07f037eddb3f8b458cf4315e2cc40d9fd725e28b9")
+        self.assertEqual(outs1[4].amount, Decimal("0.000000500000"))
+        self.assertEqual(outs1[5].stealth_address, "b2bf18a500afe1775305b19d16d0d5afec0f72096b9f15cca6604d7f5ad6e5f8")
+        self.assertEqual(outs1[5].amount, Decimal("0.300000000000"))
+        self.assertEqual(outs1[6].stealth_address, "f7a95b33912077e3aca425270f76be13af503919b6230368a591e1053b3c7436")
+        self.assertEqual(outs1[6].amount, Decimal("5.000000000000"))
+        self.assertEqual(outs1[7].stealth_address, "1e93e243a865b71e14fe4df6de0902ca634749b48002c52adc7f046053c2b921")
+        self.assertEqual(outs1[7].amount, Decimal("0.000200000000"))
+        self.assertEqual(outs1[8].stealth_address, "513822bad9697e8494ff82cb4b58a5a693aa433c16f0aafdaaf4a27b026a32e4")
+        self.assertEqual(outs1[8].amount, Decimal("0.000000000009"))
+        self.assertEqual(outs1[9].stealth_address, "6e1ace4cfdf3f5363d72c241382e3b9927af1093b549a62f2902f56137d153bc")
+        self.assertEqual(outs1[9].amount, Decimal("0.000000000070"))
+        self.assertEqual(outs1[10].stealth_address, "1df18bd04f42c9da8f6b49afe418aabc8ab973448a941d365534b5d0862a3d46")
+        self.assertEqual(outs1[10].amount, Decimal("0.000000002000"))
+        self.assertEqual(outs1[11].stealth_address, "caf3e6c07f8172fc31a56ba7f541ba8d6cc601f2c7da1a135126f8f3455e3ffc")
+        self.assertEqual(outs1[11].amount, Decimal("20.000000000000"))
+        self.assertEqual(outs1[12].stealth_address, "1ce506bc1ee041dfe36df3e085156023be26e133fb14f5e529b60a2d769a7c7c")
+        self.assertEqual(outs1[12].amount, Decimal("0.000030000000"))
+        self.assertEqual(outs1[13].stealth_address, "ee1a22b1f49db4df0df56161801974326cda4ceacbbf2a17c795ebe945790281")
+        self.assertEqual(outs1[13].amount, Decimal("0.030000000000"))
+        outs2 = tx2.outputs()
+        self.assertEqual(len(outs2), 10)
+        self.assertEqual(outs2[0].stealth_address, "ddd1d47e5d419cf5e2298e4d9e828364b929976912dfc1bbed25fb20cc681f9f")
+        self.assertEqual(outs2[0].amount, Decimal("3.000000000000"))
+        self.assertEqual(outs2[1].stealth_address, "a0c0edc478a3448a0d371755bd614854505d2f158499d9881bfffa8b05c5b3e8")
+        self.assertEqual(outs2[1].amount, Decimal("0.600000000000"))
+        self.assertEqual(outs2[2].stealth_address, "f9aeb5f16117f363adcd22f6b73d6e35eda64c25fee2f59208bd68d411b6d0c6")
+        self.assertEqual(outs2[2].amount, Decimal("0.000000000700"))
+        self.assertEqual(outs2[3].stealth_address, "17e36384cf11a4d85be1320c0e221505818edbb2d6634dd54db24e25570d0f75")
+        self.assertEqual(outs2[3].amount, Decimal("0.000000500000"))
+        self.assertEqual(outs2[4].stealth_address, "8b7e5dac3e0e45f9e7213ec3d4a465c5301b20f8ef30a5b2b5baba80867952b3")
+        self.assertEqual(outs2[4].amount, Decimal("0.000000000070"))
+        self.assertEqual(outs2[5].stealth_address, "d1e24eeaa62232cb0e4be536fc785e03075416457dd2b704437bced16da52500")
+        self.assertEqual(outs2[5].amount, Decimal("0.000000001000"))
+        self.assertEqual(outs2[6].stealth_address, "52c26fcce9d0a41f91ec57074e2cbfe301ca96b556e861deba51cd54e3e5b3e3")
+        self.assertEqual(outs2[6].amount, Decimal("0.000010000000"))
+        self.assertEqual(outs2[7].stealth_address, "c5859574278889dede61d5aa341e14d2fb2acf45941486276f61dd286e7f8895")
+        self.assertEqual(outs2[7].amount, Decimal("0.000000010000"))
+        self.assertEqual(outs2[8].stealth_address, "a3556072b7c8f77abdd16fe762fe1099c10c5ab071e16075ce0c667a3eacf1cc")
+        self.assertEqual(outs2[8].amount, Decimal("0.090000000000"))
+        self.assertEqual(outs2[9].stealth_address, "d72affedd142c6a459c42318169447f22042dba0d93c0f7ade42ddb222de8914")
+        self.assertEqual(outs2[9].amount, Decimal("0.009000000000"))
+
     # TODO add test of ExtraParser initialized with str and bytes
     # TODO add test of extra with TX_EXTRA_TAG_PADDING
     # TODO add test of extra with TX_EXTRA_TAG_EXTRA_NONCE
