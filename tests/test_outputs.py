@@ -10,6 +10,7 @@ from monero.backends.jsonrpc import JSONRPCDaemon, JSONRPCWallet
 from monero.backends.offline import OfflineWallet
 from monero.daemon import Daemon
 from monero.transaction import Transaction
+from monero.transaction.extra import ExtraParser
 from monero.wallet import Wallet
 
 from .base import JSONTestCase
@@ -181,7 +182,18 @@ class OutputTestCase(JSONTestCase):
         self.assertEqual(outs2[9].stealth_address, "d72affedd142c6a459c42318169447f22042dba0d93c0f7ade42ddb222de8914")
         self.assertEqual(outs2[9].amount, Decimal("0.009000000000"))
 
-    # TODO add test of ExtraParser initialized with str and bytes
-    # TODO add test of extra with TX_EXTRA_TAG_PADDING
-    # TODO add test of extra with TX_EXTRA_TAG_EXTRA_NONCE
-    # TODO add test of extra with unknown tag, e.g. 0x03
+    def test_extra_unknown_tag(self):
+        # try initializing as string
+        ep = ExtraParser(
+            "0169858d0d6de79c2dfd94b3f97745a12c9a7a61ffbae16b7a34bbf5b36b75084302086003c919"
+            "1772d1f90300786a796a227d07e9ae41ff9248a6b2e55adb3f6a42eb4c7ccc1c1b3d0f42c524")
+        with self.assertRaises(ValueError):
+            pdata = ep.parse()
+
+        # also try initializing as bytes
+        ep = ExtraParser(
+            b"015894c0e5a8d376e931df4b4ae45b753d9442de52ec8d94036253fba5aeff9782020901cb0e5e"
+            b"5a80a4e135ff301ea13334dfbe1508dafcaa32762a86cf12cd4fd193ee9807edcb91bc87f6ccb6"
+            b"02384b54dff4664b232a058b8d28ad7d")
+        with self.assertRaises(ValueError):
+            pdata = ep.parse()
