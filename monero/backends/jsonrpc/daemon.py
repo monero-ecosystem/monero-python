@@ -587,22 +587,23 @@ class JSONRPCDaemon(object):
 
         return self.raw_jsonrpc_request('hard_fork_info')
 
-    def set_bans(self, bans):
+    def set_bans(self, ip, ban, seconds):
         """
-        Ban (or uban) other nodes by IP for a certain length of time.
+        Ban (or unban) other nodes by IP for a certain length of time.
 
-        :param bans: list of dict ban entries with the following structure:
-
-        ban = {
-            "host": str; Host to ban (IP in A.B.C.D form - will support I2P address in the future),
-            "ip": unsigned int; IP address to ban, in int format,
-            "ban": bool; Set true to ban,
-            "seconds": unsigned int; Number of seconds to ban node
-        }
+        :param ip: ip address of node to ban in two forms: 'a.b.c.d' str or 32-bit unsigned integer
+        :param bool ban: Whether to ban (True) or unban (False)
+        :param int seconds: Number of seconds to ban
 
         Notes:
-        * For a given entry, only one of "host" or "ip" must be provided, but both may be provided so long as they match.
-        * "seconds" does not need to be provided if "ban" is False
+        * Params "ip", "ban", and "seconds" can be single elements or they can be iterables of the same length. For example:
+
+            ips =        ['229.52.8.67', 611282986]
+            should_ban = [True,          False]
+            seconds =    [10000,         None]
+            daemon.set_bans(ips, should_ban, seconds)
+
+        * "seconds" can be 0 or None if "ban" is False
 
         Output:
         {
@@ -610,45 +611,61 @@ class JSONRPCDaemon(object):
         }
         """
 
-        if isinstance(bans, dict):
-            bans = [bans]
-
-        # Validate bans
-        for ban_info in bans:
-            host = ban_info.get('host')
-            ip = ban_info.get('ip')
-            ban = ban_info.get('ban')
-            seconds = ban_info.get('seconds')
-            if host is None and ip is None:
-                raise ValueError('host or ip must be provided for each ban')
-            elif ban is None:
-                raise ValueError('"ban" value must be provided for each ban entry')
-            elif seconds is None and ban:
-                raise ValueError('"seconds" value must be provided when an IP is banned')
-            if host:
-                if len(host.split('.')) != 4:
-                    raise ValueError('host "{}" is incorrectly formatted'.format(host))
-                for ip_part in host.split('.'):
+        def is_valid_ip(ip):
+            if isinstance(ip, (int)):
+                return 0 <= ip < 2 ** 32
+            else:
+                if len(ip.split('.')) != 4:
+                    return False
+                for ip_part in ip.split('.'):
                     try:
                         ip_part_num = int(ip_part)
                         if ip_part_num < 0 or ip_part_num >= 256:
-                            raise ValueError('host "{}" is incorrectly formatted'.format(host))
-                    except ValueError:
-                        raise ValueError('host "{}" is incorrectly formatted'.format(host))
-            if ip and (ip < 0 or ip >= 2**32):
-                raise ValueError('ip number {} is out of range'.format(host))
-            if host is not None and ip is not None:
-                # check that "host" represents same logical address as "ip"
-                # both have already individually been checked for validity
-                # We could use the ipaddress package, but it is only standard after Python 3.3
-                a, b, c, d = map(int, host.split('.'))
-                ip_from_host = (a << 24) | (b << 16) | (c << 8) | d
-                if ip_from_host != ip:
-                    raise ValueError('host "{}" does not represent ip "{}"'.format(host, ip))
-            if not isinstance(seconds, (NoneType, int)):
-                raise TypeError('"seconds" key in bans must be an int not a {}'.format(type(seconds)))
-            elif not isinstance(ban, bool):
-                raise TypeError('"ban" key in bans must be a bool not a {}'.format(type(ban)))
+                            return False
+                    except:
+                        return False
+                return True
+
+        if isinstance(ip, (str, int)): # If single element paramters
+            user_bans = [{
+                'ip': ip,
+                'ban': ban,
+                'seconds': seconds
+            }]
+        else: # If params are iterables, contrust the list of ban entries
+            if not (len(ip) == len(ban) == len(seconds)):
+                raise ValueError('"ip", "ban", and "seconds" are not the same length')
+
+            user_bans = [{
+                'ip': ip[i],
+                'ban': ban[i],
+                'seconds': seconds[i]
+            } for i in range(len(ip))]
+
+        # Construct the bans parameter to be passed to the RPC command
+        bans = []
+        for ban_entry in user_bans:
+            curr_ip = ban_entry['ip']
+            curr_ban = bool(ban_entry['ban'])
+            curr_seconds = ban_entry['seconds']
+
+            if not is_valid_ip(curr_ip):
+                raise ValueError('"{}" is not a valid IP address'.format(ip))
+            elif curr_ban and curr_seconds is None:
+                raise ValueError('Whenever "ban" is True, "seconds" must not be None')
+            elif curr_seconds is not None and curr_seconds < 0:
+                raise ValueError('"seconds" can not be less than zero')
+
+            ban = {}
+            if isinstance(curr_ip, int):
+                ban['ip'] = curr_ip
+            else:
+                ban['host'] = curr_ip
+            if curr_seconds is not None:
+                ban['seconds'] = curr_seconds
+            ban['ban'] = curr_ban
+
+            bans.append(ban)
 
         return self.raw_jsonrpc_request('set_bans', params={'bans': bans})
 
