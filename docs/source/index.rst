@@ -23,6 +23,7 @@ Project homepage: https://github.com/monero-ecosystem/monero-python
    address
    transactions
    daemon
+   outputs
    backends
    seed
    misc
