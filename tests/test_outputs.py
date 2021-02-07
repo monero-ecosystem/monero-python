@@ -68,6 +68,7 @@ class OutputTestCase(JSONTestCase):
         self.assertEqual(outs[3].amount, outs[3].payment.amount)
         self.assertEqual(outs[4].amount, outs[4].payment.amount)
         self.assertEqual(outs[0].amount, Decimal(4))
+        self.assertIsNone(outs[1].amount)
         self.assertEqual(outs[2].amount, Decimal(1))
         self.assertEqual(outs[3].amount, Decimal(2))
         self.assertEqual(outs[4].amount, Decimal(8))
@@ -83,6 +84,10 @@ class OutputTestCase(JSONTestCase):
         self.assertEqual(
                 outs[4].payment.local_address,
                 "7BJxHKTa4p5USJ9Z5GY15ZARXL6Qe84qT3FnWkMbSJSoEj9ugGjnpQ1N9H1jqkjsTzLiN5VTbCP8f4MYYVPAcXhr36bHXzP")
+        self.assertEqual(
+                repr(outs[0]),
+                "d3eb42322566c1d48685ee0d1ad7aed2ba6210291a785ec051d8b13ae797d202, 4.000000000000 "
+                "to [76Qt2x]")
 
     def test_coinbase_no_own_output(self):
         txdata = self._read("test_coinbase_no_own_output-26dcb5.json")

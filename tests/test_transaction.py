@@ -6,7 +6,7 @@ import unittest
 
 from monero.address import address
 from monero.numbers import PaymentID
-from monero.transaction import IncomingPayment, Transaction, OneTimeOutput, _ByHeight
+from monero.transaction import IncomingPayment, Transaction, Output, _ByHeight
 from monero import exceptions
 
 class FiltersTestCase(unittest.TestCase):
@@ -36,8 +36,8 @@ class FiltersTestCase(unittest.TestCase):
             '5997e64b90d59f7f810ddbc801f747c4fa43e2de593e4ea48531e16d776c00fd']}}
         self.outind1 = [25884175, 25884176]
         self.tx2 = Transaction(json=self.json1, output_indices=self.outind1)
-        self.oto1 = OneTimeOutput(index=25973289, amount=Decimal('0.000000000000'))
-        self.oto2 = OneTimeOutput(pubkey='0faff18f7149a0db5aa0dc3c9116887740ccbb5dc4d1eeff87895288e55e5052')
+        self.oto1 = Output(index=25973289, amount=Decimal('0.000000000000'))
+        self.oto2 = Output(pubkey='0faff18f7149a0db5aa0dc3c9116887740ccbb5dc4d1eeff87895288e55e5052')
 
     def test_hash(self):
         self.assertIn(
@@ -52,15 +52,16 @@ class FiltersTestCase(unittest.TestCase):
         self.assertEqual(out1.transaction, self.tx2)
         self.assertEqual(out2.transaction, self.tx2)
         self.assertIn(self.json1['vout'][0]['target']['key'], repr(out1))
-        self.assertFalse(out2 != OneTimeOutput(stealth_address=self.json1['vout'][1]['target']['key']))
+        self.assertFalse(out2 != Output(stealth_address=self.json1['vout'][1]['target']['key']))
         self.assertIn('(index=25973289,amount=0E-12)', repr(self.oto1))
-        self.assertEqual(self.oto1, OneTimeOutput(index=25973289, amount=Decimal('0.000000000000')))
+        self.assertEqual(self.oto1, Output(index=25973289, amount=Decimal('0.000000000000')))
 
         with self.assertRaises(exceptions.TransactionWithoutJSON):
             self.tx1.outputs()
 
         with self.assertRaises(TypeError):
             self.oto1 == self.oto2
+
 
 class SortingTestCase(unittest.TestCase):
     def test_sorting(self):

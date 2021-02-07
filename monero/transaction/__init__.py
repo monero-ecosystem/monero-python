@@ -192,18 +192,17 @@ class Transaction(object):
                     self.json["rct_signatures"]["ecdhInfo"][idx]["amount"]
                 )
             payment = None
-            amount = from_atomic(vout['amount'])
+            amount = from_atomic(vout['amount']) if self.version == 1 or self.is_coinbase else None
             if wallet:
                 for addridx, addr in enumerate(addresses):
                     psk = binascii.unhexlify(addr.spend_key())
                     payment = _scan_pubkeys(svk, psk, stealth_address, amount, encamount)
                     if payment:
                         break
-            outs.append(OneTimeOutput(
+            outs.append(Output(
                 stealth_address=vout['target']['key'],
                 amount=payment.amount if payment else amount,
                 index=self.output_indices[idx] if self.output_indices else None,
-                height=self.height,
                 transaction=self,
                 payment=payment))
         return outs
@@ -212,7 +211,7 @@ class Transaction(object):
         return self.hash
 
 
-class OneTimeOutput(object):
+class Output(object):
     """
     A Monero one-time public output (A.K.A stealth address).
     Identified by `stealth_address`, or `index` and `amount`
@@ -224,29 +223,27 @@ class OneTimeOutput(object):
     stealth_address = None
     amount = None
     index = None
-    height = None
-    mask = None
     transaction = None
     payment = None
-    unlocked = None
 
     def __init__(self, **kwargs):
         self.stealth_address = kwargs.get('stealth_address', self.stealth_address)
         self.amount = kwargs.get('amount', self.amount)
         self.index = kwargs.get('index', self.index)
-        self.height = kwargs.get('height', self.height)
-        self.mask = kwargs.get('mask', self.mask)
         self.transaction = kwargs.get('transaction', self.transaction)
         self.payment = kwargs.get('payment', self.payment)
-        self.unlocked = kwargs.get('unlocked', self.unlocked)
 
     def __repr__(self):
         # Try to represent output as (index, amount) pair if applicable because there is no RPC
         # daemon command to lookup outputs by their stealth_address ;( 
         if self.stealth_address:
-            return self.stealth_address
+            res = self.stealth_address
         else:
-            return '(index={},amount={})'.format(self.index, self.amount)
+            res = "(index={},amount={})".format(self.index, self.amount)
+        if self.payment:
+            return "{:s}, {:.12f} to [{:s}]".format(
+                res, self.payment.amount, str(self.payment.local_address)[:6])
+        return res
 
     def __eq__(self, other):
         # Try to compare stealth_addresses, then try to compare (index,amount) pairs, else raise error
