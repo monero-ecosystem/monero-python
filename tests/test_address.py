@@ -50,7 +50,6 @@ class Tests(object):
         self.assertEqual(ia.payment_id(), self.pid)
         self.assertEqual(str(ia), self.iaddr)
 
-    @pytest.mark.filterwarnings("ignore::DeprecationWarning")
     def test_recognition_and_comparisons(self):
         a = Address(self.addr)
         a2 = address(self.addr)
@@ -60,19 +59,7 @@ class Tests(object):
         self.assertEqual(self.addr, a)
         self.assertEqual(hash(a), hash(self.addr))
         self.assertEqual(a.net, self.net)
-        with pytest.deprecated_call():
-            self.assertEqual(a.is_mainnet(), self.net == const.NET_MAIN)
-        with pytest.deprecated_call():
-            self.assertEqual(a.is_testnet(), self.net == const.NET_TEST)
-        with pytest.deprecated_call():
-            self.assertEqual(a.is_stagenet(), self.net == const.NET_STAGE)
         self.assertEqual(a2.net, self.net)
-        with pytest.deprecated_call():
-            self.assertEqual(a2.is_mainnet(), self.net == const.NET_MAIN)
-        with pytest.deprecated_call():
-            self.assertEqual(a2.is_testnet(), self.net == const.NET_TEST)
-        with pytest.deprecated_call():
-            self.assertEqual(a2.is_stagenet(), self.net == const.NET_STAGE)
 
         ia = IntegratedAddress(self.iaddr)
         ia2 = address(self.iaddr)
@@ -82,19 +69,7 @@ class Tests(object):
         self.assertEqual(self.iaddr, ia)
         self.assertEqual(hash(ia), hash(self.iaddr))
         self.assertEqual(ia.net, self.net)
-        with pytest.deprecated_call():
-            self.assertEqual(ia.is_mainnet(), self.net == const.NET_MAIN)
-        with pytest.deprecated_call():
-            self.assertEqual(ia.is_testnet(), self.net == const.NET_TEST)
-        with pytest.deprecated_call():
-            self.assertEqual(ia.is_stagenet(), self.net == const.NET_STAGE)
         self.assertEqual(ia2.net, self.net)
-        with pytest.deprecated_call():
-            self.assertEqual(ia2.is_mainnet(), self.net == const.NET_MAIN)
-        with pytest.deprecated_call():
-            self.assertEqual(ia2.is_testnet(), self.net == const.NET_TEST)
-        with pytest.deprecated_call():
-            self.assertEqual(ia2.is_stagenet(), self.net == const.NET_STAGE)
         self.assertEqual(ia2.base_address(), a)
 
         self.assertEqual(ia.view_key(), a.view_key())
@@ -108,19 +83,7 @@ class Tests(object):
         self.assertEqual(self.subaddr, sa)
         self.assertEqual(hash(sa), hash(self.subaddr))
         self.assertEqual(sa.net, self.net)
-        with pytest.deprecated_call():
-            self.assertEqual(sa.is_mainnet(), self.net == const.NET_MAIN)
-        with pytest.deprecated_call():
-            self.assertEqual(sa.is_testnet(), self.net == const.NET_TEST)
-        with pytest.deprecated_call():
-            self.assertEqual(sa.is_stagenet(), self.net == const.NET_STAGE)
         self.assertEqual(sa2.net, self.net)
-        with pytest.deprecated_call():
-            self.assertEqual(sa2.is_mainnet(), self.net == const.NET_MAIN)
-        with pytest.deprecated_call():
-            self.assertEqual(sa2.is_testnet(), self.net == const.NET_TEST)
-        with pytest.deprecated_call():
-            self.assertEqual(sa2.is_stagenet(), self.net == const.NET_STAGE)
 
         self.assertNotEqual(a, 0)
 

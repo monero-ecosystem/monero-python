@@ -42,39 +42,6 @@ class BaseAddress(object):
     def net(self):
         return const.NETS[self._valid_netbytes.index(self._decoded[0])]
 
-    def is_mainnet(self):
-        """Returns `True` if the address belongs to mainnet.
-
-        :rtype: bool
-        """
-        warnings.warn(".is_mainnet(), .is_testnet() and .is_stagenet() methods are deprecated "
-            "and will be gone in 0.8; use Address.net property and constants form monero.const "
-            "instead",
-            DeprecationWarning)
-        return self.net == const.NET_MAIN
-
-    def is_testnet(self):
-        """Returns `True` if the address belongs to testnet.
-
-        :rtype: bool
-        """
-        warnings.warn(".is_mainnet(), .is_testnet() and .is_stagenet() methods are deprecated "
-            "and will be gone in 0.8; use Address.net property and constants form monero.const "
-            "instead",
-            DeprecationWarning)
-        return self.net == const.NET_TEST
-
-    def is_stagenet(self):
-        """Returns `True` if the address belongs to stagenet.
-
-        :rtype: bool
-        """
-        warnings.warn(".is_mainnet(), .is_testnet() and .is_stagenet() methods are deprecated "
-            "and will be gone in 0.8; use Address.net property and constants form monero.const "
-            "instead",
-            DeprecationWarning)
-        return self.net == const.NET_STAGE
-
     def _decode(self, address):
         self._decoded = bytearray(unhexlify(base58.decode(address)))
         checksum = self._decoded[-4:]

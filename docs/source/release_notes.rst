@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+0.8
+---
+
+Backward-incompatible changes:
+
+ 1. The ``monero.prio`` submodule has been removed. Switch to ``monero.const``.
+ 2. Methods ``.is_mainnet()``, ``.is_testnet()``, ``.is_stagenet()`` have been removed from
+    ``monero.address.Address`` instances. Use ``.net`` attribute instead.
+
 0.7
 ---
 

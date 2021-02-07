@@ -159,12 +159,6 @@ class Seed(object):
         """
         # backward compatibility
         _net = net[:-3] if net.endswith('net') else net
-        if _net != net:
-            warnings.warn(
-                "Argument '{:s}' is deprecated and will not be accepted in 0.8, "
-                "use one of monero.const.NET_*".format(net),
-                DeprecationWarning)
-            net = _net
         if net not in const.NETS:
             raise ValueError(
                 "Invalid net argument '{:s}'. Must be one of monero.const.NET_*".format(net))
