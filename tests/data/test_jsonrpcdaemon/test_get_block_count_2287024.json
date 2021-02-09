@@ -1,0 +1,9 @@
+{
+  "id": 0,
+  "jsonrpc": "2.0",
+  "result": {
+    "count": 2287024,
+    "status": "OK",
+    "untrusted": false
+  }
+}

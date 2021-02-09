@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 import binascii
 from datetime import datetime
 from decimal import Decimal
+import ipaddress
 import json
 import logging
 import requests
@@ -587,13 +588,13 @@ class JSONRPCDaemon(object):
 
         return self.raw_jsonrpc_request('hard_fork_info')
 
-    def set_bans(self, ip, ban, seconds):
+    def set_bans(self, ip, ban, seconds=None):
         """
         Ban (or unban) other nodes by IP for a certain length of time.
 
         :param ip: ip address of node to ban in two forms: 'a.b.c.d' str or 32-bit unsigned integer
         :param bool ban: Whether to ban (True) or unban (False)
-        :param int seconds: Number of seconds to ban
+        :param int seconds: Number of seconds to ban. Optional if "ban" is False
 
         Notes:
         * Params "ip", "ban", and "seconds" can be single elements or they can be iterables of the same length. For example:
@@ -610,21 +611,6 @@ class JSONRPCDaemon(object):
         "status": str; General RPC error code. "OK" means everything looks good. Any other value means that something went wrong.
         }
         """
-
-        def is_valid_ip(ip):
-            if isinstance(ip, (int)):
-                return 0 <= ip < 2 ** 32
-            else:
-                if len(ip.split('.')) != 4:
-                    return False
-                for ip_part in ip.split('.'):
-                    try:
-                        ip_part_num = int(ip_part)
-                        if ip_part_num < 0 or ip_part_num >= 256:
-                            return False
-                    except:
-                        return False
-                return True
 
         if isinstance(ip, (str, int)): # If single element paramters
             user_bans = [{
@@ -649,9 +635,10 @@ class JSONRPCDaemon(object):
             curr_ban = bool(ban_entry['ban'])
             curr_seconds = ban_entry['seconds']
 
-            if not is_valid_ip(curr_ip):
-                raise ValueError('"{}" is not a valid IP address'.format(ip))
-            elif curr_ban and curr_seconds is None:
+            # validate IP
+            ipaddress.IPv4Address(curr_ip)
+
+            if curr_ban and curr_seconds is None:
                 raise ValueError('Whenever "ban" is True, "seconds" must not be None')
             elif curr_seconds is not None and curr_seconds < 0:
                 raise ValueError('"seconds" can not be less than zero')
@@ -708,7 +695,12 @@ class JSONRPCDaemon(object):
 
         txids = self._validate_hashlist(txids)
 
-        return self.raw_jsonrpc_request('flush_txpool', params={'txids': txids})
+        resp = self.raw_jsonrpc_request('flush_txpool', params={'txids': txids})
+
+        if 'transactions' not in resp:
+            resp['transactions'] = []
+
+        return resp
 
     def get_output_histogram(self, amounts, min_count=None, max_count=None, unlocked=None, recent_cutoff=None):
         """
@@ -716,10 +708,10 @@ class JSONRPCDaemon(object):
         of outputs on the chain for that amount. RingCT outputs counts as 0 amount.
 
         :param list amounts: list of unsigned ints in atomic units, or Decimals as full monero amounts
-        :min_count: unsigned int lower bound for output number
-        :min_count: unsigned int upper bound for output number
-        :unlocked: boolean for whether to count only unlocked
-        :recent_cutoff: unsigned int
+        :param int min_count: lower bound for output number
+        :param int max_count: upper bound for output number
+        :param bool unlocked: whether to count only unlocked
+        :pramrm int recent_cutoff: unsigned int
 
 
         Output:
@@ -735,12 +727,12 @@ class JSONRPCDaemon(object):
         "untrusted": bool; True for bootstrap mode, False for full sync mode.
         }
         """
+
         # Coerce amounts paramter
         if isinstance(amounts, (int, Decimal)):
             amounts = [to_atomic(amounts) if isinstance(amounts, Decimal) else amounts]
-        elif not amounts:
-            raise ValueError('amounts must have at least one element')
-        amounts = list(map(lambda a: to_atomic(a) if isinstance(a, Decimal) else int(a), amounts))
+        elif amounts is None:
+            raise ValueError('amounts is None')
 
         # Construct RPC parameters
         params = {'amounts': amounts}
@@ -805,7 +797,12 @@ class JSONRPCDaemon(object):
         }
         """
 
-        params = None if not grace_blocks else {'grace_blocks': grace_blocks}
+        if not isinstance(grace_blocks, (int, type(None))):
+            raise TypeError("grace_blocks is not an int")
+        elif grace_blocks is not None and grace_blocks < 0:
+            raise ValueError("grace_blocks < 0")
+
+        params = {'grace_blocks': grace_blocks} if grace_blocks else None
         return self.raw_jsonrpc_request('get_fee_estimate', params=params)
 
     def get_alternate_chains(self):
@@ -826,6 +823,7 @@ class JSONRPCDaemon(object):
         }
 
         """
+
         return self.raw_jsonrpc_request('get_alternate_chains')
 
     def relay_tx(self, txids):
@@ -919,7 +917,6 @@ class JSONRPCDaemon(object):
             amounts = [to_atomic(amounts) if isinstance(amounts, Decimal) else amounts]
         elif not amounts:
             raise ValueError('amounts must have at least one element')
-        amounts = list(map(lambda a: to_atomic(a) if isinstance(a, Decimal) else int(a), amounts))
 
         return self.raw_jsonrpc_request('get_output_distribution', params={
             'amounts': amounts,
@@ -1507,7 +1504,7 @@ class JSONRPCDaemon(object):
 
     def _is_valid_256_hex(self, hexhash):
         try:
-            bytes.fromhex(hexhash)
+            bytearray.fromhex(hexhash)
 
             return len(hexhash) == 64
         except ValueError:
