@@ -1,0 +1,15 @@
+{
+  "credits": 0,
+  "outs": [
+    {
+      "height": 1222460,
+      "key": "9c7055cb5b790f1eebf10b7b8fbe01241eb736b5766d15554da7099bbcdc4b44",
+      "mask": "42e37af85cddaeccbea6fe597037c9377045a682e66661260868877b9440af70",
+      "txid": "b357374ad4636f17520b6c2fdcf0fb5e6a1185fed2aef509b19b5100d04ae552",
+      "unlocked": true
+    }
+  ],
+  "status": "OK",
+  "top_hash": "",
+  "untrusted": false
+}

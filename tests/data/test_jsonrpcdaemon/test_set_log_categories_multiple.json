@@ -1,0 +1,5 @@
+{
+  "categories": "logging:INFO,net:FATAL",
+  "status": "OK",
+  "untrusted": false
+}

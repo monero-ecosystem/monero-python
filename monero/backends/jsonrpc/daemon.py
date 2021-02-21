@@ -200,7 +200,13 @@ class JSONRPCDaemon(object):
                 code=rsp.status_code,
                 method=method))
 
-        result = rsp.json()
+        try:
+            result = rsp.json()
+        except ValueError as e:
+            _log.error(u"Could not parse JSON response from '{url}' during method '{method}'. Response:\n{resp}".format(
+                url=self.url, method=method, resp=rsp.text))
+            raise RPCError("Daemon returned an unreadable JSON response. It may contain unparseable binary characters.")
+
         _ppresult = json.dumps(result, indent=2, sort_keys=True)
         _log.debug(u"Result:\n{result}".format(result=_ppresult))
 
@@ -870,60 +876,6 @@ class JSONRPCDaemon(object):
 
         return self.raw_jsonrpc_request('sync_info')
 
-    def get_txpool_backlog(self):
-        """
-        Get all transaction pool backlog.
-
-        Output:
-        {
-        "backlog": list; list of tx_backlog_entry with the following structure (in binary form)
-            {
-                "blob_size": unsigned int (in binary form).
-                "fee": unsigned int (in binary form).
-                "time_in_pool": unsigned int (in binary form).
-            }
-        "status": str; General RPC error code. "OK" means everything looks good.
-        "untrusted": bool; True for bootstrap mode, False for full sync mode.
-        }
-        """
-
-        return self.raw_jsonrpc_request('get_txpool_backlog')
-
-    def get_output_distribution(self, amounts, cumulative=False, from_height=0, to_height=0):
-        """
-        Get distribution of outputs for givens amount on the blockchain in a certain range of heights.
-        RingCT outputs are found with amount 0.
-
-        :param list amounts: amounts to look for of type int for atomic units, or Decimal for full Monero amounts
-        :param bool cumulative: true if the result should be cumulative
-        :param int from_height: starting height to check from
-        :param int to_height: ending height to check up to
-
-        Output:
-        {
-        "distributions": list; distribution informations with the following structure
-            {
-                "amount": unsigned int
-                "base": unsigned int
-                "distribution": array of unsigned int
-                "start_height": unsigned int
-            }
-        "status": str; General RPC error code. "OK" means everything looks good.
-        }
-        """
-
-        # Coerce amounts paramter
-        if isinstance(amounts, (int, Decimal)):
-            amounts = [to_atomic(amounts) if isinstance(amounts, Decimal) else amounts]
-        elif not amounts:
-            raise ValueError('amounts must have at least one element')
-
-        return self.raw_jsonrpc_request('get_output_distribution', params={
-            'amounts': amounts,
-            'cumulative': cumulative,
-            'from_height': from_height,
-            'to_height': to_height})
-
     # Other RPC Methods (https://www.getmonero.org/resources/developer-guides/daemon-rpc.html#other-daemon-rpc-calls)
 
     def get_height(self):
@@ -997,10 +949,10 @@ class JSONRPCDaemon(object):
 
         return self.raw_request('/get_transactions', data={
             'txs_hashes': tx_hashes,
-            'decode_as_json': decode_as_json,
-            'prune': prune})
+            'decode_as_json': bool(decode_as_json),
+            'prune': bool(prune)})
 
-    def get_alt_block_hashes(self):
+    def get_alt_blocks_hashes(self):
         """
         Get the known blocks hashes which are not on the main chain.
 
@@ -1012,7 +964,7 @@ class JSONRPCDaemon(object):
         }
         """
 
-        return self.raw_request('/get_alt_block_hashes')
+        return self.raw_request('/get_alt_blocks_hashes')
 
     def is_key_image_spent(self, key_images):
         """
@@ -1035,7 +987,7 @@ class JSONRPCDaemon(object):
 
         key_images = self._validate_hashlist(key_images)
 
-        return self.raw_request('/is_key_image_spent', data={'key images': key_images})
+        return self.raw_request('/is_key_image_spent', data={'key_images': key_images})
 
     def send_raw_transaction(self, tx_as_hex, do_not_relay=False):
         """
@@ -1082,17 +1034,26 @@ class JSONRPCDaemon(object):
         }
         """
 
-        try:
-            address.address(miner_address)
-        except ValueError:
-            raise ValueError('miner_address "{}" does not match any recognized wallet format'.format(miner_address))
+        if isinstance(miner_address, address.Address):
+            miner_address = repr(miner_address)
+        else:
+            try:
+                converted_addr = address.address(miner_address)
+            except ValueError:
+                raise ValueError('miner_address "{}" does not match any recognized address format'.format(miner_address))
+
+            if not isinstance(converted_addr, address.Address):
+                raise ValueError('miner_address must be a "standard" monero address (i.e. it must start with a "4")')
+
+        if not isinstance(threads_count, int):
+            raise TypeError("threads_count must be an int")
 
         if threads_count < 0:
             raise ValueError('threads_count < 0')
 
         return self.raw_request('/start_mining', data={
-            'do_background_mining': do_background_mining,
-            'ignore_battery': ignore_battery,
+            'do_background_mining': bool(do_background_mining),
+            'ignore_battery': bool(ignore_battery),
             'miner_address': miner_address,
             'threads_count': threads_count})
 
@@ -1159,7 +1120,7 @@ class JSONRPCDaemon(object):
 
         return self.raw_request('/get_peer_list')
 
-    def set_log_hashrate(self, visible):
+    def set_log_hash_rate(self, visible):
         """
         Set the log hash rate display mode.
 
@@ -1171,7 +1132,13 @@ class JSONRPCDaemon(object):
         }
         """
 
-        return self.set_log_hashrate('/set_log_hashrate', data={'visible': visible})
+        resp = self.raw_request('/set_log_hash_rate', data={'visible': bool(visible)})
+
+        if resp['status'] == 'NOT MINING':
+            raise RPCError('The node at "{url}" is not currently mining and therefore cannot set its hash rate log visibility.'
+                .format(url=self.url))
+
+        return resp
 
     def set_log_level(self, level):
         """
@@ -1217,7 +1184,7 @@ class JSONRPCDaemon(object):
                 category, level = cat_str.split(':')
 
                 if category not in self._KNOWN_LOG_CATEGORIES:
-                    _log.warn(u"Unrecognized log category: \"{}\"",format(category))
+                    _log.warn(u"Unrecognized log category: \"{}\"".format(category))
 
                 if level not in self._KNOWN_LOG_LEVELS:
                     _log.warn(u"Unrecognized log level: \"{}\"".format(level))
@@ -1257,6 +1224,7 @@ class JSONRPCDaemon(object):
                 "relayed": bool; States if this transaction has been relayed
                 "tx_blob": unsigned int; Hexadecimal blob represnting the transaction.
                 "tx_json": json string; JSON structure of all information in the transaction (see get_transactions() for structure information)
+            }
         "status": str; General RPC error code. "OK" means everything looks good.
         }
         """
@@ -1274,10 +1242,11 @@ class JSONRPCDaemon(object):
             "bytes_med" unsigned int; Median transaction size in pool.
             "bytes_min" unsigned int; Min transaction size in pool.
             "bytes_total": unsigned int; total size of all transactions in pool.
-            "histo": {
-                "txs": unsigned int; number of transactions.
-                "bytes": unsigned int; size in bytes.
-            }
+            "histo": list; histogram of transaction sizes with the following structure
+                {
+                    "txs": unsigned int; number of transactions.
+                    "bytes": unsigned int; size in bytes.
+                }
             "histo_98pc": unsigned int; the time 98% of txes are "younger" than.
             "num_10m": unsigned int; number of transactions in pool for more than 10 minutes.
             "num_double_spends": unsigned int; number of double spend transactions.
@@ -1346,7 +1315,7 @@ class JSONRPCDaemon(object):
         """
         Limit number of outgoing peers.
 
-        :param int out_peers_arg: Max number of outgoing peers
+        :param int out_peers_arg: Max number of outgoing peers. If less than zero, allow unlimited outgoing peers
 
         Output:
         {
@@ -1354,15 +1323,18 @@ class JSONRPCDaemon(object):
         }
         """
 
-        out_peers_arg = int(out_peers_arg)
+        if out_peers_arg < 0:
+            out_peers_arg = 2**32 - 1
+        elif out_peers_arg > 2**32 - 1:
+            raise ValueError('out_peers_arg "{}" is too large'.format(out_peers_arg))
 
-        return self.raw_request('/out_peers', data={'out_peers': out_peers_arg})
+        return self.raw_request('/out_peers', data={'out_peers': int(out_peers_arg)})
 
     def in_peers(self, in_peers_arg):
         """
-        Limit number of Incoming peers.
+        Limit number of incoming peers.
 
-        :param int in_peers_arg: Max number of incoming peers
+        :param int in_peers_arg: Max number of incoming peers. If less than zero, allow unlimited incoming peers
 
         Output:
         {
@@ -1370,23 +1342,21 @@ class JSONRPCDaemon(object):
         }
         """
 
-        in_peers_arg = int(in_peers_arg)
+        if in_peers_arg < 0:
+            in_peers_arg = 2**32 - 1
+        elif in_peers_arg > 2**32 - 1:
+            raise ValueError('in_peers_arg "{}" is too large'.format(in_peers_arg))
 
-        return self.raw_request('/in_peers', data={'in_peers': in_peers_arg})
+        return self.raw_request('/in_peers', data={'in_peers': int(in_peers_arg)})
 
-    def get_outs(self, outputs, get_txid=True):
+    def get_outs(self, amount, index, get_txid=True):
         """
         Get information about one-time outputs (stealth addresses).
 
 
-        :param list outputs: array of output structures, as defined below
-        :param bool get_txid: If true, a txid will included for each output in the response.
-
-        Structure for outputs parameter:
-        {
-            "amount": unsigned int in atomic units or Decimal in full monero units (1e12 atmomic units)
-            "index": unsigned int; output's global index
-        }
+        :param amount: list or single element of output amount. Decimal for full monero amounts or int for atmoic units
+        :param index: list of single element of output index. int
+        :param bool get_txid: Optional. If true, a txid will included for each output in the response.
 
         Output:
         {
@@ -1403,16 +1373,17 @@ class JSONRPCDaemon(object):
         }
         """
 
-        # Validate outputs paramter
-        if isinstance(outputs, dict):
-            outputs = [outputs]
-        for i, out in enumerate(outputs):
-            if 'amount' not in out or 'index' not in out:
-                raise ValueError('structure of outputs is malformed')
-            amount, index = out['amount'], out['index']
-            if isinstance(amount, Decimal):
-                amount = to_atomic(amount)
-            outputs[i] = {'amount': amount, 'index': index}
+        if isinstance(index, int): # single element
+            outputs = [{'amount': amount if isinstance(amount, int) else to_atomic(amount), 'index': index}]
+        else: # multiple elements
+            if len(amount) != len(index):
+                raise ValueError('length of amount and index do not match')
+
+            outputs = []
+            for a, i in zip(amount, index):
+                outputs.append({
+                    'amount': a if isinstance(a, int) else to_atomic(a),
+                    'index': i})
 
         return self.raw_request('/get_outs', data={
             'outputs': outputs,
@@ -1455,11 +1426,11 @@ class JSONRPCDaemon(object):
     # Supporting class methods
 
     @classmethod
-    def get_all_known_log_categories(cls):
+    def known_log_categories(cls):
         return cls._KNOWN_LOG_CATEGORIES
 
     @classmethod
-    def get_all_known_log_levels(cls):
+    def known_log_levels(cls):
         return cls._KNOWN_LOG_LEVELS
 
     # private methods
