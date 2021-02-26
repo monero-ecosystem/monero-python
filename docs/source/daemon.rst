@@ -151,6 +151,47 @@ The second transaction failed because it used the same inputs as the previous on
 checks all incoming transactions for possible double-spends and rejects them if such conflict
 is discovered.
 
+Other RPC Commands
+------------------
+
+Any RPC commands not available in the Daemon class, are likely available in the JSONRPCDaemon
+class. The official Monero Daemon RPC Documentation can be found
+`here <https://www.getmonero.org/resources/developer-guides/daemon-rpc.html>`. At the time of
+writing, all the RPC commands from the documentation have been implemented in JSONRPCDaemon, with
+the exception of any .bin commands, `/get_txpool_backlog`, and `/get_output_distribution`. These
+methods share the same name as their corresponding RPC names, and unlike the Daemon methods, the
+methods in JSONRPCDaemon are designed to be lower-level. As such, the return values of these
+methods reflect the raw JSON objects returned by the daemon. An example:
+
+.. code-block:: python
+    [In 20]: from monero.backends.jsonrpc import JSONRPCDaemon
+
+    [In 21]: daemon = JSONRPCDaemon(host='192.168.0.50')
+
+    [In 22]: sync_info = daemon.sync_info()
+
+    [In 23]: sync_info['height']
+    [Out 23]: 2304844
+
+    [In 24]: daemon.get_bans()
+    [Out 24]:
+    {
+    "bans": [
+      {
+        "host": "145.239.118.5",
+        "ip": 91680657,
+        "seconds": 72260
+      },
+      {
+        "host": "146.59.156.116",
+        "ip": 1956395922,
+        "seconds": 69397
+      }
+    ],
+    "status": "OK",
+    "untrusted": False
+    }
+
 API reference
 -------------
 
