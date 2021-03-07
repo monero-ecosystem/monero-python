@@ -74,7 +74,7 @@ class Daemon(object):
 
         :rtype: :class:`Block <monero.block.Block>`
         """
-        if not height and not bhash:
+        if height is None and bhash is None:
             raise ValueError("Height or hash must be specified")
         return self._backend.block(bhash=bhash, height=height)
 
