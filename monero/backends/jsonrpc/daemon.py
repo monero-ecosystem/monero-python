@@ -309,10 +309,10 @@ class JSONRPCDaemon(object):
         }
         """
 
-        if isinstance(blobs, (bytes, str)):
+        if isinstance(blobs, (six.binary_type,) + six.string_types):
             blobs = [blobs]
 
-        blobs = [binascii.hexlify(b).decode() if isinstance(b, bytes) else six.ensure_text(b) for b in blobs]
+        blobs = [binascii.hexlify(b).decode() if isinstance(b, six.binary_type) else six.ensure_text(b) for b in blobs]
 
         return self.raw_jsonrpc_request('submit_block', params=blobs)
 
@@ -618,7 +618,7 @@ class JSONRPCDaemon(object):
         }
         """
 
-        if isinstance(ip, (str, int)): # If single element paramters
+        if isinstance(ip, six.string_types + six.integer_types): # If single element paramters
             user_bans = [{
                 'ip': ip,
                 'ban': ban,
@@ -650,7 +650,7 @@ class JSONRPCDaemon(object):
                 raise ValueError('"seconds" can not be less than zero')
 
             ban = {}
-            if isinstance(curr_ip, int):
+            if isinstance(curr_ip, six.integer_types):
                 ban['ip'] = curr_ip
             else:
                 ban['host'] = curr_ip
@@ -735,7 +735,7 @@ class JSONRPCDaemon(object):
         """
 
         # Coerce amounts paramter
-        if isinstance(amounts, (int, Decimal)):
+        if isinstance(amounts, (Decimal,) + six.integer_types):
             amounts = [to_atomic(amounts) if isinstance(amounts, Decimal) else amounts]
         elif amounts is None:
             raise ValueError('amounts is None')
@@ -803,7 +803,7 @@ class JSONRPCDaemon(object):
         }
         """
 
-        if not isinstance(grace_blocks, (int, type(None))):
+        if not isinstance(grace_blocks, (type(None),) + six.integer_types):
             raise TypeError("grace_blocks is not an int")
         elif grace_blocks is not None and grace_blocks < 0:
             raise ValueError("grace_blocks < 0")
@@ -1175,7 +1175,7 @@ class JSONRPCDaemon(object):
 
         if not categories:
             return self.raw_request('/set_log_categories')
-        elif isinstance(categories, str):
+        elif isinstance(categories, six.string_types):
             categories = categories.split(',')
 
         # Validate categories
@@ -1373,8 +1373,8 @@ class JSONRPCDaemon(object):
         }
         """
 
-        if isinstance(index, int): # single element
-            outputs = [{'amount': amount if isinstance(amount, int) else to_atomic(amount), 'index': index}]
+        if isinstance(index, six.integer_types): # single element
+            outputs = [{'amount': amount if isinstance(amount, six.integer_types) else to_atomic(amount), 'index': index}]
         else: # multiple elements
             if len(amount) != len(index):
                 raise ValueError('length of amount and index do not match')
@@ -1382,7 +1382,7 @@ class JSONRPCDaemon(object):
             outputs = []
             for a, i in zip(amount, index):
                 outputs.append({
-                    'amount': a if isinstance(a, int) else to_atomic(a),
+                    'amount': a if isinstance(a, six.integer_types) else to_atomic(a),
                     'index': i})
 
         return self.raw_request('/get_outs', data={
@@ -1485,7 +1485,7 @@ class JSONRPCDaemon(object):
         if not hashes:
             return []
         else:
-            if isinstance(hashes, str):
+            if isinstance(hashes, six.string_types):
                 hashes = [hashes]
             else:
                 coerce_compatible_str = lambda s: six.ensure_text(str(s))
