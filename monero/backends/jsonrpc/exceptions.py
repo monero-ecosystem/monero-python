@@ -10,3 +10,6 @@ class Unauthorized(RPCError):
 
 class MethodNotFound(RPCError):
     pass
+
+class RestrictedRPC(RPCError):
+	pass

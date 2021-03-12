@@ -1,0 +1,13 @@
+{
+  "id": "0",
+  "jsonrpc": "2.0",
+  "result": {
+    "chains": [{
+      "block_hash": "697cf03c89a9b118f7bdf11b1b3a6a028d7b3617d2d0ed91322c5709acf75625",
+      "difficulty": 14114729638300280,
+      "height": 1562062,
+      "length": 2
+    }],
+    "status": "OK"
+  }
+}

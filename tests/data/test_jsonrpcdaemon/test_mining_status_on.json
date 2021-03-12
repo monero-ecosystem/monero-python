@@ -1,0 +1,19 @@
+{
+  "active": true,
+  "address": "497e4umLC7pfJ5TSSuU1QY8E1Nh5h5cWfYnvvpTrYFKiQriWfVYeVn2KH8Hpp3AeDRbCSxTvZuUZ1WYd8PGLqM4r5P5hjNQ",
+  "bg_idle_threshold": 0,
+  "bg_ignore_battery": false,
+  "bg_min_idle_seconds": 0,
+  "bg_target": 0,
+  "block_reward": 1162352277907,
+  "block_target": 120,
+  "difficulty": 252551179535,
+  "difficulty_top64": 0,
+  "is_background_mining_enabled": false,
+  "pow_algorithm": "RandomX",
+  "speed": 6,
+  "status": "OK",
+  "threads_count": 4,
+  "untrusted": false,
+  "wide_difficulty": "0x3acd392d0f"
+}

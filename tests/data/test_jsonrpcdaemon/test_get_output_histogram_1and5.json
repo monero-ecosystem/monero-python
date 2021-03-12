@@ -1,0 +1,24 @@
+{
+  "id": 0,
+  "jsonrpc": "2.0",
+  "result": {
+    "credits": 0,
+    "histogram": [
+      {
+        "amount": 1000000000000,
+        "recent_instances": 874619,
+        "total_instances": 874619,
+        "unlocked_instances": 874619
+      },
+      {
+        "amount": 5000000000000,
+        "recent_instances": 255089,
+        "total_instances": 255089,
+        "unlocked_instances": 255089
+      }
+    ],
+    "status": "OK",
+    "top_hash": "",
+    "untrusted": false
+  }
+}

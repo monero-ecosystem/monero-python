@@ -7,6 +7,9 @@ class BackendException(MoneroException):
 class NoDaemonConnection(BackendException):
     pass
 
+class DaemonIsBusy(BackendException):
+    pass
+
 class AccountException(MoneroException):
     pass
 

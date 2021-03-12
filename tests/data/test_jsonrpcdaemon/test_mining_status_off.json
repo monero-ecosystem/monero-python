@@ -1,0 +1,19 @@
+{
+  "active": false,
+  "address": "",
+  "bg_idle_threshold": 0,
+  "bg_ignore_battery": false,
+  "bg_min_idle_seconds": 0,
+  "bg_target": 0,
+  "block_reward": 0,
+  "block_target": 120,
+  "difficulty": 250236969769,
+  "difficulty_top64": 0,
+  "is_background_mining_enabled": false,
+  "pow_algorithm": "RandomX",
+  "speed": 0,
+  "status": "OK",
+  "threads_count": 0,
+  "untrusted": false,
+  "wide_difficulty": "0x3a43492329"
+}

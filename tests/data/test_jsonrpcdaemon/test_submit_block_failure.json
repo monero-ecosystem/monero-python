@@ -1,0 +1,8 @@
+{
+  "id": "0",
+  "jsonrpc": "2.0",
+  "error": {
+    "code": -7,
+    "message": "Block not accepted"
+  }
+}

@@ -1,4 +1,5 @@
 pysha3
 requests
 six>=1.12.0
+ipaddress
 varint

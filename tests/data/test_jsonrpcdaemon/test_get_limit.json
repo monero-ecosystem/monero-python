@@ -1,0 +1,6 @@
+{
+  "limit_down": 8192,
+  "limit_up": 2048,
+  "status": "OK",
+  "untrusted": false
+}

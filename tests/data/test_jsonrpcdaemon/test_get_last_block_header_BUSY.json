@@ -1,0 +1,32 @@
+{
+  "id": 0,
+  "jsonrpc": "2.0",
+  "result": {
+    "block_header": {
+      "block_size": 0,
+      "cumulative_difficulty": 0,
+      "cumulative_difficulty_top64": 0,
+      "depth": 0,
+      "difficulty": 0,
+      "difficulty_top64": 0,
+      "hash": "",
+      "height": 0,
+      "major_version": 0,
+      "miner_tx_hash": "",
+      "minor_version": 0,
+      "nonce": 0,
+      "num_txes": 0,
+      "orphan_status": false,
+      "pow_hash": "",
+      "prev_hash": "",
+      "reward": 0,
+      "timestamp": 0,
+      "wide_cumulative_difficulty": "",
+      "wide_difficulty": ""
+    },
+    "credits": 0,
+    "status": "BUSY",
+    "top_hash": "",
+    "untrusted": false
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "id": 0,
+  "jsonrpc": "2.0",
+  "result": {
+    "release": true,
+    "status": "OK",
+    "untrusted": false,
+    "version": 196613
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "credits": 0,
+  "pool_stats": {
+    "bytes_max": 17922,
+    "bytes_med": 1967,
+    "bytes_min": 1452,
+    "bytes_total": 75438,
+    "fee_total": 586900000,
+    "histo": [
+      {
+        "bytes": 3419,
+        "txs": 2
+      },
+      {
+        "bytes": 3423,
+        "txs": 2
+      },
+      {
+        "bytes": 1455,
+        "txs": 1
+      },
+      {
+        "bytes": 14851,
+        "txs": 1
+      },
+      {
+        "bytes": 0,
+        "txs": 0
+      },
+      {
+        "bytes": 0,
+        "txs": 0
+      },
+      {
+        "bytes": 22776,
+        "txs": 5
+      },
+      {
+        "bytes": 0,
+        "txs": 0
+      },
+      {
+        "bytes": 0,
+        "txs": 0
+      },
+      {
+        "bytes": 29514,
+        "txs": 6
+      }
+    ],
+    "histo_98pc": 0,
+    "num_10m": 0,
+    "num_double_spends": 0,
+    "num_failing": 0,
+    "num_not_relayed": 0,
+    "oldest": 1613865632,
+    "txs_total": 17
+  },
+  "status": "OK",
+  "top_hash": "",
+  "untrusted": false
+}
