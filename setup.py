@@ -37,9 +37,6 @@ setup(
     tests_require=open(
         'test_requirements_py{:d}.txt'.format(sys.version_info.major),
         'r').read().splitlines(),
-    setup_requires=[
-        'pytest-runner',
-    ],
     packages = find_packages('.', exclude=['tests']),
     include_package_data = True,
     author = 'Michał Sałaban',
