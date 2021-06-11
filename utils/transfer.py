@@ -1,15 +1,13 @@
 #!/usr/bin/python
 import argparse
-from decimal import Decimal
 import operator
 import logging
 import os
-import random
 import re
 
 import monero
 from monero.address import address
-from monero.numbers import PaymentID, as_monero
+from monero.numbers import as_monero
 from monero.wallet import Wallet
 from monero.backends.jsonrpc import JSONRPCWallet
 
@@ -33,9 +31,6 @@ argsparser.add_argument('-a', dest='account', default=0, type=int, help="Source 
 argsparser.add_argument('-p', dest='prio',
     choices=['unimportant', 'normal', 'elevated', 'priority'],
     default='normal')
-argsparser.add_argument('-i', dest='payment_id', nargs='?', type=PaymentID,
-    const=PaymentID(random.randint(0, 2**256)),
-    help="Payment ID")
 argsparser.add_argument('--save', dest='outdir', nargs='?', default=None, const='.',
     help="Save to file, optionally follow by destination directory (default is .)\n"
         "Transaction will be not relayed to the network.")
@@ -53,7 +48,7 @@ logging.basicConfig(level=level, format="%(asctime)-15s %(message)s")
 
 w = Wallet(JSONRPCWallet(timeout=args.timeout, **args.wallet_rpc_url))
 txns = w.accounts[args.account].transfer_multiple(
-    args.destinations, priority=prio, payment_id=args.payment_id,
+    args.destinations, priority=prio,
     relay=args.outdir is None)
 for tx in txns:
     print(u"Transaction {hash}:\nfee: {fee:21.12f}\n"
