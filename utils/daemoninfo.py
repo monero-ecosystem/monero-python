@@ -32,10 +32,10 @@ def get_daemon():
 
 d = get_daemon()
 info = d.info()
-print("Net: {net:>15s}net\n"
-    "Height:      {height:10d}\n"
-    "Difficulty:  {difficulty:10d}\n"
-    "Alt blocks:  {alt_blocks_count:10d}\n".format(
+print("Net: {net:>20s}net\n"
+    "Height:      {height:15d}\n"
+    "Difficulty:  {difficulty:15d}\n"
+    "Alt blocks:  {alt_blocks_count:15d}\n".format(
         net='test' if info['testnet'] \
             else 'stage' if info['stagenet'] \
             else 'main' if info['mainnet'] else 'unknown',
