@@ -36,6 +36,16 @@ class JSONRPCWalletTestCase(JSONTestCase):
                 'total_balance': 236153709446071,
                 'total_unlocked_balance': 236153709446071}}
 
+    def test_open_wallet(self):
+        self.wallet = Wallet(JSONRPCWallet(), wallet_open=False)
+        
+        self.wallet.open_wallet('ReuseIt', 'hahaha')
+
+        accounts = self.wallet.accounts
+        
+        self.assertEqual(type(self.wallet._backend), JSONRPCWallet)
+        self.assertNotEqual(len(accounts), 0)
+
     @patch('monero.backends.jsonrpc.wallet.requests.post')
     def test_seed(self, mock_post):
         mock_post.return_value.status_code = 200
@@ -157,7 +167,7 @@ class JSONRPCWalletTestCase(JSONTestCase):
         subaddr, index = w.accounts[1].new_address()
         self.assertIsInstance(subaddr, SubAddress)
         self.assertIsInstance(index, int)
-
+    
     @patch('monero.backends.jsonrpc.wallet.requests.post')
     def test_incoming_confirmed(self, mock_post):
         mock_post.return_value.status_code = 200
@@ -1271,3 +1281,15 @@ class JSONRPCWalletTestCase(JSONTestCase):
 
         with self.assertRaises(ValueError):
             wallet3 = Wallet(backend=JSONRPCWallet(), port=18089)
+
+
+    def test_close_wallet(self):
+        self.wallet = Wallet(JSONRPCWallet())
+        
+        accounts_result = []
+        self.wallet.close_wallet()
+        
+        accounts = self.wallet.accounts
+        self.assertEqual(len(accounts), 0)
+        
+        

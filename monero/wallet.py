@@ -26,20 +26,23 @@ class Wallet(object):
     The wallet exposes a number of methods that operate on the default account (of index 0).
 
     :param backend: a wallet backend
+    :param wallet_open: if you started the RPC wallet with the argument '--wallet-file', leave it as it is. If the RPC wallet was launched with the argument '--wallet-dir', set its value to False.
     :param \\**kwargs: arguments to initialize a :class:`JSONRPCWallet <monero.backends.jsonrpc.JSONRPCWallet>`
                         instance if no backend is given
     """
     accounts = None
 
-    def __init__(self, backend=None, **kwargs):
+    def __init__(self, backend=None, wallet_open=True, **kwargs):
         if backend and len(kwargs):
             raise ValueError('backend already given, other arguments are extraneous')
 
         self._backend = backend if backend else JSONRPCWallet(**kwargs)
         self.incoming = PaymentManager(0, self._backend, 'in')
         self.outgoing = PaymentManager(0, self._backend, 'out')
-        self.refresh()
-
+        
+        if wallet_open:
+            self.refresh()
+    
     def refresh(self):
         """
         Reloads the wallet and its accounts. By default, this method is called only once,
@@ -66,7 +69,44 @@ class Wallet(object):
         :rtype: int
         """
         return self._backend.height()
+    
+    def open_wallet(self, filename, password=''):
+        """
+        Open a existing wallet within the directory you specified with the argument --wallet-dir,
+        when launching 'monero-wallet-rpc.'
+        """
+        
+        if password == '':
+            self._backend.open_wallet(filename)
+        else:
+            self._backend.open_wallet(filename, password)
+        
+        self.refresh()
 
+    def close_wallet(self):
+        """
+        Saves and closes the wallet and clears the 'accounts' variable of a list type.
+        If you happened to launch the 'monero-wallet-rpc' with the argument --wallet-file, 
+        you have to restart 'monero-wallet-rpc' without the argument --wallet-file and with the argument --wallet-dir.
+        """
+
+        self._backend.close_current_wallet()
+        
+        self.accounts.clear() 
+
+    def create_wallet(self, filename, password=''):
+        """
+        Creates a new wallet with the 'filename' argument as a name of the wallet file
+        within the directory you specified with the argument --wallet-dir.
+        Specify the password if needed.
+        """
+        if password == '':
+            self._backend.create_new_wallet(filename)
+        else:
+            self._backend.create_new_wallet(filename, password)
+
+        self.refresh()
+            
     def spend_key(self):
         """
         Returns private spend key. None if wallet is view-only.

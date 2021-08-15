@@ -5,6 +5,7 @@ import json
 import logging
 import operator
 import requests
+import re
 
 from ... import exceptions
 from ...account import Account
@@ -317,6 +318,19 @@ class JSONRPCWallet(object):
                     "Method '{method}' failed with RPC Error of unknown code {code}, "
                     "message: {message}".format(method=method, data=data, result=result, **err))
         return result['result']
+    
+    def open_wallet(self, filename, password=''):
+        params = {'filename': filename, 'password': password}
+
+        return self.raw_request('open_wallet', params=params)
+     
+    def create_new_wallet(self, filename, password=''):
+        params = {'filename': filename, 'password': password, 'language': "English"}
+ 
+        return self.raw_request('create_wallet', params=params)
+
+    def close_current_wallet(self):
+        return self.raw_request('close_wallet')
 
 _err2exc = {
     -2: exceptions.WrongAddress,
