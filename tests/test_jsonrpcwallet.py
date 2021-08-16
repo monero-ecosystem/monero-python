@@ -36,14 +36,22 @@ class JSONRPCWalletTestCase(JSONTestCase):
                 'total_balance': 236153709446071,
                 'total_unlocked_balance': 236153709446071}}
 
-    def test_open_wallet(self):
+    def test_create_wallet(self):
         self.wallet = Wallet(JSONRPCWallet(), wallet_open=False)
-        
-        self.wallet.open_wallet('ReuseIt', 'hahaha')
+
+        self.wallet.create_wallet('test_wallet_for_monero_python')
 
         accounts = self.wallet.accounts
         
-        self.assertEqual(type(self.wallet._backend), JSONRPCWallet)
+        self.assertEqual(len(accounts), 1)
+        
+    def test_open_wallet(self):
+        self.wallet = Wallet(JSONRPCWallet(), wallet_open=False)
+        
+        self.wallet.open_wallet('test_wallet_for_open_wallet_function')
+
+        accounts = self.wallet.accounts
+        
         self.assertNotEqual(len(accounts), 0)
 
     @patch('monero.backends.jsonrpc.wallet.requests.post')

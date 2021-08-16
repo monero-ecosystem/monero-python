@@ -86,8 +86,10 @@ class Wallet(object):
     def close_wallet(self):
         """
         Saves and closes the wallet and clears the 'accounts' variable of a list type.
-        If you happened to launch the 'monero-wallet-rpc' with the argument --wallet-file, 
-        you have to restart 'monero-wallet-rpc' without the argument --wallet-file and with the argument --wallet-dir.
+        
+        ** Starting a new wallet after this function may require the restart of the 'monero-wallet-rpc'
+        if you didn't specify the argument '--wallet-dir' at the beginning. **
+
         """
 
         self._backend.close_current_wallet()
