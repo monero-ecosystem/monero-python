@@ -80,6 +80,9 @@ class Wallet(object):
             self._backend.open_wallet(filename)
         else:
             self._backend.open_wallet(filename, password)
+
+        if type(self.accounts) is list:
+            self.accounts.clear()
         
         self.refresh()
 
@@ -106,6 +109,9 @@ class Wallet(object):
             self._backend.create_new_wallet(filename)
         else:
             self._backend.create_new_wallet(filename, password)
+        
+        if type(self.accounts) is list:
+            self.accounts.clear()
 
         self.refresh()
             
