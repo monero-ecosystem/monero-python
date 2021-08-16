@@ -10,6 +10,15 @@ class NoDaemonConnection(BackendException):
 class DaemonIsBusy(BackendException):
     pass
 
+class UnknownError(MoneroException):
+    pass
+
+class WalletNotOpen(MoneroException):
+    pass
+
+class WalletAlreadyExists(MoneroException):
+    pass
+
 class AccountException(MoneroException):
     pass
 

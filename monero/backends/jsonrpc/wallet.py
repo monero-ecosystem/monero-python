@@ -333,16 +333,19 @@ class JSONRPCWallet(object):
     
 
 _err2exc = {
+    -1: exceptions.UnknownError,
     -2: exceptions.WrongAddress,
     -4: exceptions.GenericTransferError,
     -5: exceptions.WrongPaymentId,
     -8: exceptions.TransactionNotFound,
     -9: exceptions.SignatureCheckFailed,
+    -13: exceptions.WalletNotOpen,
     -14: exceptions.AccountIndexOutOfBound,
     -15: exceptions.AddressIndexOutOfBound,
     -16: exceptions.TransactionNotPossible,
     -17: exceptions.NotEnoughMoney,
     -20: exceptions.AmountIsZero,
+    -21: exceptions.WalletAlreadyExists,
     -29: exceptions.WalletIsWatchOnly,
     -37: exceptions.NotEnoughUnlockedMoney,
     -38: exceptions.NoDaemonConnection,
