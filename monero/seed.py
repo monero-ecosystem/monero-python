@@ -37,10 +37,10 @@
 
 from binascii import hexlify, unhexlify
 from os import urandom
-from sha3 import keccak_256
 import warnings
 from . import base58, const, ed25519, wordlists
 from .address import address
+from .keccak import keccak_256
 
 class Seed(object):
     """Creates a seed object either from local system randomness or an imported phrase.
@@ -124,9 +124,7 @@ class Seed(object):
         return self.hex
 
     def _hex_seed_keccak(self):
-        h = keccak_256()
-        h.update(unhexlify(self.hex))
-        return h.digest()
+        return keccak_256(unhexlify(self.hex)).digest()
 
     def secret_spend_key(self):
         a = self._hex_seed_keccak() if self.is_mymonero() else unhexlify(self.hex)
@@ -134,9 +132,7 @@ class Seed(object):
 
     def secret_view_key(self):
         b = self._hex_seed_keccak() if self.is_mymonero() else unhexlify(self.secret_spend_key())
-        h = keccak_256()
-        h.update(b)
-        return self.sc_reduce(h.digest())
+        return self.sc_reduce(keccak_256(b).digest())
 
     def public_spend_key(self):
         if self._ed_pub_spend_key:
@@ -164,9 +160,7 @@ class Seed(object):
                 "Invalid net argument '{:s}'. Must be one of monero.const.NET_*".format(net))
         netbyte = (18, 53, 24)[const.NETS.index(net)]
         data = "{:x}{:s}{:s}".format(netbyte, self.public_spend_key(), self.public_view_key())
-        h = keccak_256()
-        h.update(unhexlify(data))
-        checksum = h.hexdigest()
+        checksum = keccak_256(unhexlify(data)).hexdigest()
         return address(base58.encode(data + checksum[0:8]))
 
 

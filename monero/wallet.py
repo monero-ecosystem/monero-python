@@ -1,5 +1,4 @@
 from binascii import hexlify, unhexlify
-from sha3 import keccak_256
 import struct
 
 from . import address
@@ -9,6 +8,7 @@ from . import const
 from . import ed25519
 from . import numbers
 from .transaction import Payment, PaymentManager
+from .keccak import keccak_256
 
 class Wallet(object):
     """

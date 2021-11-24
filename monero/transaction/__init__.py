@@ -2,7 +2,6 @@ import binascii
 import itertools
 import operator
 import re
-import sha3
 import six
 import struct
 import varint
@@ -12,6 +11,7 @@ from ..numbers import from_atomic, PaymentID
 from .. import ed25519
 from .. import exceptions
 from .extra import ExtraParser
+from ..keccak import keccak_256
 
 class Payment(object):
     """
@@ -138,7 +138,7 @@ class Transaction(object):
                         varint.encode(idx),
                     ]
                 )
-                Hs_ur = sha3.keccak_256(hsdata).digest()
+                Hs_ur = keccak_256(hsdata).digest()
 
                 # sc_reduce32:
                 Hsint_ur = ed25519.decodeint(Hs_ur)
@@ -159,7 +159,7 @@ class Transaction(object):
                         timestamp=self.timestamp,
                         transaction=self,
                         local_address=addr)
-                amount_hs = sha3.keccak_256(b"amount" + Hs).digest()
+                amount_hs = keccak_256(b"amount" + Hs).digest()
                 xormask = amount_hs[:len(encamount)]
                 dec_amount = bytearray(a ^ b for a, b in zip(*map(bytearray, (encamount, xormask))))
                 int_amount = struct.unpack("<Q", dec_amount)[0]

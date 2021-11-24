@@ -1,6 +1,5 @@
 from binascii import hexlify, unhexlify
 import re
-from sha3 import keccak_256
 import six
 import struct
 import warnings
@@ -9,6 +8,7 @@ from . import base58
 from . import const
 from . import ed25519
 from . import numbers
+from .keccak import keccak_256
 
 _ADDR_REGEX = re.compile(r'^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{95}$')
 _IADDR_REGEX = re.compile(r'^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{106}$')
