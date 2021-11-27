@@ -42,6 +42,7 @@ import warnings
 from . import base58, const, ed25519, wordlists
 from .address import address
 
+
 class Seed(object):
     """Creates a seed object either from local system randomness or an imported phrase.
 
@@ -55,8 +56,8 @@ class Seed(object):
 
         :rtype: :class:`Seed <monero.seed.Seed>`
         """
-        self.phrase = "" #13 or 25 word mnemonic word string
-        self.hex = "" # hexadecimal
+        self.phrase = ""  # 13 or 25 word mnemonic word string
+        self.hex = ""  # hexadecimal
 
         self.word_list = wordlists.get_wordlist(wordlist)
 
@@ -82,11 +83,15 @@ class Seed(object):
             elif len(seed_split) == 1:
                 # single string, probably hex, but confirm
                 if not len(phrase_or_hex) % 8 == 0:
-                    raise ValueError("Not valid hexadecimal: {hex}".format(hex=phrase_or_hex))
+                    raise ValueError(
+                        "Not valid hexadecimal: {hex}".format(hex=phrase_or_hex)
+                    )
                 self.hex = phrase_or_hex
                 self._encode_seed()
             else:
-                raise ValueError("Not valid mnemonic phrase or hex: {arg}".format(arg=phrase_or_hex))
+                raise ValueError(
+                    "Not valid mnemonic phrase or hex: {arg}".format(arg=phrase_or_hex)
+                )
         else:
             self.hex = generate_hex()
             self._encode_seed()
@@ -96,13 +101,11 @@ class Seed(object):
         return len(self.hex) == 32
 
     def _encode_seed(self):
-        """Convert hexadecimal string to mnemonic word representation with checksum.
-        """
+        """Convert hexadecimal string to mnemonic word representation with checksum."""
         self.phrase = self.word_list.encode(self.hex)
 
     def _decode_seed(self):
-        """Calculate hexadecimal representation of the phrase.
-        """
+        """Calculate hexadecimal representation of the phrase."""
         self.hex = self.word_list.decode(self.phrase)
 
     def _validate_checksum(self):
@@ -133,7 +136,11 @@ class Seed(object):
         return self.sc_reduce(a)
 
     def secret_view_key(self):
-        b = self._hex_seed_keccak() if self.is_mymonero() else unhexlify(self.secret_spend_key())
+        b = (
+            self._hex_seed_keccak()
+            if self.is_mymonero()
+            else unhexlify(self.secret_spend_key())
+        )
         h = keccak_256()
         h.update(b)
         return self.sc_reduce(h.digest())
@@ -158,12 +165,17 @@ class Seed(object):
         :rtype: :class:`Address <monero.address.Address>`
         """
         # backward compatibility
-        _net = net[:-3] if net.endswith('net') else net
+        _net = net[:-3] if net.endswith("net") else net
         if net not in const.NETS:
             raise ValueError(
-                "Invalid net argument '{:s}'. Must be one of monero.const.NET_*".format(net))
+                "Invalid net argument '{:s}'. Must be one of monero.const.NET_*".format(
+                    net
+                )
+            )
         netbyte = (18, 53, 24)[const.NETS.index(net)]
-        data = "{:x}{:s}{:s}".format(netbyte, self.public_spend_key(), self.public_view_key())
+        data = "{:x}{:s}{:s}".format(
+            netbyte, self.public_spend_key(), self.public_view_key()
+        )
         h = keccak_256()
         h.update(unhexlify(data))
         checksum = h.hexdigest()

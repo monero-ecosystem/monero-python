@@ -13,6 +13,7 @@ from .. import ed25519
 from .. import exceptions
 from .extra import ExtraParser
 
+
 class Payment(object):
     """
     A payment base class, representing payment not associated with any
@@ -21,28 +22,35 @@ class Payment(object):
     This class is not intended to be turned into objects by the user,
     it is used by backends.
     """
+
     payment_id = None
     amount = None
     timestamp = None
     transaction = None
     local_address = None
-    note = ''
+    note = ""
 
     _reprstr = "{} @ {} {:.12f} id={}"
 
     def __init__(self, **kwargs):
-        self.amount = kwargs.pop('amount', self.amount)
-        self.timestamp = kwargs.pop('timestamp', self.timestamp)
-        self.payment_id = kwargs.pop('payment_id', self.payment_id)
-        self.transaction = kwargs.pop('transaction', self.transaction)
-        self.local_address = kwargs.pop('local_address', self.local_address)
-        self.note = kwargs.pop('note', self.note)
+        self.amount = kwargs.pop("amount", self.amount)
+        self.timestamp = kwargs.pop("timestamp", self.timestamp)
+        self.payment_id = kwargs.pop("payment_id", self.payment_id)
+        self.transaction = kwargs.pop("transaction", self.transaction)
+        self.local_address = kwargs.pop("local_address", self.local_address)
+        self.note = kwargs.pop("note", self.note)
         if len(kwargs):
-            raise ValueError("Excessive arguments for {}: {}".format(type(self), kwargs))
+            raise ValueError(
+                "Excessive arguments for {}: {}".format(type(self), kwargs)
+            )
 
     def __repr__(self):
         return self._reprstr.format(
-            self.transaction.hash, self.transaction.height or 'pool', self.amount, self.payment_id)
+            self.transaction.hash,
+            self.transaction.height or "pool",
+            self.amount,
+            self.payment_id,
+        )
 
 
 class IncomingPayment(Payment):
@@ -50,6 +58,7 @@ class IncomingPayment(Payment):
     An incoming payment (one that increases the balance of an
     :class:`Account <monero.account.Account>`)
     """
+
     _reprstr = "in: {} @ {} {:.12f} id={}"
 
 
@@ -58,10 +67,11 @@ class OutgoingPayment(Payment):
     An outgoing payment (one that decreases the balance of an
     :class:`Account <monero.account.Account>`)
     """
+
     destinations = None
 
     def __init__(self, **kwargs):
-        self.destinations = kwargs.pop('destinations', [])
+        self.destinations = kwargs.pop("destinations", [])
         super(OutgoingPayment, self).__init__(**kwargs)
 
     _reprstr = "out: {} @ {} {:.12f} id={}"
@@ -75,6 +85,7 @@ class Transaction(object):
     This class is not intended to be turned into objects by the user,
     it is used by backends.
     """
+
     hash = None
     fee = None
     height = None
@@ -90,29 +101,31 @@ class Transaction(object):
     @property
     def is_coinbase(self):
         if self.json:
-            return "gen" in self.json['vin'][0]
+            return "gen" in self.json["vin"][0]
         raise exceptions.TransactionWithoutJSON(
             "Tx {:s} has no .json attribute and it cannot be determined "
-            "if it's coinbase tx.".format(self.hash))
+            "if it's coinbase tx.".format(self.hash)
+        )
 
     @property
     def size(self):
         if not self.blob:
             raise exceptions.TransactionWithoutBlob(
                 "Transaction has no blob, hence the size cannot be determined. "
-                "Perhaps the backend prunes transaction data?")
+                "Perhaps the backend prunes transaction data?"
+            )
         return len(self.blob)
 
     def __init__(self, **kwargs):
-        self.hash = kwargs.get('hash', self.hash)
-        self.fee = kwargs.get('fee', self.fee)
-        self.height = kwargs.get('height', self.height)
-        self.timestamp = kwargs.get('timestamp', self.timestamp)
-        self.key = kwargs.get('key', self.key)
-        self.blob = kwargs.get('blob', self.blob)
-        self.confirmations = kwargs.get('confirmations', self.confirmations)
-        self.output_indices = kwargs.get('output_indices', self.output_indices)
-        self.json = kwargs.get('json', self.json)
+        self.hash = kwargs.get("hash", self.hash)
+        self.fee = kwargs.get("fee", self.fee)
+        self.height = kwargs.get("height", self.height)
+        self.timestamp = kwargs.get("timestamp", self.timestamp)
+        self.key = kwargs.get("key", self.key)
+        self.blob = kwargs.get("blob", self.blob)
+        self.confirmations = kwargs.get("confirmations", self.confirmations)
+        self.output_indices = kwargs.get("output_indices", self.output_indices)
+        self.json = kwargs.get("json", self.json)
         self.pubkeys = self.pubkeys or []
         if self.json:
             if "rct_signatures" in self.json:
@@ -126,6 +139,7 @@ class Transaction(object):
         for outputs directed to the wallet, provided that matching subaddresses have been
         already generated.
         """
+
         def _scan_pubkeys(svk, psk, stealth_address, amount, encamount):
             for keyidx, tx_key in enumerate(self.pubkeys):
                 hsdata = b"".join(
@@ -147,7 +161,8 @@ class Transaction(object):
 
                 k = ed25519.encodepoint(
                     ed25519.edwards_add(
-                        ed25519.scalarmult_B(Hsint), ed25519.decodepoint(psk),
+                        ed25519.scalarmult_B(Hsint),
+                        ed25519.decodepoint(psk),
                     )
                 )
                 if k != stealth_address:
@@ -158,22 +173,26 @@ class Transaction(object):
                         amount=amount,
                         timestamp=self.timestamp,
                         transaction=self,
-                        local_address=addr)
+                        local_address=addr,
+                    )
                 amount_hs = sha3.keccak_256(b"amount" + Hs).digest()
-                xormask = amount_hs[:len(encamount)]
-                dec_amount = bytearray(a ^ b for a, b in zip(*map(bytearray, (encamount, xormask))))
+                xormask = amount_hs[: len(encamount)]
+                dec_amount = bytearray(
+                    a ^ b for a, b in zip(*map(bytearray, (encamount, xormask)))
+                )
                 int_amount = struct.unpack("<Q", dec_amount)[0]
                 amount = from_atomic(int_amount)
                 return Payment(
-                        amount=amount,
-                        timestamp=self.timestamp,
-                        transaction=self,
-                        local_address=addr)
-
+                    amount=amount,
+                    timestamp=self.timestamp,
+                    transaction=self,
+                    local_address=addr,
+                )
 
         if not self.json:
             raise exceptions.TransactionWithoutJSON(
-                'Tx {:s} has no .json attribute'.format(self.hash))
+                "Tx {:s} has no .json attribute".format(self.hash)
+            )
 
         if wallet:
             ep = ExtraParser(self.json["extra"])
@@ -182,29 +201,41 @@ class Transaction(object):
             svk = binascii.unhexlify(wallet.view_key())
             # fetch before loop to save on calls; cast to list to preserve over multiple iterations
             addresses = list(
-                itertools.chain(*map(operator.methodcaller("addresses"), wallet.accounts)))
+                itertools.chain(
+                    *map(operator.methodcaller("addresses"), wallet.accounts)
+                )
+            )
         outs = []
-        for idx, vout in enumerate(self.json['vout']):
-            stealth_address = binascii.unhexlify(vout['target']['key'])
+        for idx, vout in enumerate(self.json["vout"]):
+            stealth_address = binascii.unhexlify(vout["target"]["key"])
             encamount = None
             if self.version == 2 and not self.is_coinbase:
                 encamount = binascii.unhexlify(
                     self.json["rct_signatures"]["ecdhInfo"][idx]["amount"]
                 )
             payment = None
-            amount = from_atomic(vout['amount']) if self.version == 1 or self.is_coinbase else None
+            amount = (
+                from_atomic(vout["amount"])
+                if self.version == 1 or self.is_coinbase
+                else None
+            )
             if wallet:
                 for addridx, addr in enumerate(addresses):
                     psk = binascii.unhexlify(addr.spend_key())
-                    payment = _scan_pubkeys(svk, psk, stealth_address, amount, encamount)
+                    payment = _scan_pubkeys(
+                        svk, psk, stealth_address, amount, encamount
+                    )
                     if payment:
                         break
-            outs.append(Output(
-                stealth_address=vout['target']['key'],
-                amount=payment.amount if payment else amount,
-                index=self.output_indices[idx] if self.output_indices else None,
-                transaction=self,
-                payment=payment))
+            outs.append(
+                Output(
+                    stealth_address=vout["target"]["key"],
+                    amount=payment.amount if payment else amount,
+                    index=self.output_indices[idx] if self.output_indices else None,
+                    transaction=self,
+                    payment=payment,
+                )
+            )
         return outs
 
     def __repr__(self):
@@ -220,6 +251,7 @@ class Output(object):
     This class is not intended to be turned into objects by the user,
     it is used by backends.
     """
+
     stealth_address = None
     amount = None
     index = None
@@ -227,22 +259,23 @@ class Output(object):
     payment = None
 
     def __init__(self, **kwargs):
-        self.stealth_address = kwargs.get('stealth_address', self.stealth_address)
-        self.amount = kwargs.get('amount', self.amount)
-        self.index = kwargs.get('index', self.index)
-        self.transaction = kwargs.get('transaction', self.transaction)
-        self.payment = kwargs.get('payment', self.payment)
+        self.stealth_address = kwargs.get("stealth_address", self.stealth_address)
+        self.amount = kwargs.get("amount", self.amount)
+        self.index = kwargs.get("index", self.index)
+        self.transaction = kwargs.get("transaction", self.transaction)
+        self.payment = kwargs.get("payment", self.payment)
 
     def __repr__(self):
         # Try to represent output as (index, amount) pair if applicable because there is no RPC
-        # daemon command to lookup outputs by their stealth_address ;( 
+        # daemon command to lookup outputs by their stealth_address ;(
         if self.stealth_address:
             res = self.stealth_address
         else:
             res = "(index={},amount={})".format(self.index, self.amount)
         if self.payment:
             return "{:s}, {:.12f} to [{:s}]".format(
-                res, self.payment.amount, str(self.payment.local_address)[:6])
+                res, self.payment.amount, str(self.payment.local_address)[:6]
+            )
         return res
 
     def __eq__(self, other):
@@ -252,10 +285,12 @@ class Output(object):
         elif None not in (self.index, other.index, self.amount, other.amount):
             return self.index == other.index and self.amount == other.amount
         else:
-            raise TypeError('Given one-time outputs (%r,%r) are not comparable'.format(self, other))
+            raise TypeError(
+                "Given one-time outputs (%r,%r) are not comparable".format(self, other)
+            )
 
     def __ne__(self, other):
-        return not(self == other)
+        return not (self == other)
 
 
 class PaymentManager(object):
@@ -266,6 +301,7 @@ class PaymentManager(object):
     This class is not intended to be turned into objects by the user,
     it is used by backends.
     """
+
     account_idx = 0
     backend = None
 
@@ -275,14 +311,20 @@ class PaymentManager(object):
         self.direction = direction
 
     def __call__(self, **filterparams):
-        fetch = self.backend.transfers_in if self.direction == 'in' else self.backend.transfers_out
+        fetch = (
+            self.backend.transfers_in
+            if self.direction == "in"
+            else self.backend.transfers_out
+        )
         return fetch(self.account_idx, PaymentFilter(**filterparams))
 
 
 def _validate_tx_id(txid):
-    if not bool(re.compile('^[0-9a-f]{64}$').match(txid)):
-        raise ValueError("Transaction ID must be a 64-character hexadecimal string, not "
-            "'{}'".format(txid))
+    if not bool(re.compile("^[0-9a-f]{64}$").match(txid)):
+        raise ValueError(
+            "Transaction ID must be a 64-character hexadecimal string, not "
+            "'{}'".format(txid)
+        )
     return txid
 
 
@@ -292,8 +334,10 @@ class _ByHeight(object):
 
     **WARNING:** Integer sorting is reversed here.
     """
+
     def __init__(self, pmt):
         self.pmt = pmt
+
     def _cmp(self, other):
         sh = self.pmt.transaction.height
         oh = other.pmt.transaction.height
@@ -304,16 +348,22 @@ class _ByHeight(object):
         if oh is None:
             return -1
         return (sh > oh) - (sh < oh)
+
     def __lt__(self, other):
         return self._cmp(other) > 0
+
     def __le__(self, other):
         return self._cmp(other) >= 0
+
     def __eq__(self, other):
         return self._cmp(other) == 0
+
     def __ge__(self, other):
         return self._cmp(other) <= 0
+
     def __gt__(self, other):
         return self._cmp(other) < 0
+
     def __ne__(self, other):
         return self._cmp(other) != 0
 
@@ -325,27 +375,35 @@ class PaymentFilter(object):
     This class is not intended to be turned into objects by the user,
     it is used by backends.
     """
+
     def __init__(self, **filterparams):
-        self.min_height = filterparams.pop('min_height', None)
-        self.max_height = filterparams.pop('max_height', None)
-        self.unconfirmed = filterparams.pop('unconfirmed', False)
-        self.confirmed = filterparams.pop('confirmed', True)
-        _local_address = filterparams.pop('local_address', None)
-        _tx_id = filterparams.pop('tx_id', None)
-        _payment_id = filterparams.pop('payment_id', None)
+        self.min_height = filterparams.pop("min_height", None)
+        self.max_height = filterparams.pop("max_height", None)
+        self.unconfirmed = filterparams.pop("unconfirmed", False)
+        self.confirmed = filterparams.pop("confirmed", True)
+        _local_address = filterparams.pop("local_address", None)
+        _tx_id = filterparams.pop("tx_id", None)
+        _payment_id = filterparams.pop("payment_id", None)
         if len(filterparams) > 0:
-            raise ValueError("Excessive arguments for payment query: {}".format(filterparams))
-        if self.unconfirmed and (self.min_height is not None or self.max_height is not None):
-            warnings.warn("Height filtering (min_height/max_height) has been requested while "
-                    "also asking for unconfirmed transactions. These are mutually exclusive. "
-                    "As mempool transactions have no height at all, they will be excluded "
-                    "from the result.",
-                    RuntimeWarning)
+            raise ValueError(
+                "Excessive arguments for payment query: {}".format(filterparams)
+            )
+        if self.unconfirmed and (
+            self.min_height is not None or self.max_height is not None
+        ):
+            warnings.warn(
+                "Height filtering (min_height/max_height) has been requested while "
+                "also asking for unconfirmed transactions. These are mutually exclusive. "
+                "As mempool transactions have no height at all, they will be excluded "
+                "from the result.",
+                RuntimeWarning,
+            )
         if _local_address is None:
             self.local_addresses = []
         else:
-            if isinstance(_local_address, six.string_types) \
-                or isinstance(_local_address, six.text_type):
+            if isinstance(_local_address, six.string_types) or isinstance(
+                _local_address, six.text_type
+            ):
                 local_addresses = [_local_address]
             else:
                 try:
@@ -357,7 +415,9 @@ class PaymentFilter(object):
         if _tx_id is None:
             self.tx_ids = []
         else:
-            if isinstance(_tx_id, six.string_types) or isinstance(_tx_id, six.text_type):
+            if isinstance(_tx_id, six.string_types) or isinstance(
+                _tx_id, six.text_type
+            ):
                 tx_ids = [_tx_id]
             else:
                 try:
@@ -369,7 +429,9 @@ class PaymentFilter(object):
         if _payment_id is None:
             self.payment_ids = []
         else:
-            if isinstance(_payment_id, six.string_types) or isinstance(_payment_id, six.text_type):
+            if isinstance(_payment_id, six.string_types) or isinstance(
+                _payment_id, six.text_type
+            ):
                 payment_ids = [_payment_id]
             else:
                 try:
@@ -403,6 +465,4 @@ class PaymentFilter(object):
         return True
 
     def filter(self, payments):
-        return sorted(
-            filter(self.check, payments),
-            key=_ByHeight)
+        return sorted(filter(self.check, payments), key=_ByHeight)

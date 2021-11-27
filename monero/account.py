@@ -15,6 +15,7 @@ class Account(object):
     :param index: the account's index within the wallet
     :param label: optional account label as `str`
     """
+
     index = None
     wallet = None
     label = None
@@ -23,8 +24,8 @@ class Account(object):
         self.index = index
         self.label = label
         self._backend = backend
-        self.incoming = PaymentManager(index, backend, 'in')
-        self.outgoing = PaymentManager(index, backend, 'out')
+        self.incoming = PaymentManager(index, backend, "in")
+        self.outgoing = PaymentManager(index, backend, "out")
 
     def balances(self):
         """
@@ -69,9 +70,15 @@ class Account(object):
         """
         return self._backend.new_address(account=self.index, label=label)
 
-    def transfer(self, address, amount,
-            priority=const.PRIO_NORMAL, payment_id=None, unlock_time=0,
-            relay=True):
+    def transfer(
+        self,
+        address,
+        amount,
+        priority=const.PRIO_NORMAL,
+        payment_id=None,
+        unlock_time=0,
+        relay=True,
+    ):
         """
         Sends a transfer. Returns a list of resulting transactions.
 
@@ -95,11 +102,17 @@ class Account(object):
             payment_id,
             unlock_time,
             account=self.index,
-            relay=relay)
+            relay=relay,
+        )
 
-    def transfer_multiple(self, destinations,
-            priority=const.PRIO_NORMAL, payment_id=None, unlock_time=0,
-            relay=True):
+    def transfer_multiple(
+        self,
+        destinations,
+        priority=const.PRIO_NORMAL,
+        payment_id=None,
+        unlock_time=0,
+        relay=True,
+    ):
         """
         Sends a batch of transfers. Returns a list of resulting transactions.
 
@@ -124,10 +137,18 @@ class Account(object):
             payment_id,
             unlock_time,
             account=self.index,
-            relay=relay)
+            relay=relay,
+        )
 
-    def sweep_all(self, address, priority=const.PRIO_NORMAL, payment_id=None,
-            subaddr_indices=None, unlock_time=0, relay=True):
+    def sweep_all(
+        self,
+        address,
+        priority=const.PRIO_NORMAL,
+        payment_id=None,
+        subaddr_indices=None,
+        unlock_time=0,
+        relay=True,
+    ):
         """
         Sends all unlocked balance to an address. Returns a list of resulting transactions.
 
@@ -153,4 +174,5 @@ class Account(object):
             subaddr_indices,
             unlock_time,
             account=self.index,
-            relay=relay)
+            relay=relay,
+        )

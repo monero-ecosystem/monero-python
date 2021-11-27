@@ -1,5 +1,6 @@
 from ... import exceptions
 
+
 class RPCError(exceptions.BackendException):
     pass
 
@@ -11,5 +12,6 @@ class Unauthorized(RPCError):
 class MethodNotFound(RPCError):
     pass
 
+
 class RestrictedRPC(RPCError):
-	pass
+    pass

@@ -1690,5 +1690,5 @@ class English(Wordlist):
         "zodiac",
         "zombie",
         "zones",
-        "zoom"
+        "zoom",
     ]

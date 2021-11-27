@@ -59,6 +59,7 @@
 
 from .wordlist import Wordlist
 
+
 class Lojban(Wordlist):
     language_name = "Lojban"
     english_language_name = "Lojban"

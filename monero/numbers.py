@@ -1,20 +1,24 @@
 from decimal import Decimal
 import six
 
-PICONERO = Decimal('0.000000000001')
-EMPTY_KEY = '0' * 64
+PICONERO = Decimal("0.000000000001")
+EMPTY_KEY = "0" * 64
 
 
 def to_atomic(amount):
     """Convert Monero decimal to atomic integer of piconero."""
     if not isinstance(amount, (Decimal, float) + six.integer_types):
-        raise ValueError("Amount '{}' doesn't have numeric type. Only Decimal, int, long and "
-                "float (not recommended) are accepted as amounts.")
-    return int(amount * 10**12)
+        raise ValueError(
+            "Amount '{}' doesn't have numeric type. Only Decimal, int, long and "
+            "float (not recommended) are accepted as amounts."
+        )
+    return int(amount * 10 ** 12)
+
 
 def from_atomic(amount):
     """Convert atomic integer of piconero to Monero decimal."""
     return (Decimal(amount) * PICONERO).quantize(PICONERO)
+
 
 def as_monero(amount):
     """Return the amount rounded to maximal Monero precision."""
@@ -31,18 +35,25 @@ class PaymentID(object):
 
     :param payment_id: the payment ID as integer or hexadecimal string
     """
+
     _payment_id = None
 
     def __init__(self, payment_id):
         if isinstance(payment_id, PaymentID):
             payment_id = int(payment_id)
-        if isinstance(payment_id, six.text_type) or isinstance(payment_id, six.string_types):
+        if isinstance(payment_id, six.text_type) or isinstance(
+            payment_id, six.string_types
+        ):
             payment_id = int(payment_id, 16)
         elif not isinstance(payment_id, six.integer_types):
-            raise TypeError("payment_id must be either int or hexadecimal str or bytes, "
-                "is {0}".format(type(payment_id)))
+            raise TypeError(
+                "payment_id must be either int or hexadecimal str or bytes, "
+                "is {0}".format(type(payment_id))
+            )
         if payment_id.bit_length() > 256:
-            raise ValueError("payment_id {0} is more than 256 bits long".format(payment_id))
+            raise ValueError(
+                "payment_id {0} is more than 256 bits long".format(payment_id)
+            )
         self._payment_id = payment_id
 
     def is_short(self):

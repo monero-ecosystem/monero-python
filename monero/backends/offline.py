@@ -13,6 +13,7 @@ class OfflineWallet(object):
     """
     Offline backend for Monero wallet. Provides support for address generation.
     """
+
     _address = None
     _svk = None
     _ssk = EMPTY_KEY
@@ -43,7 +44,7 @@ class OfflineWallet(object):
     def addresses(self, account=0, addr_indices=None):
         if account == 0 and (addr_indices == [0] or addr_indices is None):
             return [self._address]
-        raise WalletIsOffline() # pragma: no cover (this should never happen)
+        raise WalletIsOffline()  # pragma: no cover (this should never happen)
 
     def new_address(self, account=0, label=None):
         raise WalletIsOffline()

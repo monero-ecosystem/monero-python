@@ -1689,5 +1689,5 @@ class Dutch(Wordlist):
         "zwepen",
         "zwiep",
         "zwijmel",
-        "zworen"
+        "zworen",
     ]

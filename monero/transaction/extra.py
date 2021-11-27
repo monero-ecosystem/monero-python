@@ -35,7 +35,7 @@ class ExtraParser(object):
         return extra
 
     def _pop_pubkey(self, extra):
-        key = bytes(bytearray(extra[:32]))      # bytearray() is for py2 compatibility
+        key = bytes(bytearray(extra[:32]))  # bytearray() is for py2 compatibility
         if len(key) < 32:
             raise ValueError(
                 "offset {:d}: only {:d} bytes of key data, expected 32".format(

@@ -10,6 +10,7 @@ from . import ed25519
 from . import numbers
 from .transaction import Payment, PaymentManager
 
+
 class Wallet(object):
     """
     Monero wallet.
@@ -29,15 +30,16 @@ class Wallet(object):
     :param \\**kwargs: arguments to initialize a :class:`JSONRPCWallet <monero.backends.jsonrpc.JSONRPCWallet>`
                         instance if no backend is given
     """
+
     accounts = None
 
     def __init__(self, backend=None, **kwargs):
         if backend and len(kwargs):
-            raise ValueError('backend already given, other arguments are extraneous')
+            raise ValueError("backend already given, other arguments are extraneous")
 
         self._backend = backend if backend else JSONRPCWallet(**kwargs)
-        self.incoming = PaymentManager(0, self._backend, 'in')
-        self.outgoing = PaymentManager(0, self._backend, 'out')
+        self.incoming = PaymentManager(0, self._backend, "in")
+        self.outgoing = PaymentManager(0, self._backend, "out")
         self.refresh()
 
     def refresh(self):
@@ -209,34 +211,47 @@ class Wallet(object):
         :rtype: :class:`BaseAddress <monero.address.BaseAddress>`
         """
         # ensure indexes are within uint32
-        if major < 0 or major >= 2**32:
-            raise ValueError('major index {} is outside uint32 range'.format(major))
-        if minor < 0 or minor >= 2**32:
-            raise ValueError('minor index {} is outside uint32 range'.format(minor))
+        if major < 0 or major >= 2 ** 32:
+            raise ValueError("major index {} is outside uint32 range".format(major))
+        if minor < 0 or minor >= 2 ** 32:
+            raise ValueError("minor index {} is outside uint32 range".format(minor))
         master_address = self.address()
         if major == minor == 0:
             return master_address
         master_svk = unhexlify(self.view_key())
         master_psk = unhexlify(self.address().spend_key())
         # m = Hs("SubAddr\0" || master_svk || major || minor)
-        hsdata = b''.join([
-                b'SubAddr\0', master_svk,
-                struct.pack('<I', major), struct.pack('<I', minor)])
+        hsdata = b"".join(
+            [
+                b"SubAddr\0",
+                master_svk,
+                struct.pack("<I", major),
+                struct.pack("<I", minor),
+            ]
+        )
         m = keccak_256(hsdata).digest()
         # D = master_psk + m * B
         D = ed25519.edwards_add(
-                ed25519.decodepoint(master_psk),
-                ed25519.scalarmult_B(ed25519.decodeint(m)))
+            ed25519.decodepoint(master_psk), ed25519.scalarmult_B(ed25519.decodeint(m))
+        )
         # C = master_svk * D
         C = ed25519.scalarmult(D, ed25519.decodeint(master_svk))
-        netbyte = bytearray([const.SUBADDR_NETBYTES[const.NETS.index(master_address.net)]])
+        netbyte = bytearray(
+            [const.SUBADDR_NETBYTES[const.NETS.index(master_address.net)]]
+        )
         data = netbyte + ed25519.encodepoint(D) + ed25519.encodepoint(C)
         checksum = keccak_256(data).digest()[:4]
         return address.SubAddress(base58.encode(hexlify(data + checksum)))
 
-    def transfer(self, address, amount,
-            priority=const.PRIO_NORMAL, payment_id=None, unlock_time=0,
-            relay=True):
+    def transfer(
+        self,
+        address,
+        amount,
+        priority=const.PRIO_NORMAL,
+        payment_id=None,
+        unlock_time=0,
+        relay=True,
+    ):
         """
         Sends a transfer from the default account. Returns a list of resulting transactions.
 
@@ -255,16 +270,22 @@ class Wallet(object):
         :rtype: list of :class:`Transaction <monero.transaction.Transaction>`
         """
         return self.accounts[0].transfer(
-                address,
-                amount,
-                priority=priority,
-                payment_id=payment_id,
-                unlock_time=unlock_time,
-                relay=relay)
+            address,
+            amount,
+            priority=priority,
+            payment_id=payment_id,
+            unlock_time=unlock_time,
+            relay=relay,
+        )
 
-    def transfer_multiple(self, destinations,
-            priority=const.PRIO_NORMAL, payment_id=None, unlock_time=0,
-            relay=True):
+    def transfer_multiple(
+        self,
+        destinations,
+        priority=const.PRIO_NORMAL,
+        payment_id=None,
+        unlock_time=0,
+        relay=True,
+    ):
         """
         Sends a batch of transfers from the default account. Returns a list of resulting
         transactions and amounts.
@@ -284,14 +305,22 @@ class Wallet(object):
                 [(:class:`Transaction <monero.transaction.Transaction>`, `Decimal`), ...]
         """
         return self.accounts[0].transfer_multiple(
-                destinations,
-                priority=priority,
-                payment_id=payment_id,
-                unlock_time=unlock_time,
-                relay=relay)
+            destinations,
+            priority=priority,
+            payment_id=payment_id,
+            unlock_time=unlock_time,
+            relay=relay,
+        )
 
-    def sweep_all(self, address, priority=const.PRIO_NORMAL, payment_id=None,
-            subaddr_indices=None, unlock_time=0, relay=True):
+    def sweep_all(
+        self,
+        address,
+        priority=const.PRIO_NORMAL,
+        payment_id=None,
+        subaddr_indices=None,
+        unlock_time=0,
+        relay=True,
+    ):
         """
         Sends all unlocked balance from the default account to an address.
         Returns a list of resulting transactions.
@@ -317,4 +346,5 @@ class Wallet(object):
             payment_id=payment_id,
             subaddr_indices=subaddr_indices,
             unlock_time=unlock_time,
-            relay=relay)
+            relay=relay,
+        )
