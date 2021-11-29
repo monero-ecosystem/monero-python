@@ -134,7 +134,11 @@ class Seed(object):
         return self.sc_reduce(a)
 
     def secret_view_key(self):
-        b = self._hex_seed_keccak() if self.is_mymonero() else unhexlify(self.secret_spend_key())
+        b = (
+            self._hex_seed_keccak()
+            if self.is_mymonero()
+            else unhexlify(self.secret_spend_key())
+        )
         return self.sc_reduce(keccak_256(b).digest())
 
     def public_spend_key(self):
@@ -165,7 +169,9 @@ class Seed(object):
                 )
             )
         netbyte = (18, 53, 24)[const.NETS.index(net)]
-        data = "{:x}{:s}{:s}".format(netbyte, self.public_spend_key(), self.public_view_key())
+        data = "{:x}{:s}{:s}".format(
+            netbyte, self.public_spend_key(), self.public_view_key()
+        )
         checksum = keccak_256(unhexlify(data)).hexdigest()
         return address(base58.encode(data + checksum[0:8]))
 

@@ -173,10 +173,13 @@ class Transaction(object):
                         amount=amount,
                         timestamp=self.timestamp,
                         transaction=self,
-                        local_address=addr)
+                        local_address=addr,
+                    )
                 amount_hs = keccak_256(b"amount" + Hs).digest()
-                xormask = amount_hs[:len(encamount)]
-                dec_amount = bytearray(a ^ b for a, b in zip(*map(bytearray, (encamount, xormask))))
+                xormask = amount_hs[: len(encamount)]
+                dec_amount = bytearray(
+                    a ^ b for a, b in zip(*map(bytearray, (encamount, xormask)))
+                )
                 int_amount = struct.unpack("<Q", dec_amount)[0]
                 amount = from_atomic(int_amount)
                 return Payment(
