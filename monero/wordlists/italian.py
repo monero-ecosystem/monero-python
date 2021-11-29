@@ -1690,5 +1690,5 @@ class Italian(Wordlist):
         "zoccolo",
         "zolfo",
         "zombie",
-        "zucchero"
+        "zucchero",
     ]

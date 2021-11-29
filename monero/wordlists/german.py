@@ -59,6 +59,7 @@
 
 from .wordlist import Wordlist
 
+
 class German(Wordlist):
     language_name = "Deutsch"
     english_language_name = "German"
@@ -1689,5 +1690,5 @@ class German(Wordlist):
         u"Zugvogel",
         u"Zündung",
         u"Zweck",
-        u"Zyklop"
+        u"Zyklop",
     ]

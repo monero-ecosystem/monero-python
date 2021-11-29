@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+0.9
+---
+
+The hashing library ``sha3`` has been replaced by ``pycryptodomex`` which is a more actively
+maintained project. However, the code still may work with the old ``sha3`` module. Just ignore
+the new dependency and run as usual.
+
 0.8
 ---
 

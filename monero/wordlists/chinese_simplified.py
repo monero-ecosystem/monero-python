@@ -61,7 +61,7 @@ from .wordlist import Wordlist
 
 
 class ChineseSimplified(Wordlist):
-    language_name = u"简体中文 (中国)",
+    language_name = (u"简体中文 (中国)",)
     english_language_name = "Chinese (simplified)"
     unique_prefix_length = 1
     word_list = [
@@ -1690,5 +1690,5 @@ class ChineseSimplified(Wordlist):
         u"祝",
         u"秒",
         u"浙",
-        u"貌"
+        u"貌",
     ]

@@ -1690,5 +1690,5 @@ class Spanish(Wordlist):
         u"riqueza",
         u"risa",
         u"ritmo",
-        u"rito"
+        u"rito",
     ]

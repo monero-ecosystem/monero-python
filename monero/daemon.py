@@ -2,6 +2,7 @@ import six
 
 from .backends.jsonrpc import JSONRPCDaemon
 
+
 class Daemon(object):
     """Monero daemon.
 
@@ -11,9 +12,10 @@ class Daemon(object):
     :param \\**kwargs: arguments to initialize a :class:`JSONRPCDaemon <monero.backends.jsonrpc.JSONRPCDaemon>`
                         instance if no backend is given
     """
+
     def __init__(self, backend=None, **kwargs):
         if backend and len(kwargs):
-            raise ValueError('backend already given, other arguments are extraneous')
+            raise ValueError("backend already given, other arguments are extraneous")
 
         self._backend = backend if backend else JSONRPCDaemon(**kwargs)
 
@@ -35,7 +37,7 @@ class Daemon(object):
 
         :rtype: int
         """
-        return self._backend.info()['height']
+        return self._backend.info()["height"]
 
     def send_transaction(self, tx, relay=True):
         """
@@ -54,7 +56,6 @@ class Daemon(object):
         :rtype: list of :class:`Transaction <monero.transaction.Transaction>`
         """
         return self._backend.mempool()
-
 
     def headers(self, start_height, end_height=None):
         """

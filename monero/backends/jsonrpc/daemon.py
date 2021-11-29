@@ -43,27 +43,68 @@ class JSONRPCDaemon(object):
 
     _METHOD_NOT_FOUND_CODE = -32601
     _KNOWN_LOG_CATEGORIES = [
-        '*', 'default', 'net', 'net.http', 'net.p2p',
-        'logging', 'net.throttle', 'blockchain.db', 'blockchain.db.lmdb', 'bcutil',
-        'checkpoints', 'net.dns', 'net.dl', 'i18n', 'perf',
-        'stacktrace', 'updates', 'account', 'cn', 'difficulty',
-        'hardfork', 'miner', 'blockchain', 'txpool', 'cn.block_queue',
-        'net.cn', 'daemon', 'debugtools.deserialize', 'debugtools.objectsizes', 'device.ledger',
-        'wallet.gen_multisig', 'multisig', 'bulletproofs', 'ringct', 'daemon.rpc',
-        'wallet.simplewallet', 'WalletAPI', 'wallet.ringdb', 'wallet.wallet2', 'wallet.rpc'
-        'tests.core']
-    _KNOWN_LOG_LEVELS = ['FATAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG', 'TRACE']
+        "*",
+        "default",
+        "net",
+        "net.http",
+        "net.p2p",
+        "logging",
+        "net.throttle",
+        "blockchain.db",
+        "blockchain.db.lmdb",
+        "bcutil",
+        "checkpoints",
+        "net.dns",
+        "net.dl",
+        "i18n",
+        "perf",
+        "stacktrace",
+        "updates",
+        "account",
+        "cn",
+        "difficulty",
+        "hardfork",
+        "miner",
+        "blockchain",
+        "txpool",
+        "cn.block_queue",
+        "net.cn",
+        "daemon",
+        "debugtools.deserialize",
+        "debugtools.objectsizes",
+        "device.ledger",
+        "wallet.gen_multisig",
+        "multisig",
+        "bulletproofs",
+        "ringct",
+        "daemon.rpc",
+        "wallet.simplewallet",
+        "WalletAPI",
+        "wallet.ringdb",
+        "wallet.wallet2",
+        "wallet.rpc" "tests.core",
+    ]
+    _KNOWN_LOG_LEVELS = ["FATAL", "ERROR", "WARNING", "INFO", "DEBUG", "TRACE"]
 
     _net = None
     _restricted = None
 
-    def __init__(self, protocol='http', host='127.0.0.1', port=18081, path='/json_rpc',
-            user='', password='', timeout=30, verify_ssl_certs=True, proxy_url=None,
-            prune_transactions=True):
-        self.url = '{protocol}://{host}:{port}'.format(
-                protocol=protocol,
-                host=host,
-                port=port)
+    def __init__(
+        self,
+        protocol="http",
+        host="127.0.0.1",
+        port=18081,
+        path="/json_rpc",
+        user="",
+        password="",
+        timeout=30,
+        verify_ssl_certs=True,
+        proxy_url=None,
+        prune_transactions=True,
+    ):
+        self.url = "{protocol}://{host}:{port}".format(
+            protocol=protocol, host=host, port=port
+        )
         _log.debug("JSONRPC daemon backend URL: {url}".format(url=self.url))
         self.user = user
         self.password = password
@@ -73,7 +114,7 @@ class JSONRPCDaemon(object):
         self.prune_transactions = prune_transactions
 
     def info(self):
-        info = self.raw_jsonrpc_request('get_info')
+        info = self.raw_jsonrpc_request("get_info")
         self._set_net(info)
         return info
 
@@ -90,63 +131,72 @@ class JSONRPCDaemon(object):
         return self._restricted
 
     def send_transaction(self, blob, relay=True):
-        res = self.raw_request('/sendrawtransaction', {
-            'tx_as_hex': six.ensure_text(binascii.hexlify(blob)),
-            'do_not_relay': not relay})
-        if res['status'] == 'OK':
+        res = self.raw_request(
+            "/sendrawtransaction",
+            {
+                "tx_as_hex": six.ensure_text(binascii.hexlify(blob)),
+                "do_not_relay": not relay,
+            },
+        )
+        if res["status"] == "OK":
             return res
         raise exceptions.TransactionBroadcastError(
-                "{status}: {reason}".format(**res),
-                details=res)
+            "{status}: {reason}".format(**res), details=res
+        )
 
     def mempool(self):
-        res = self.raw_request('/get_transaction_pool', {})
+        res = self.raw_request("/get_transaction_pool", {})
         txs = []
-        for tx in res.get('transactions', []):
-            txs.append(Transaction(
-                hash=tx['id_hash'],
-                fee=from_atomic(tx['fee']),
-                timestamp=datetime.fromtimestamp(tx['receive_time']),
-                blob=binascii.unhexlify(tx['tx_blob']),
-                json=json.loads(tx['tx_json']),
-                confirmations=0))
+        for tx in res.get("transactions", []):
+            txs.append(
+                Transaction(
+                    hash=tx["id_hash"],
+                    fee=from_atomic(tx["fee"]),
+                    timestamp=datetime.fromtimestamp(tx["receive_time"]),
+                    blob=binascii.unhexlify(tx["tx_blob"]),
+                    json=json.loads(tx["tx_json"]),
+                    confirmations=0,
+                )
+            )
         return txs
 
     def headers(self, start_height, end_height=None):
         end_height = end_height or start_height
-        res = self.raw_jsonrpc_request('get_block_headers_range', {
-                'start_height': start_height,
-                'end_height': end_height})
-        if res['status'] == 'OK':
-            return res['headers']
-        raise exceptions.BackendException(res['status'])
+        res = self.raw_jsonrpc_request(
+            "get_block_headers_range",
+            {"start_height": start_height, "end_height": end_height},
+        )
+        if res["status"] == "OK":
+            return res["headers"]
+        raise exceptions.BackendException(res["status"])
 
     def block(self, bhash=None, height=None):
         data = {}
         if bhash:
-            data['hash'] = bhash
+            data["hash"] = bhash
         if height:
-            data['height'] = height
-        res = self.raw_jsonrpc_request('get_block', data)
-        if res['status'] == 'OK':
-            bhdr = res['block_header']
-            sub_json = json.loads(res['json'])
+            data["height"] = height
+        res = self.raw_jsonrpc_request("get_block", data)
+        if res["status"] == "OK":
+            bhdr = res["block_header"]
+            sub_json = json.loads(res["json"])
             data = {
-                'blob': res['blob'],
-                'hash': bhdr['hash'],
-                'height': bhdr['height'],
-                'timestamp': datetime.fromtimestamp(bhdr['timestamp']),
-                'version': (bhdr['major_version'], bhdr['minor_version']),
-                'difficulty': bhdr['difficulty'],
-                'nonce': bhdr['nonce'],
-                'orphan': bhdr['orphan_status'],
-                'prev_hash': bhdr['prev_hash'],
-                'reward': from_atomic(bhdr['reward']),
-                'transactions': self.transactions(
-                    [bhdr['miner_tx_hash']] + sub_json['tx_hashes']),
+                "blob": res["blob"],
+                "hash": bhdr["hash"],
+                "height": bhdr["height"],
+                "timestamp": datetime.fromtimestamp(bhdr["timestamp"]),
+                "version": (bhdr["major_version"], bhdr["minor_version"]),
+                "difficulty": bhdr["difficulty"],
+                "nonce": bhdr["nonce"],
+                "orphan": bhdr["orphan_status"],
+                "prev_hash": bhdr["prev_hash"],
+                "reward": from_atomic(bhdr["reward"]),
+                "transactions": self.transactions(
+                    [bhdr["miner_tx_hash"]] + sub_json["tx_hashes"]
+                ),
             }
             return Block(**data)
-        raise exceptions.BackendException(res['status'])
+        raise exceptions.BackendException(res["status"])
 
     def transactions(self, hashes):
         """
@@ -159,75 +209,105 @@ class JSONRPCDaemon(object):
         while len(hashes):
             result.extend(
                 self._do_get_transactions(
-                    hashes[:RESTRICTED_MAX_TRANSACTIONS],
-                    prune=self.prune_transactions))
+                    hashes[:RESTRICTED_MAX_TRANSACTIONS], prune=self.prune_transactions
+                )
+            )
             hashes = hashes[RESTRICTED_MAX_TRANSACTIONS:]
         return result
 
     def raw_request(self, path, data=None):
-        hdr = {'Content-Type': 'application/json'}
-        _log.debug(u"Request: {path}\nData: {data}".format(
-            path=path,
-            data=json.dumps(data, indent=2, sort_keys=True)))
+        hdr = {"Content-Type": "application/json"}
+        _log.debug(
+            "Request: {path}\nData: {data}".format(
+                path=path, data=json.dumps(data, indent=2, sort_keys=True)
+            )
+        )
         auth = requests.auth.HTTPDigestAuth(self.user, self.password)
         rsp = requests.post(
-            self.url + path, headers=hdr, data=json.dumps(data) if data else None, auth=auth,
-            timeout=self.timeout, verify=self.verify_ssl_certs, proxies=self.proxies)
+            self.url + path,
+            headers=hdr,
+            data=json.dumps(data) if data else None,
+            auth=auth,
+            timeout=self.timeout,
+            verify=self.verify_ssl_certs,
+            proxies=self.proxies,
+        )
         if rsp.status_code != 200:
-            raise RPCError("Invalid HTTP status {code} for path {path}.".format(
-                code=rsp.status_code,
-                path=path))
+            raise RPCError(
+                "Invalid HTTP status {code} for path {path}.".format(
+                    code=rsp.status_code, path=path
+                )
+            )
         result = rsp.json()
         _ppresult = json.dumps(result, indent=2, sort_keys=True)
-        _log.debug(u"Result:\n{result}".format(result=_ppresult))
+        _log.debug("Result:\n{result}".format(result=_ppresult))
         return result
 
     def raw_jsonrpc_request(self, method, params=None):
-        hdr = {'Content-Type': 'application/json'}
-        data = {'jsonrpc': '2.0', 'id': 0, 'method': method, 'params': params or {}}
-        _log.debug(u"Method: {method}\nParams:\n{params}".format(
-            method=method,
-            params=json.dumps(params, indent=2, sort_keys=True)))
+        hdr = {"Content-Type": "application/json"}
+        data = {"jsonrpc": "2.0", "id": 0, "method": method, "params": params or {}}
+        _log.debug(
+            "Method: {method}\nParams:\n{params}".format(
+                method=method, params=json.dumps(params, indent=2, sort_keys=True)
+            )
+        )
         auth = requests.auth.HTTPDigestAuth(self.user, self.password)
         rsp = requests.post(
-            self.url + '/json_rpc', headers=hdr, data=json.dumps(data), auth=auth,
-            timeout=self.timeout, verify=self.verify_ssl_certs, proxies=self.proxies)
+            self.url + "/json_rpc",
+            headers=hdr,
+            data=json.dumps(data),
+            auth=auth,
+            timeout=self.timeout,
+            verify=self.verify_ssl_certs,
+            proxies=self.proxies,
+        )
 
         if rsp.status_code == 401:
             raise Unauthorized("401 Unauthorized. Invalid RPC user name or password.")
         elif rsp.status_code != 200:
-            raise RPCError("Invalid HTTP status {code} for method {method}.".format(
-                code=rsp.status_code,
-                method=method))
+            raise RPCError(
+                "Invalid HTTP status {code} for method {method}.".format(
+                    code=rsp.status_code, method=method
+                )
+            )
 
         try:
             result = rsp.json()
         except ValueError as e:
-            _log.error(u"Could not parse JSON response from '{url}' during method '{method}'. Response:\n{resp}".format(
-                url=self.url, method=method, resp=rsp.text))
-            raise RPCError("Daemon returned an unreadable JSON response. It may contain unparseable binary characters.")
+            _log.error(
+                "Could not parse JSON response from '{url}' during method '{method}'. Response:\n{resp}".format(
+                    url=self.url, method=method, resp=rsp.text
+                )
+            )
+            raise RPCError(
+                "Daemon returned an unreadable JSON response. It may contain unparseable binary characters."
+            )
 
         _ppresult = json.dumps(result, indent=2, sort_keys=True)
-        _log.debug(u"Result:\n{result}".format(result=_ppresult))
+        _log.debug("Result:\n{result}".format(result=_ppresult))
 
-        if 'error' in result:
-            err = result['error']
-            code = err['code']
-            msg = err['message']
+        if "error" in result:
+            err = result["error"]
+            code = err["code"]
+            msg = err["message"]
 
             if code == self._METHOD_NOT_FOUND_CODE:
                 raise MethodNotFound('Daemon method "{}" not found'.format(method))
 
-            _log.error(u"JSON RPC error:\n{result}".format(result=_ppresult))
+            _log.error("JSON RPC error:\n{result}".format(result=_ppresult))
             raise RPCError(
                 "Method '{method}' failed with RPC Error of unknown code {code}, "
-                "message: {msg}".format(method=method, data=data, result=result, code=code, msg=msg))
-        elif 'status' in result['result'] and result['result']['status'] == 'BUSY':
+                "message: {msg}".format(
+                    method=method, data=data, result=result, code=code, msg=msg
+                )
+            )
+        elif "status" in result["result"] and result["result"]["status"] == "BUSY":
             raise exceptions.DaemonIsBusy(
                 "In JSONRPC method '{method}': daemon at {url} is in BUSY mode. RPC command results will be unpredictable "
-                "until daemon is fully synced.".format(method=method, url=self.url))
+                "until daemon is fully synced.".format(method=method, url=self.url)
+            )
 
-        return result['result']
+        return result["result"]
 
     # JSON RPC Methods (https://www.getmonero.org/resources/developer-guides/daemon-rpc.html#json-rpc-methods)
 
@@ -242,7 +322,7 @@ class JSONRPCDaemon(object):
         }
         """
 
-        return self.raw_jsonrpc_request('get_block_count')
+        return self.raw_jsonrpc_request("get_block_count")
 
     def on_get_block_hash(self, height):
         """
@@ -256,9 +336,9 @@ class JSONRPCDaemon(object):
         height = int(height)
 
         if height < 0:
-            raise ValueError('height < 0')
+            raise ValueError("height < 0")
 
-        return self.raw_jsonrpc_request('on_get_block_hash', params=[height])
+        return self.raw_jsonrpc_request("on_get_block_hash", params=[height])
 
     def get_block_template(self, wallet_address, reserve_size):
         """
@@ -288,14 +368,15 @@ class JSONRPCDaemon(object):
         try:
             address.address(wallet_address)
         except ValueError:
-            raise ValueError('wallet_address is not in a recognized address form')
+            raise ValueError("wallet_address is not in a recognized address form")
 
         if reserve_size not in range(128):
-            raise ValueError('reserve_size {} is out of bounds'.format(reserve_size))
+            raise ValueError("reserve_size {} is out of bounds".format(reserve_size))
 
-        return self.raw_jsonrpc_request('get_block_template', params={
-            'wallet_address': wallet_address,
-            'reserve_size': reserve_size})
+        return self.raw_jsonrpc_request(
+            "get_block_template",
+            params={"wallet_address": wallet_address, "reserve_size": reserve_size},
+        )
 
     def submit_block(self, blobs):
         """
@@ -312,9 +393,14 @@ class JSONRPCDaemon(object):
         if isinstance(blobs, (six.binary_type,) + six.string_types):
             blobs = [blobs]
 
-        blobs = [binascii.hexlify(b).decode() if isinstance(b, six.binary_type) else six.ensure_text(b) for b in blobs]
+        blobs = [
+            binascii.hexlify(b).decode()
+            if isinstance(b, six.binary_type)
+            else six.ensure_text(b)
+            for b in blobs
+        ]
 
-        return self.raw_jsonrpc_request('submit_block', params=blobs)
+        return self.raw_jsonrpc_request("submit_block", params=blobs)
 
     def get_last_block_header(self):
         """
@@ -342,7 +428,7 @@ class JSONRPCDaemon(object):
         }
         """
 
-        return self.raw_jsonrpc_request('get_last_block_header')
+        return self.raw_jsonrpc_request("get_last_block_header")
 
     def get_block_header_by_hash(self, blk_hash):
         """
@@ -375,7 +461,9 @@ class JSONRPCDaemon(object):
         if not self._is_valid_256_hex(blk_hash):
             raise ValueError('blk_hash "{}" is not a valid hash'.format(blk_hash))
 
-        return self.raw_jsonrpc_request('get_block_header_by_hash', params={'hash': blk_hash})
+        return self.raw_jsonrpc_request(
+            "get_block_header_by_hash", params={"hash": blk_hash}
+        )
 
     def get_block_header_by_height(self, height):
         """
@@ -406,9 +494,11 @@ class JSONRPCDaemon(object):
         """
 
         if height < 0:
-            raise ValueError('height < 0')
+            raise ValueError("height < 0")
 
-        return self.raw_jsonrpc_request('get_block_header_by_height', params={'height': height})
+        return self.raw_jsonrpc_request(
+            "get_block_header_by_height", params={"height": height}
+        )
 
     def get_block_headers_range(self, start_height, end_height):
         """
@@ -430,13 +520,14 @@ class JSONRPCDaemon(object):
         end_height = int(end_height)
 
         if start_height < 0:
-            raise ValueError('start_height < 0')
+            raise ValueError("start_height < 0")
         if end_height < start_height:
-            raise ValueError('end_height < start_height')
+            raise ValueError("end_height < start_height")
 
-        return self.raw_jsonrpc_request('get_block_headers_range', params={
-            'start_height': start_height,
-            'end_height': end_height})
+        return self.raw_jsonrpc_request(
+            "get_block_headers_range",
+            params={"start_height": start_height, "end_height": end_height},
+        )
 
     def get_block(self, height=None, hash=None):
         """
@@ -482,22 +573,22 @@ class JSONRPCDaemon(object):
         """
 
         if height is None and hash is None:
-            raise ValueError('height or hash must be provided')
+            raise ValueError("height or hash must be provided")
         elif height is not None and hash is not None:
-            raise ValueError('height and hash can not both be provided')
+            raise ValueError("height and hash can not both be provided")
 
         if height is not None:
             if height < 0:
-                raise ValueError('{} is not a valid height'.format(height))
+                raise ValueError("{} is not a valid height".format(height))
 
-            params = {'height': int(height)}
+            params = {"height": int(height)}
         else:
             if not self._is_valid_256_hex(hash):
                 raise ValueError('blk_hash "{}" is not a valid hash'.format(hash))
 
-            params = {'hash': hash}
+            params = {"hash": hash}
 
-        return self.raw_jsonrpc_request('get_block', params=params)
+        return self.raw_jsonrpc_request("get_block", params=params)
 
     def get_connections(self):
         """
@@ -532,7 +623,7 @@ class JSONRPCDaemon(object):
         }
         """
 
-        return self.raw_jsonrpc_request('get_connections')
+        return self.raw_jsonrpc_request("get_connections")
 
     def get_info(self):
         """
@@ -572,7 +663,7 @@ class JSONRPCDaemon(object):
         }
         """
 
-        return self.raw_jsonrpc_request('get_info')
+        return self.raw_jsonrpc_request("get_info")
 
     def hard_fork_info(self):
         """
@@ -592,7 +683,7 @@ class JSONRPCDaemon(object):
         }
         """
 
-        return self.raw_jsonrpc_request('hard_fork_info')
+        return self.raw_jsonrpc_request("hard_fork_info")
 
     def set_bans(self, ip, ban, seconds=None):
         """
@@ -618,28 +709,25 @@ class JSONRPCDaemon(object):
         }
         """
 
-        if isinstance(ip, six.string_types + six.integer_types): # If single element paramters
-            user_bans = [{
-                'ip': ip,
-                'ban': ban,
-                'seconds': seconds
-            }]
-        else: # If params are iterables, contrust the list of ban entries
+        if isinstance(
+            ip, six.string_types + six.integer_types
+        ):  # If single element paramters
+            user_bans = [{"ip": ip, "ban": ban, "seconds": seconds}]
+        else:  # If params are iterables, contrust the list of ban entries
             if not (len(ip) == len(ban) == len(seconds)):
                 raise ValueError('"ip", "ban", and "seconds" are not the same length')
 
-            user_bans = [{
-                'ip': ip[i],
-                'ban': ban[i],
-                'seconds': seconds[i]
-            } for i in range(len(ip))]
+            user_bans = [
+                {"ip": ip[i], "ban": ban[i], "seconds": seconds[i]}
+                for i in range(len(ip))
+            ]
 
         # Construct the bans parameter to be passed to the RPC command
         bans = []
         for ban_entry in user_bans:
-            curr_ip = ban_entry['ip']
-            curr_ban = bool(ban_entry['ban'])
-            curr_seconds = ban_entry['seconds']
+            curr_ip = ban_entry["ip"]
+            curr_ban = bool(ban_entry["ban"])
+            curr_seconds = ban_entry["seconds"]
 
             # validate IP
             ipaddress.IPv4Address(curr_ip)
@@ -651,16 +739,16 @@ class JSONRPCDaemon(object):
 
             ban = {}
             if isinstance(curr_ip, six.integer_types):
-                ban['ip'] = curr_ip
+                ban["ip"] = curr_ip
             else:
-                ban['host'] = curr_ip
+                ban["host"] = curr_ip
             if curr_seconds is not None:
-                ban['seconds'] = curr_seconds
-            ban['ban'] = curr_ban
+                ban["seconds"] = curr_seconds
+            ban["ban"] = curr_ban
 
             bans.append(ban)
 
-        return self.raw_jsonrpc_request('set_bans', params={'bans': bans})
+        return self.raw_jsonrpc_request("set_bans", params={"bans": bans})
 
     def get_bans(self):
         """
@@ -678,12 +766,12 @@ class JSONRPCDaemon(object):
         }
         """
 
-        resp = self.raw_jsonrpc_request('get_bans')
+        resp = self.raw_jsonrpc_request("get_bans")
 
         # When there are no ban entries, the node returns a responses with no "bans" field.
         # This is counterintuitive for the user, so I add an empty field if it's not provided.
-        if 'bans' not in resp:
-            resp['bans'] = []
+        if "bans" not in resp:
+            resp["bans"] = []
 
         return resp
 
@@ -701,14 +789,16 @@ class JSONRPCDaemon(object):
 
         txids = self._validate_hashlist(txids)
 
-        resp = self.raw_jsonrpc_request('flush_txpool', params={'txids': txids})
+        resp = self.raw_jsonrpc_request("flush_txpool", params={"txids": txids})
 
-        if 'transactions' not in resp:
-            resp['transactions'] = []
+        if "transactions" not in resp:
+            resp["transactions"] = []
 
         return resp
 
-    def get_output_histogram(self, amounts, min_count=None, max_count=None, unlocked=None, recent_cutoff=None):
+    def get_output_histogram(
+        self, amounts, min_count=None, max_count=None, unlocked=None, recent_cutoff=None
+    ):
         """
         Get a histogram of output amounts. For all amounts (possibly filtered by parameters), gives the number
         of outputs on the chain for that amount. RingCT outputs counts as 0 amount.
@@ -738,20 +828,20 @@ class JSONRPCDaemon(object):
         if isinstance(amounts, (Decimal,) + six.integer_types):
             amounts = [to_atomic(amounts) if isinstance(amounts, Decimal) else amounts]
         elif amounts is None:
-            raise ValueError('amounts is None')
+            raise ValueError("amounts is None")
 
         # Construct RPC parameters
-        params = {'amounts': amounts}
+        params = {"amounts": amounts}
         if min_count is not None:
-            params['min_count'] = int(min_count)
+            params["min_count"] = int(min_count)
         if max_count is not None:
-            params['max_count'] = int(max_count)
+            params["max_count"] = int(max_count)
         if unlocked is not None:
-            params['unlocked'] = bool(unlocked)
+            params["unlocked"] = bool(unlocked)
         if recent_cutoff is not None:
-            params['recent_cutoff'] = int(recent_cutoff)
+            params["recent_cutoff"] = int(recent_cutoff)
 
-        return self.raw_jsonrpc_request('get_output_histogram', params=params)
+        return self.raw_jsonrpc_request("get_output_histogram", params=params)
 
     def get_coinbase_tx_sum(self, height, count):
         """
@@ -769,11 +859,13 @@ class JSONRPCDaemon(object):
         """
 
         if height < 0:
-            raise ValueError('height < 0')
+            raise ValueError("height < 0")
         elif count < 0:
-            raise ValueError('count < 0')
+            raise ValueError("count < 0")
 
-        return self.raw_jsonrpc_request('get_coinbase_tx_sum', params={'height': height, 'count': count})
+        return self.raw_jsonrpc_request(
+            "get_coinbase_tx_sum", params={"height": height, "count": count}
+        )
 
     def get_version(self):
         """
@@ -786,7 +878,7 @@ class JSONRPCDaemon(object):
         "untrusted": bool; True for bootstrap mode, False for full sync mode.
         }
         """
-        return self.raw_jsonrpc_request('get_version')
+        return self.raw_jsonrpc_request("get_version")
 
     def get_fee_estimate(self, grace_blocks=None):
         """
@@ -808,8 +900,8 @@ class JSONRPCDaemon(object):
         elif grace_blocks is not None and grace_blocks < 0:
             raise ValueError("grace_blocks < 0")
 
-        params = {'grace_blocks': grace_blocks} if grace_blocks else None
-        return self.raw_jsonrpc_request('get_fee_estimate', params=params)
+        params = {"grace_blocks": grace_blocks} if grace_blocks else None
+        return self.raw_jsonrpc_request("get_fee_estimate", params=params)
 
     def get_alternate_chains(self):
         """
@@ -830,7 +922,7 @@ class JSONRPCDaemon(object):
 
         """
 
-        return self.raw_jsonrpc_request('get_alternate_chains')
+        return self.raw_jsonrpc_request("get_alternate_chains")
 
     def relay_tx(self, txids):
         """
@@ -846,7 +938,7 @@ class JSONRPCDaemon(object):
 
         txids = self._validate_hashlist(txids)
 
-        return self.raw_jsonrpc_request('relay_tx', params={'txids': txids})
+        return self.raw_jsonrpc_request("relay_tx", params={"txids": txids})
 
     def sync_info(self):
         """
@@ -874,7 +966,7 @@ class JSONRPCDaemon(object):
         }
         """
 
-        return self.raw_jsonrpc_request('sync_info')
+        return self.raw_jsonrpc_request("sync_info")
 
     # Other RPC Methods (https://www.getmonero.org/resources/developer-guides/daemon-rpc.html#other-daemon-rpc-calls)
 
@@ -890,7 +982,7 @@ class JSONRPCDaemon(object):
         }
         """
 
-        return self.raw_request('/get_height')
+        return self.raw_request("/get_height")
 
     def get_transactions(self, tx_hashes, decode_as_json=False, prune=False):
         """
@@ -947,10 +1039,14 @@ class JSONRPCDaemon(object):
 
         tx_hashes = self._validate_hashlist(tx_hashes)
 
-        return self.raw_request('/get_transactions', data={
-            'txs_hashes': tx_hashes,
-            'decode_as_json': bool(decode_as_json),
-            'prune': bool(prune)})
+        return self.raw_request(
+            "/get_transactions",
+            data={
+                "txs_hashes": tx_hashes,
+                "decode_as_json": bool(decode_as_json),
+                "prune": bool(prune),
+            },
+        )
 
     def get_alt_blocks_hashes(self):
         """
@@ -964,7 +1060,7 @@ class JSONRPCDaemon(object):
         }
         """
 
-        return self.raw_request('/get_alt_blocks_hashes')
+        return self.raw_request("/get_alt_blocks_hashes")
 
     def is_key_image_spent(self, key_images):
         """
@@ -987,7 +1083,7 @@ class JSONRPCDaemon(object):
 
         key_images = self._validate_hashlist(key_images)
 
-        return self.raw_request('/is_key_image_spent', data={'key_images': key_images})
+        return self.raw_request("/is_key_image_spent", data={"key_images": key_images})
 
     def send_raw_transaction(self, tx_as_hex, do_not_relay=False):
         """
@@ -1015,11 +1111,14 @@ class JSONRPCDaemon(object):
 
         tx_as_hex = six.ensure_text(tx_as_hex)
 
-        return self.raw_request('/send_raw_transaction', data={
-            'tx_as_hex': tx_as_hex,
-            'do_not_relay': do_not_relay})
+        return self.raw_request(
+            "/send_raw_transaction",
+            data={"tx_as_hex": tx_as_hex, "do_not_relay": do_not_relay},
+        )
 
-    def start_mining(self, do_background_mining, ignore_battery, miner_address, threads_count):
+    def start_mining(
+        self, do_background_mining, ignore_battery, miner_address, threads_count
+    ):
         """
         Start mining on the daemon.
 
@@ -1040,22 +1139,32 @@ class JSONRPCDaemon(object):
             try:
                 converted_addr = address.address(miner_address)
             except ValueError:
-                raise ValueError('miner_address "{}" does not match any recognized address format'.format(miner_address))
+                raise ValueError(
+                    'miner_address "{}" does not match any recognized address format'.format(
+                        miner_address
+                    )
+                )
 
             if not isinstance(converted_addr, address.Address):
-                raise ValueError('miner_address must be a "standard" monero address (i.e. it must start with a "4")')
+                raise ValueError(
+                    'miner_address must be a "standard" monero address (i.e. it must start with a "4")'
+                )
 
         if not isinstance(threads_count, int):
             raise TypeError("threads_count must be an int")
 
         if threads_count < 0:
-            raise ValueError('threads_count < 0')
+            raise ValueError("threads_count < 0")
 
-        return self.raw_request('/start_mining', data={
-            'do_background_mining': bool(do_background_mining),
-            'ignore_battery': bool(ignore_battery),
-            'miner_address': miner_address,
-            'threads_count': threads_count})
+        return self.raw_request(
+            "/start_mining",
+            data={
+                "do_background_mining": bool(do_background_mining),
+                "ignore_battery": bool(ignore_battery),
+                "miner_address": miner_address,
+                "threads_count": threads_count,
+            },
+        )
 
     def stop_mining(self):
         """
@@ -1067,7 +1176,7 @@ class JSONRPCDaemon(object):
         }
         """
 
-        return self.raw_request('/stop_mining')
+        return self.raw_request("/stop_mining")
 
     def mining_status(self):
         """
@@ -1084,7 +1193,7 @@ class JSONRPCDaemon(object):
         }
         """
 
-        return self.raw_request('/mining_status')
+        return self.raw_request("/mining_status")
 
     def save_bc(self):
         """
@@ -1097,7 +1206,7 @@ class JSONRPCDaemon(object):
         }
         """
 
-        return self.raw_request('/save_bc')
+        return self.raw_request("/save_bc")
 
     def get_peer_list(self):
         """
@@ -1118,7 +1227,7 @@ class JSONRPCDaemon(object):
         }
         """
 
-        return self.raw_request('/get_peer_list')
+        return self.raw_request("/get_peer_list")
 
     def set_log_hash_rate(self, visible):
         """
@@ -1132,11 +1241,14 @@ class JSONRPCDaemon(object):
         }
         """
 
-        resp = self.raw_request('/set_log_hash_rate', data={'visible': bool(visible)})
+        resp = self.raw_request("/set_log_hash_rate", data={"visible": bool(visible)})
 
-        if resp['status'] == 'NOT MINING':
-            raise RPCError('The node at "{url}" is not currently mining and therefore cannot set its hash rate log visibility.'
-                .format(url=self.url))
+        if resp["status"] == "NOT MINING":
+            raise RPCError(
+                'The node at "{url}" is not currently mining and therefore cannot set its hash rate log visibility.'.format(
+                    url=self.url
+                )
+            )
 
         return resp
 
@@ -1153,9 +1265,11 @@ class JSONRPCDaemon(object):
         """
 
         if level not in range(5):
-            raise ValueError('level must an integer between 0 (less verbose) and 4 (more verbose), inclusive')
+            raise ValueError(
+                "level must an integer between 0 (less verbose) and 4 (more verbose), inclusive"
+            )
 
-        return self.raw_request('/set_log_level', data={'level': level})
+        return self.raw_request("/set_log_level", data={"level": level})
 
     def set_log_categories(self, categories=None):
         """
@@ -1174,26 +1288,28 @@ class JSONRPCDaemon(object):
         """
 
         if not categories:
-            return self.raw_request('/set_log_categories')
+            return self.raw_request("/set_log_categories")
         elif isinstance(categories, six.string_types):
-            categories = categories.split(',')
+            categories = categories.split(",")
 
         # Validate categories
         for cat_str in categories:
             try:
-                category, level = cat_str.split(':')
+                category, level = cat_str.split(":")
 
                 if category not in self._KNOWN_LOG_CATEGORIES:
-                    _log.warn(u"Unrecognized log category: \"{}\"".format(category))
+                    _log.warn('Unrecognized log category: "{}"'.format(category))
 
                 if level not in self._KNOWN_LOG_LEVELS:
-                    _log.warn(u"Unrecognized log level: \"{}\"".format(level))
+                    _log.warn('Unrecognized log level: "{}"'.format(level))
             except ValueError:
                 raise ValueError('malformed category string: "{}"'.format(cat_str))
 
-        final_category_str = ','.join(categories)
+        final_category_str = ",".join(categories)
 
-        return self.raw_request('/set_log_categories', data={'categories': final_category_str})
+        return self.raw_request(
+            "/set_log_categories", data={"categories": final_category_str}
+        )
 
     def get_transaction_pool(self):
         """
@@ -1229,7 +1345,7 @@ class JSONRPCDaemon(object):
         }
         """
 
-        return self.raw_request('/get_transaction_pool')
+        return self.raw_request("/get_transaction_pool")
 
     def get_transaction_pool_stats(self):
         """
@@ -1260,7 +1376,7 @@ class JSONRPCDaemon(object):
         }
         """
 
-        return self.raw_request('/get_transaction_pool_stats')
+        return self.raw_request("/get_transaction_pool_stats")
 
     def stop_daemon(self):
         """
@@ -1272,7 +1388,7 @@ class JSONRPCDaemon(object):
         }
         """
 
-        return self.raw_request('/stop_daemon')
+        return self.raw_request("/stop_daemon")
 
     def get_limit(self):
         """
@@ -1287,7 +1403,7 @@ class JSONRPCDaemon(object):
         }
         """
 
-        return self.raw_request('/get_limit')
+        return self.raw_request("/get_limit")
 
     def set_limit(self, limit_down=-1, limit_up=-1):
         """
@@ -1305,11 +1421,13 @@ class JSONRPCDaemon(object):
         """
 
         if limit_down < -1:
-            raise ValueError('invalid limit_down: {}'.format(limit_down))
+            raise ValueError("invalid limit_down: {}".format(limit_down))
         elif limit_up < -1:
-            raise ValueError('invalid limit_up: {}'.format(limit_up))
+            raise ValueError("invalid limit_up: {}".format(limit_up))
 
-        return self.raw_request('/set_limit', data={'limit_down': limit_down, 'limit_up': limit_up})
+        return self.raw_request(
+            "/set_limit", data={"limit_down": limit_down, "limit_up": limit_up}
+        )
 
     def out_peers(self, out_peers_arg):
         """
@@ -1324,11 +1442,11 @@ class JSONRPCDaemon(object):
         """
 
         if out_peers_arg < 0:
-            out_peers_arg = 2**32 - 1
-        elif out_peers_arg > 2**32 - 1:
+            out_peers_arg = 2 ** 32 - 1
+        elif out_peers_arg > 2 ** 32 - 1:
             raise ValueError('out_peers_arg "{}" is too large'.format(out_peers_arg))
 
-        return self.raw_request('/out_peers', data={'out_peers': int(out_peers_arg)})
+        return self.raw_request("/out_peers", data={"out_peers": int(out_peers_arg)})
 
     def in_peers(self, in_peers_arg):
         """
@@ -1343,11 +1461,11 @@ class JSONRPCDaemon(object):
         """
 
         if in_peers_arg < 0:
-            in_peers_arg = 2**32 - 1
-        elif in_peers_arg > 2**32 - 1:
+            in_peers_arg = 2 ** 32 - 1
+        elif in_peers_arg > 2 ** 32 - 1:
             raise ValueError('in_peers_arg "{}" is too large'.format(in_peers_arg))
 
-        return self.raw_request('/in_peers', data={'in_peers': int(in_peers_arg)})
+        return self.raw_request("/in_peers", data={"in_peers": int(in_peers_arg)})
 
     def get_outs(self, amount, index, get_txid=True):
         """
@@ -1373,21 +1491,33 @@ class JSONRPCDaemon(object):
         }
         """
 
-        if isinstance(index, six.integer_types): # single element
-            outputs = [{'amount': amount if isinstance(amount, six.integer_types) else to_atomic(amount), 'index': index}]
-        else: # multiple elements
+        if isinstance(index, six.integer_types):  # single element
+            outputs = [
+                {
+                    "amount": amount
+                    if isinstance(amount, six.integer_types)
+                    else to_atomic(amount),
+                    "index": index,
+                }
+            ]
+        else:  # multiple elements
             if len(amount) != len(index):
-                raise ValueError('length of amount and index do not match')
+                raise ValueError("length of amount and index do not match")
 
             outputs = []
             for a, i in zip(amount, index):
-                outputs.append({
-                    'amount': a if isinstance(a, six.integer_types) else to_atomic(a),
-                    'index': i})
+                outputs.append(
+                    {
+                        "amount": a
+                        if isinstance(a, six.integer_types)
+                        else to_atomic(a),
+                        "index": i,
+                    }
+                )
 
-        return self.raw_request('/get_outs', data={
-            'outputs': outputs,
-            'get_txid': get_txid})
+        return self.raw_request(
+            "/get_outs", data={"outputs": outputs, "get_txid": get_txid}
+        )
 
     def update(self, command, path=None):
         """
@@ -1413,15 +1543,15 @@ class JSONRPCDaemon(object):
         command = six.ensure_text(command)
         path = six.ensure_text(path) if path is not None else None
 
-        if command not in ('check', 'download'):
+        if command not in ("check", "download"):
             raise ValueError('unrecognized command: "{}"'.format(command))
 
-        data = {'command': command}
+        data = {"command": command}
 
         if path is not None:
-            data['path'] = path
+            data["path"] = path
 
-        return self.raw_request('/update', data=data)
+        return self.raw_request("/update", data=data)
 
     # Supporting class methods
 
@@ -1436,11 +1566,11 @@ class JSONRPCDaemon(object):
     # private methods
 
     def _set_net(self, info):
-        if info['mainnet']:
+        if info["mainnet"]:
             self._net = NET_MAIN
-        if info['testnet']:
+        if info["testnet"]:
             self._net = NET_TEST
-        if info['stagenet']:
+        if info["stagenet"]:
             self._net = NET_STAGE
 
     def _set_restricted(self):
@@ -1452,24 +1582,28 @@ class JSONRPCDaemon(object):
             self._restricted = True
 
     def _do_get_transactions(self, hashes, prune):
-        res = self.raw_request('/get_transactions', {
-                'txs_hashes': hashes,
-                'decode_as_json': True,
-                'prune': prune})
-        if res['status'] != 'OK':
-            raise exceptions.BackendException(res['status'])
+        res = self.raw_request(
+            "/get_transactions",
+            {"txs_hashes": hashes, "decode_as_json": True, "prune": prune},
+        )
+        if res["status"] != "OK":
+            raise exceptions.BackendException(res["status"])
         txs = []
-        for tx in res.get('txs', []):
-            as_json = json.loads(tx['as_json'])
-            fee = as_json.get('rct_signatures', {}).get('txnFee')
-            txs.append(Transaction(
-                hash=tx['tx_hash'],
-                fee=from_atomic(fee) if fee else None,
-                height=None if tx['in_pool'] else tx['block_height'],
-                timestamp=datetime.fromtimestamp(
-                    tx['block_timestamp']) if 'block_timestamp' in tx else None,
-                blob=binascii.unhexlify(tx['as_hex']) or None,
-                json=as_json))
+        for tx in res.get("txs", []):
+            as_json = json.loads(tx["as_json"])
+            fee = as_json.get("rct_signatures", {}).get("txnFee")
+            txs.append(
+                Transaction(
+                    hash=tx["tx_hash"],
+                    fee=from_atomic(fee) if fee else None,
+                    height=None if tx["in_pool"] else tx["block_height"],
+                    timestamp=datetime.fromtimestamp(tx["block_timestamp"])
+                    if "block_timestamp" in tx
+                    else None,
+                    blob=binascii.unhexlify(tx["as_hex"]) or None,
+                    json=as_json,
+                )
+            )
 
         return txs
 
@@ -1494,6 +1628,6 @@ class JSONRPCDaemon(object):
             not_valid = lambda h: not self._is_valid_256_hex(h)
 
             if any(map(not_valid, hashes)):
-                raise ValueError('hashes contains an invalid hash')
+                raise ValueError("hashes contains an invalid hash")
 
             return hashes

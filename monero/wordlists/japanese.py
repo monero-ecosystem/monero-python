@@ -1690,5 +1690,5 @@ class Japanese(Wordlist):
         u"ひさしぶり",
         u"ひさん",
         u"びじゅつかん",
-        u"ひしょ"
+        u"ひしょ",
     ]

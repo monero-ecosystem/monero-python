@@ -1690,5 +1690,5 @@ class French(Wordlist):
         "zeste",
         "zinc",
         "zone",
-        "zoom"
+        "zoom",
     ]

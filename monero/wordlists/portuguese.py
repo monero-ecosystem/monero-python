@@ -1690,5 +1690,5 @@ class Portuguese(Wordlist):
         "zefiro",
         "zeloso",
         "zenite",
-        "zumbi"
+        "zumbi",
     ]
