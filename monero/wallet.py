@@ -231,15 +231,13 @@ class Wallet(object):
         )
         m = keccak_256(hsdata).digest()
         # D = master_psk + m * B
-        D = ed25519.edwards_add(
-            ed25519.decodepoint(master_psk), ed25519.scalarmult_B(ed25519.decodeint(m))
-        )
+        D = ed25519.edwards_add(master_psk, ed25519.scalarmult_B(m))
         # C = master_svk * D
-        C = ed25519.scalarmult(D, ed25519.decodeint(master_svk))
+        C = ed25519.scalarmult(D, master_svk)
         netbyte = bytearray(
             [const.SUBADDR_NETBYTES[const.NETS.index(master_address.net)]]
         )
-        data = netbyte + ed25519.encodepoint(D) + ed25519.encodepoint(C)
+        data = netbyte + D + C
         checksum = keccak_256(data).digest()[:4]
         return address.SubAddress(base58.encode(hexlify(data + checksum)))
 

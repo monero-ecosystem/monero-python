@@ -144,10 +144,8 @@ class Transaction(object):
             for keyidx, tx_key in enumerate(self.pubkeys):
                 hsdata = b"".join(
                     [
-                        ed25519.encodepoint(
-                            ed25519.scalarmult(
-                                ed25519.decodepoint(tx_key), ed25519.decodeint(svk) * 8
-                            )
+                        ed25519.scalarmult(
+                            tx_key, ed25519.encodeint(ed25519.decodeint(svk) * 8)
                         ),
                         varint.encode(idx),
                     ]
@@ -159,11 +157,9 @@ class Transaction(object):
                 Hsint = Hsint_ur % ed25519.l
                 Hs = ed25519.encodeint(Hsint)
 
-                k = ed25519.encodepoint(
-                    ed25519.edwards_add(
-                        ed25519.scalarmult_B(Hsint),
-                        ed25519.decodepoint(psk),
-                    )
+                k = ed25519.edwards_add(
+                    ed25519.scalarmult_B(Hs),
+                    psk,
                 )
                 if k != stealth_address:
                     continue

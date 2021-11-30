@@ -37,7 +37,6 @@
 
 from binascii import hexlify, unhexlify
 from os import urandom
-import warnings
 from . import base58, const, ed25519, wordlists
 from .address import address
 from .keccak import keccak_256
@@ -93,7 +92,7 @@ class Seed(object):
                     "Not valid mnemonic phrase or hex: {arg}".format(arg=phrase_or_hex)
                 )
         else:
-            self.hex = generate_hex()
+            self.hex = generate_random_hex()
             self._encode_seed()
 
     def is_mymonero(self):
@@ -118,10 +117,8 @@ class Seed(object):
             return True
         raise ValueError("Invalid checksum")
 
-    def sc_reduce(self, input):
-        integer = ed25519.decodeint(input)
-        modulo = integer % ed25519.l
-        return hexlify(ed25519.encodeint(modulo)).decode()
+    def _sc_reduce(self, input):
+        return hexlify(ed25519.scalar_reduce(ed25519.pad_to_64B(input))).decode()
 
     def hex_seed(self):
         return self.hex
@@ -131,7 +128,7 @@ class Seed(object):
 
     def secret_spend_key(self):
         a = self._hex_seed_keccak() if self.is_mymonero() else unhexlify(self.hex)
-        return self.sc_reduce(a)
+        return self._sc_reduce(a)
 
     def secret_view_key(self):
         b = (
@@ -139,7 +136,7 @@ class Seed(object):
             if self.is_mymonero()
             else unhexlify(self.secret_spend_key())
         )
-        return self.sc_reduce(keccak_256(b).digest())
+        return self._sc_reduce(keccak_256(b).digest())
 
     def public_spend_key(self):
         if self._ed_pub_spend_key:
@@ -176,7 +173,7 @@ class Seed(object):
         return address(base58.encode(data + checksum[0:8]))
 
 
-def generate_hex(n_bytes=32):
+def generate_random_hex(n_bytes=32):
     """Generate a secure and random hexadecimal string. 32 bytes by default, but arguments can override.
 
     :rtype: str
