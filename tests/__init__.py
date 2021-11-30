@@ -1,4 +1,3 @@
-from . import test_ed25519
 from . import test_address
 from . import test_numbers
 from . import test_seed
