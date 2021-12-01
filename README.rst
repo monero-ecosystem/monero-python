@@ -91,3 +91,9 @@ Development
 .. code-block:: bash
 
     .venv/bin/pytest
+
+6. Format your code with black
+
+.. code-block:: bash
+
+    .venv/bin/black .
