@@ -107,6 +107,7 @@ class JSONRPCDaemon(object):
         )
         _log.debug("JSONRPC daemon backend URL: {url}".format(url=self.url))
         self.auth = requests.auth.HTTPDigestAuth(user, password)
+        self.session = requests.Session()
         self.timeout = timeout
         self.verify_ssl_certs = verify_ssl_certs
         self.proxies = {protocol: proxy_url}
@@ -221,7 +222,7 @@ class JSONRPCDaemon(object):
                 path=path, data=json.dumps(data, indent=2, sort_keys=True)
             )
         )
-        rsp = requests.post(
+        rsp = self.session.post(
             self.url + path,
             headers=hdr,
             data=json.dumps(data) if data else None,
@@ -249,7 +250,7 @@ class JSONRPCDaemon(object):
                 method=method, params=json.dumps(params, indent=2, sort_keys=True)
             )
         )
-        rsp = requests.post(
+        rsp = self.session.post(
             self.url + "/json_rpc",
             headers=hdr,
             data=json.dumps(data),

@@ -51,6 +51,7 @@ class JSONRPCWallet(object):
         )
         _log.debug("JSONRPC wallet backend URL: {url}".format(url=self.url))
         self.auth = requests.auth.HTTPDigestAuth(user, password)
+        self.session = requests.Session()
         self.timeout = timeout
         self.verify_ssl_certs = verify_ssl_certs
         self.proxies = {protocol: proxy_url}
@@ -385,7 +386,7 @@ class JSONRPCWallet(object):
                 method=method, params=json.dumps(params, indent=2, sort_keys=True)
             )
         )
-        rsp = requests.post(
+        rsp = self.session.post(
             self.url,
             headers=hdr,
             data=json.dumps(data),
