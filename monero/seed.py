@@ -117,9 +117,6 @@ class Seed(object):
             return True
         raise ValueError("Invalid checksum")
 
-    def _sc_reduce(self, input):
-        return hexlify(ed25519.scalar_reduce(ed25519.pad_to_64B(input))).decode()
-
     def hex_seed(self):
         return self.hex
 
@@ -128,7 +125,7 @@ class Seed(object):
 
     def secret_spend_key(self):
         a = self._hex_seed_keccak() if self.is_mymonero() else unhexlify(self.hex)
-        return self._sc_reduce(a)
+        return hexlify(ed25519.scalar_reduce(a)).decode()
 
     def secret_view_key(self):
         b = (
@@ -136,7 +133,7 @@ class Seed(object):
             if self.is_mymonero()
             else unhexlify(self.secret_spend_key())
         )
-        return self._sc_reduce(keccak_256(b).digest())
+        return hexlify(ed25519.scalar_reduce(keccak_256(b).digest())).decode()
 
     def public_spend_key(self):
         if self._ed_pub_spend_key:

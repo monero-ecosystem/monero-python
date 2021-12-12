@@ -95,14 +95,20 @@ class Address(BaseAddress):
 
         :rtype: bool
         """
-        return ed25519.public_from_secret_hex(key) == self.view_key()
+        try:
+            return ed25519.public_from_secret_hex(key) == self.view_key()
+        except ValueError:
+            return False
 
     def check_private_spend_key(self, key):
         """Checks if private spend key matches this address.
 
         :rtype: bool
         """
-        return ed25519.public_from_secret_hex(key) == self.spend_key()
+        try:
+            return ed25519.public_from_secret_hex(key) == self.spend_key()
+        except ValueError:
+            return False
 
     def with_payment_id(self, payment_id=0):
         """Integrates payment id into the address.

@@ -231,9 +231,11 @@ class Wallet(object):
         )
         m = keccak_256(hsdata).digest()
         # D = master_psk + m * B
-        D = ed25519.edwards_add(master_psk, ed25519.scalarmult_B(m))
+        D = ed25519.edwards_add(
+            master_psk, ed25519.scalarmult_B(ed25519.scalar_reduce(m))
+        )
         # C = master_svk * D
-        C = ed25519.scalarmult(D, master_svk)
+        C = ed25519.scalarmult(master_svk, D)
         netbyte = bytearray(
             [const.SUBADDR_NETBYTES[const.NETS.index(master_address.net)]]
         )

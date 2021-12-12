@@ -145,18 +145,13 @@ class Transaction(object):
                 hsdata = b"".join(
                     [
                         ed25519.scalarmult(
-                            tx_key, ed25519.encodeint(ed25519.decodeint(svk) * 8)
+                            ed25519.encodeint(ed25519.decodeint(svk) * 8), tx_key
                         ),
                         varint.encode(idx),
                     ]
                 )
                 Hs_ur = keccak_256(hsdata).digest()
-
-                # sc_reduce32:
-                Hsint_ur = ed25519.decodeint(Hs_ur)
-                Hsint = Hsint_ur % ed25519.l
-                Hs = ed25519.encodeint(Hsint)
-
+                Hs = ed25519.scalar_reduce(Hs_ur)
                 k = ed25519.edwards_add(
                     ed25519.scalarmult_B(Hs),
                     psk,
