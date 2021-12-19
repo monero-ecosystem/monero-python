@@ -9,7 +9,13 @@ from monero.daemon import Daemon
 
 
 def url_data(url):
-    gs = re.compile(r"^(?P<host>[^:\s]+)(?::(?P<port>[0-9]+))?$").match(url).groupdict()
+    gs = (
+        re.compile(
+            r"^(?:(?P<user>[a-z0-9_-]+)?(?::(?P<password>[^@]+))?@)?(?P<host>[^:\s]+)(?::(?P<port>[0-9]+))?$"
+        )
+        .match(url)
+        .groupdict()
+    )
     return dict(filter(operator.itemgetter(1), gs.items()))
 
 
@@ -20,7 +26,7 @@ def get_daemon():
         nargs="?",
         type=url_data,
         default="127.0.0.1:18081",
-        help="Daemon RPC URL [host[:port]]",
+        help="Daemon RPC URL [user[:password]@]host[:port]",
     )
     argsparser.add_argument(
         "-p", dest="proxy_url", nargs="?", type=str, default=None, help="Proxy URL"
