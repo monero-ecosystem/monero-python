@@ -18,6 +18,7 @@ install:
   - pip install dist/*.tar.gz # install dependencies as specified in setup.py
   - pip install -r test_requirements_py`echo $TRAVIS_PYTHON_VERSION | cut -f 1 -d .`.txt
 script:
+  - black --check .
   - pytest
 after_success:
   - coveralls

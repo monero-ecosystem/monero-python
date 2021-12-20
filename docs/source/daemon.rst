@@ -164,6 +164,7 @@ methods in JSONRPCDaemon are designed to be lower-level. As such, the return val
 methods reflect the raw JSON objects returned by the daemon. An example:
 
 .. code-block:: python
+
     [In 20]: from monero.backends.jsonrpc import JSONRPCDaemon
 
     [In 21]: daemon = JSONRPCDaemon(host='192.168.0.50')

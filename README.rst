@@ -14,7 +14,7 @@ Python Monero module
 
 A comprehensive Python module for handling Monero cryptocurrency.
 
-* release 0.9.2
+* release 0.9.3
 * open source: https://github.com/monero-ecosystem/monero-python
 * works with Monero 0.13.x and `the latest source`_ (at least we try to keep up)
 * Python 2.x and 3.x compatible
@@ -36,7 +36,8 @@ Released under the BSD 3-Clause License. See `LICENSE.txt`_.
 
 Copyright (c) 2017-2018 Michał Sałaban <michal@salaban.info> and Contributors:
 `lalanza808`_, `cryptochangements34`_, `atward`_, `rooterkyberian`_, `brucexiu`_,
-`lialsoftlab`_, `moneroexamples`_, `massanchik`_, `MrClottom`_, `jeffro256`_.
+`lialsoftlab`_, `moneroexamples`_, `massanchik`_, `MrClottom`_, `jeffro256`_,
+`sometato`_.
 
 Copyright (c) 2016 The MoneroPy Developers (``monero/base58.py`` taken from `MoneroPy`_)
 
@@ -59,6 +60,7 @@ Copyright (c) 2011 thomasv@gitorious (``monero/seed.py`` based on `Electrum`_)
 .. _`massanchik`: https://github.com/massanchik
 .. _`MrClottom`: https://github.com/MrClottom
 .. _`jeffro256`: https://github.com/jeffro256
+.. _`sometato`: https://github.com/sometato
 
 Want to help?
 -------------
@@ -91,3 +93,9 @@ Development
 .. code-block:: bash
 
     .venv/bin/pytest
+
+6. Format your code with black
+
+.. code-block:: bash
+
+    .venv/bin/black .
