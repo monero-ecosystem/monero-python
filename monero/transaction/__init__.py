@@ -142,11 +142,14 @@ class Transaction(object):
 
         def _scan_pubkeys(svk, psk, stealth_address, amount, encamount):
             for keyidx, tx_key in enumerate(self.pubkeys):
+                # precompute
+                svk_2 = ed25519.scalar_add(svk, svk)
+                svk_4 = ed25519.scalar_add(svk_2, svk_2)
+                svk_8 = ed25519.scalar_add(svk_4, svk_4)
+                #
                 hsdata = b"".join(
                     [
-                        ed25519.scalarmult(
-                            ed25519.encodeint(ed25519.decodeint(svk) * 8), tx_key
-                        ),
+                        ed25519.scalarmult(svk_8, tx_key),
                         varint.encode(idx),
                     ]
                 )
