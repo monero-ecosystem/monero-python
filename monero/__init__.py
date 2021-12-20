@@ -1,3 +1,3 @@
 from . import address, account, const, daemon, wallet, numbers, wordlists, seed
 
-__version__ = "0.9.3"
+__version__ = "0.99"

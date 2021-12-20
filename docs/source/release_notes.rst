@@ -1,6 +1,19 @@
 Release Notes
 =============
 
+0.99
+----
+
+This is a test release before 1.0. The reference library for Ed25519 cryptography has been dropped
+and replaced with `pynacl`_ which is a wrapper over `libsodium`_, the industry standard
+lightning-fast C library.
+
+There are no backward-incompatible changes in the API. The aim is to have the software tested
+thoroughly before the first stable release.
+
+.. _`pynacl`: https://github.com/pyca/pynacl/
+.. _`libsodium`: https://github.com/jedisct1/libsodium/
+
 0.9
 ---
 
