@@ -1,22 +1,5 @@
 import binascii
 import nacl.bindings
-import six
-
-
-def bit(h, i):
-    return (six.indexbytes(h, i // 8) >> (i % 8)) & 1
-
-
-def encodeint(y):
-    bits = [(y >> i) & 1 for i in range(256)]
-    return b"".join(
-        [six.int2byte(sum([bits[i * 8 + j] << j for j in range(8)])) for i in range(32)]
-    )
-
-
-def decodeint(s):
-    return sum(2 ** i * bit(s, i) for i in range(0, 256))
-
 
 edwards_add = nacl.bindings.crypto_core_ed25519_add
 inv = nacl.bindings.crypto_core_ed25519_scalar_invert
