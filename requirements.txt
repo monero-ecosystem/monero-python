@@ -1,5 +1,5 @@
 pycryptodomex~=3.10
-pynacl~=1.4.0
+pynacl~=1.4
 requests
 six>=1.12.0
 ipaddress
