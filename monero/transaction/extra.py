@@ -1,5 +1,4 @@
 import binascii
-import six
 import varint
 
 

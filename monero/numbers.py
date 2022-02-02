@@ -1,5 +1,4 @@
 from decimal import Decimal
-import six
 
 PICONERO = Decimal("0.000000000001")
 EMPTY_KEY = "0" * 64
@@ -7,7 +6,7 @@ EMPTY_KEY = "0" * 64
 
 def to_atomic(amount):
     """Convert Monero decimal to atomic integer of piconero."""
-    if not isinstance(amount, (Decimal, float) + six.integer_types):
+    if not isinstance(amount, (Decimal, int, float)):
         raise ValueError(
             "Amount '{}' doesn't have numeric type. Only Decimal, int, long and "
             "float (not recommended) are accepted as amounts.".format(amount)
@@ -41,11 +40,9 @@ class PaymentID(object):
     def __init__(self, payment_id):
         if isinstance(payment_id, PaymentID):
             payment_id = int(payment_id)
-        if isinstance(payment_id, six.text_type) or isinstance(
-            payment_id, six.string_types
-        ):
+        if isinstance(payment_id, str):
             payment_id = int(payment_id, 16)
-        elif not isinstance(payment_id, six.integer_types):
+        elif not isinstance(payment_id, int):
             raise TypeError(
                 "payment_id must be either int or hexadecimal str or bytes, "
                 "is {0}".format(type(payment_id))
@@ -72,8 +69,8 @@ class PaymentID(object):
     def __eq__(self, other):
         if isinstance(other, PaymentID):
             return int(self) == int(other)
-        elif isinstance(other, six.integer_types):
+        elif isinstance(other, int):
             return int(self) == other
-        elif isinstance(other, six.text_type) or isinstance(other, six.string_types):
-            return str(self) == six.ensure_str(other)
+        elif isinstance(other, str):
+            return str(self) == other
         return super(PaymentID, self).__eq__(other)

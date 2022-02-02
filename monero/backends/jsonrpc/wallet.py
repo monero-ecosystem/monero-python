@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 import binascii
 from datetime import datetime
 import json

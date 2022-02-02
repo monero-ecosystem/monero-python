@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 import binascii
 from datetime import datetime
 from decimal import Decimal
@@ -6,7 +5,6 @@ import ipaddress
 import json
 import logging
 import requests
-import six
 
 from ... import address
 from ... import exceptions
@@ -134,7 +132,7 @@ class JSONRPCDaemon(object):
         res = self.raw_request(
             "/sendrawtransaction",
             {
-                "tx_as_hex": six.ensure_text(binascii.hexlify(blob)),
+                "tx_as_hex": binascii.hexlify(blob).decode(),
                 "do_not_relay": not relay,
             },
         )
@@ -388,14 +386,11 @@ class JSONRPCDaemon(object):
         }
         """
 
-        if isinstance(blobs, (six.binary_type,) + six.string_types):
+        if isinstance(blobs, (bytes, str)):
             blobs = [blobs]
 
         blobs = [
-            binascii.hexlify(b).decode()
-            if isinstance(b, six.binary_type)
-            else six.ensure_text(b)
-            for b in blobs
+            binascii.hexlify(b).decode() if isinstance(b, bytes) else b for b in blobs
         ]
 
         return self.raw_jsonrpc_request("submit_block", params=blobs)
@@ -707,9 +702,7 @@ class JSONRPCDaemon(object):
         }
         """
 
-        if isinstance(
-            ip, six.string_types + six.integer_types
-        ):  # If single element paramters
+        if isinstance(ip, (str, int)):  # If single element paramters
             user_bans = [{"ip": ip, "ban": ban, "seconds": seconds}]
         else:  # If params are iterables, contrust the list of ban entries
             if not (len(ip) == len(ban) == len(seconds)):
@@ -736,7 +729,7 @@ class JSONRPCDaemon(object):
                 raise ValueError('"seconds" can not be less than zero')
 
             ban = {}
-            if isinstance(curr_ip, six.integer_types):
+            if isinstance(curr_ip, int):
                 ban["ip"] = curr_ip
             else:
                 ban["host"] = curr_ip
@@ -823,7 +816,7 @@ class JSONRPCDaemon(object):
         """
 
         # Coerce amounts paramter
-        if isinstance(amounts, (Decimal,) + six.integer_types):
+        if isinstance(amounts, (Decimal, int)):
             amounts = [to_atomic(amounts) if isinstance(amounts, Decimal) else amounts]
         elif amounts is None:
             raise ValueError("amounts is None")
@@ -893,7 +886,7 @@ class JSONRPCDaemon(object):
         }
         """
 
-        if not isinstance(grace_blocks, (type(None),) + six.integer_types):
+        if not isinstance(grace_blocks, (type(None), int)):
             raise TypeError("grace_blocks is not an int")
         elif grace_blocks is not None and grace_blocks < 0:
             raise ValueError("grace_blocks < 0")
@@ -1106,9 +1099,6 @@ class JSONRPCDaemon(object):
         "untrusted": bool; True for bootstrap mode, False for full sync mode.
         }
         """
-
-        tx_as_hex = six.ensure_text(tx_as_hex)
-
         return self.raw_request(
             "/send_raw_transaction",
             data={"tx_as_hex": tx_as_hex, "do_not_relay": do_not_relay},
@@ -1287,7 +1277,7 @@ class JSONRPCDaemon(object):
 
         if not categories:
             return self.raw_request("/set_log_categories")
-        elif isinstance(categories, six.string_types):
+        elif isinstance(categories, str):
             categories = categories.split(",")
 
         # Validate categories
@@ -1489,12 +1479,10 @@ class JSONRPCDaemon(object):
         }
         """
 
-        if isinstance(index, six.integer_types):  # single element
+        if isinstance(index, int):  # single element
             outputs = [
                 {
-                    "amount": amount
-                    if isinstance(amount, six.integer_types)
-                    else to_atomic(amount),
+                    "amount": amount,
                     "index": index,
                 }
             ]
@@ -1506,9 +1494,7 @@ class JSONRPCDaemon(object):
             for a, i in zip(amount, index):
                 outputs.append(
                     {
-                        "amount": a
-                        if isinstance(a, six.integer_types)
-                        else to_atomic(a),
+                        "amount": a if isinstance(a, int) else to_atomic(a),
                         "index": i,
                     }
                 )
@@ -1537,10 +1523,6 @@ class JSONRPCDaemon(object):
         "status": str; General RPC error code. "OK" means everything looks good.
         }
         """
-
-        command = six.ensure_text(command)
-        path = six.ensure_text(path) if path is not None else None
-
         if command not in ("check", "download"):
             raise ValueError('unrecognized command: "{}"'.format(command))
 
@@ -1620,10 +1602,12 @@ class JSONRPCDaemon(object):
         if not hashes:
             return []
         else:
-            if isinstance(hashes, six.string_types):
+            if isinstance(hashes, str):
                 hashes = [hashes]
             else:
-                coerce_compatible_str = lambda s: six.ensure_text(str(s))
+                coerce_compatible_str = (
+                    lambda s: s.decode() if isinstance(s, bytes) else s
+                )
                 hashes = list(map(coerce_compatible_str, hashes))
 
             not_valid = lambda h: not self._is_valid_256_hex(h)

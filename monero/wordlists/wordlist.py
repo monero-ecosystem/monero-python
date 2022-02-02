@@ -4,8 +4,6 @@
 import logging
 from binascii import crc32
 
-from six import with_metaclass
-
 
 WORDLISTS = {}
 _log = logging.getLogger(__name__)
@@ -40,7 +38,7 @@ class WordlistType(type):
         return new_cls
 
 
-class Wordlist(with_metaclass(WordlistType)):
+class Wordlist(metaclass=WordlistType):
     n = 1626
 
     @classmethod

@@ -1,5 +1,3 @@
-import six
-
 from .backends.jsonrpc import JSONRPCDaemon
 
 
@@ -85,6 +83,6 @@ class Daemon(object):
 
         :param hashes: str or list of str
         """
-        if isinstance(hashes, six.string_types):
+        if isinstance(hashes, str):
             hashes = [hashes]
         return self._backend.transactions(hashes)

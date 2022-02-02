@@ -1,8 +1,6 @@
 from binascii import hexlify, unhexlify
 import re
-import six
 import struct
-import warnings
 
 from . import base58
 from . import const
@@ -66,10 +64,8 @@ class BaseAddress(object):
         return base58.encode(hexlify(self._decoded))
 
     def __eq__(self, other):
-        if isinstance(other, BaseAddress):
+        if isinstance(other, (BaseAddress, str)):
             return str(self) == str(other)
-        elif isinstance(other, six.text_type) or isinstance(other, six.string_types):
-            return str(self) == six.ensure_str(other)
         return super(BaseAddress, self).__eq__(other)
 
     def __hash__(self):

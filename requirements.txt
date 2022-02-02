@@ -2,6 +2,5 @@ pycryptodomex~=3.14
 pynacl~=1.4
 pysocks~=1.7
 requests
-six>=1.12.0
 ipaddress
 varint

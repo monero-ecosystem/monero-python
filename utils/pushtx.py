@@ -4,7 +4,6 @@ import logging
 import operator
 import re
 import sys
-import six
 
 from monero.backends.jsonrpc import JSONRPCDaemon
 from monero.daemon import Daemon
@@ -61,7 +60,7 @@ logging.basicConfig(level=level, format="%(asctime)-15s %(message)s")
 if args.tx_filenames:
     blobs = [(f, open(f, "rb").read()) for f in args.tx_filenames]
 else:
-    blobs = [("transaction", sys.stdin.buffer.read() if six.PY3 else sys.stdin.read())]
+    blobs = [("transaction", sys.stdin.buffer.read())]
 d = Daemon(
     JSONRPCDaemon(timeout=args.timeout, proxy_url=args.proxy_url, **args.daemon_rpc_url)
 )

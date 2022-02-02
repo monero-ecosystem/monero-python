@@ -3,7 +3,6 @@ import json
 import logging
 import os
 import responses
-import six
 
 from monero.const import NET_STAGE
 from monero.daemon import Daemon
@@ -867,7 +866,7 @@ class JSONRPCDaemonTestCase(JSONTestCase):
             status=200,
         )
 
-        resp = self.backend.set_bans(six.ensure_text("188.165.17.204"), True, 3600)
+        resp = self.backend.set_bans("188.165.17.204", True, 3600)
 
         self.assertEqual(resp["status"], "OK")
 
@@ -881,9 +880,9 @@ class JSONRPCDaemonTestCase(JSONTestCase):
         )
 
         ips = [
-            six.ensure_text("188.165.17.204"),
+            "188.165.17.204",
             1466097787,
-            six.ensure_text("87.98.224.124"),
+            "87.98.224.124",
         ]
         bans = [True, True, False]
         seconds = [3600, 500, 7200]

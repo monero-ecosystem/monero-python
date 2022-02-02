@@ -1,5 +1,4 @@
 from decimal import Decimal
-import sys
 import unittest
 
 from monero.numbers import to_atomic, from_atomic, as_monero, PaymentID
@@ -18,8 +17,6 @@ class NumbersTestCase(unittest.TestCase):
         "Only check if conversion of given type succeeds or fails."
         self.assertTrue(to_atomic(1))
         self.assertTrue(to_atomic(1.0))
-        if hasattr(sys, "maxint"):  # Python 2.x
-            self.assertTrue(to_atomic(sys.maxint + 1))
         self.assertRaises(ValueError, to_atomic, "1")
 
     def test_rounding(self):
@@ -52,4 +49,4 @@ class NumbersTestCase(unittest.TestCase):
             pid, "00000000000000000000000000000000000000000000000a1234567812345678"
         )
         self.assertEqual(PaymentID(pid), pid)
-        self.assertRaises(ValueError, PaymentID, 2 ** 256 + 1)
+        self.assertRaises(ValueError, PaymentID, 2**256 + 1)

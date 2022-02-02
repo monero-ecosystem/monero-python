@@ -1,5 +1,4 @@
 import operator
-import six
 from .transaction import Transaction
 
 
@@ -43,12 +42,12 @@ class Block(object):
     def __eq__(self, other):
         if isinstance(other, Block):
             return self.hash == other.hash
-        elif isinstance(other, six.string_types):
-            return six.ensure_text(self.hash) == six.ensure_text(other)
+        elif isinstance(other, str):
+            return self.hash == other
         return super(Block, self).__eq__(other)
 
     def __contains__(self, tx):
-        if isinstance(tx, six.string_types):
+        if isinstance(tx, str):
             txid = tx
         elif isinstance(tx, Transaction):
             txid = tx.hash

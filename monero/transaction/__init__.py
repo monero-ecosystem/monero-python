@@ -2,7 +2,6 @@ import binascii
 import itertools
 import operator
 import re
-import six
 import struct
 import varint
 import warnings
@@ -461,9 +460,7 @@ class PaymentFilter(object):
         if _local_address is None:
             self.local_addresses = []
         else:
-            if isinstance(_local_address, six.string_types) or isinstance(
-                _local_address, six.text_type
-            ):
+            if isinstance(_local_address, str):
                 local_addresses = [_local_address]
             else:
                 try:
@@ -475,9 +472,7 @@ class PaymentFilter(object):
         if _tx_id is None:
             self.tx_ids = []
         else:
-            if isinstance(_tx_id, six.string_types) or isinstance(
-                _tx_id, six.text_type
-            ):
+            if isinstance(_tx_id, str):
                 tx_ids = [_tx_id]
             else:
                 try:
@@ -489,9 +484,7 @@ class PaymentFilter(object):
         if _payment_id is None:
             self.payment_ids = []
         else:
-            if isinstance(_payment_id, six.string_types) or isinstance(
-                _payment_id, six.text_type
-            ):
+            if isinstance(_payment_id, str):
                 payment_ids = [_payment_id]
             else:
                 try:
