@@ -152,7 +152,7 @@ them the transactions they do not have.
 
     **With significant amounts you should also wait for a few confirmations to appear.** The top
     of the blockchain sometimes gets replaced by a competing block. It is a popular practice to
-    wait for at least 6 confirmations to appear, which is also the standard in Monero before funds
+    wait for at least 10 confirmations to appear, which is also the standard in Monero before funds
     get unlocked and can be used in subsequent transactions.
 
 However, it is possible to query the wallet for transactions in the mempool. You may use them as
