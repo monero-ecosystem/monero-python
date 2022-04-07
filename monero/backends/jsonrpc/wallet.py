@@ -126,6 +126,8 @@ class JSONRPCWallet(object):
     def transfers_in(self, account, pmtfilter):
         params = {"account_index": account, "pending": False}
         method = "get_transfers"
+        _pmts = {}
+
         if pmtfilter.tx_ids:
             method = "get_transfer_by_txid"
         if pmtfilter.unconfirmed:
