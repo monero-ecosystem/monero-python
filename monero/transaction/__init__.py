@@ -152,7 +152,7 @@ class Transaction(object):
                 if on_chain_vt:
                     shared_secret = ed25519.scalarmult(svk_8, tx_key)
                     vt_hsdata = b"".join([
-                                           on_chain_vt, # need to make sure to only take first 8 bytes of this string
+                                           "view_tag", # need to make sure to only take first 8 bytes of this string
                                            shared_secret,
                                            varint.encode(idx)
                     ])
