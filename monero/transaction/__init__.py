@@ -140,27 +140,46 @@ class Transaction(object):
         already generated.
         """
 
-        def _scan_pubkeys(svk, psk, stealth_address, amount, encamount):
+        def _scan_pubkeys(svk, psk, stealth_address, amount, encamount, on_chain_vt):
             for keyidx, tx_key in enumerate(self.pubkeys):
                 # precompute
                 svk_2 = ed25519.scalar_add(svk, svk)
                 svk_4 = ed25519.scalar_add(svk_2, svk_2)
                 svk_8 = ed25519.scalar_add(svk_4, svk_4)
                 #
-                hsdata = b"".join(
+                svk_8 = ed25519.scalar_add(svk_4, svk_4)
+
+                if on_chain_vt:
+                    shared_secret = ed25519.scalarmult(svk_8, tx_key)
+                    vt_hsdata = b"".join([
+                                           on_chain_vt, # need to make sure to only take first 8 bytes of this string
+                                           shared_secret,
+                                           varint.encode(idx)
+                    ])
+                    vt_full = keccak_256(vt_hsdata).digest()
+                    vt = vt_full[0] # the view tag is the first byte of vt_full
+
+                    if vt != on_chain_vt:
+                        continue
+                else:
+                    hsdata = b"".join(
                     [
                         ed25519.scalarmult(svk_8, tx_key),
                         varint.encode(idx),
-                    ]
-                )
-                Hs_ur = keccak_256(hsdata).digest()
-                Hs = ed25519.scalar_reduce(Hs_ur)
-                k = ed25519.edwards_add(
-                    ed25519.scalarmult_B(Hs),
-                    psk,
-                )
-                if k != stealth_address:
-                    continue
+                    ])
+                    Hs_ur = keccak_256(hsdata).digest()
+                    Hs = ed25519.scalar_reduce(Hs_ur)
+                    k = ed25519.edwards_add(
+                        ed25519.scalarmult_B(Hs),
+                        psk,
+                    )
+                    if k != stealth_address:
+                        continue
+                hsdata = b"".join([
+                                     shared_secret,
+                                     varint.encode(idx),
+                ])
+                Hs_ur = keccak_256(hsdata).digest()    
                 if not encamount:
                     # Tx ver 1
                     return Payment(
@@ -199,9 +218,35 @@ class Transaction(object):
                     *map(operator.methodcaller("addresses"), wallet.accounts)
                 )
             )
+        '''
+        pre hard fork:
+        { 
+          "target": {
+            "key": "ea3f..."
+          }
+        }
+        post hard fork:
+        { 
+          "target": {
+            "tagged_key": {
+              "key": "ea3f...",
+              "view_tag": "a1"
+            }
+          }
+        }
+        '''
         outs = []
         for idx, vout in enumerate(self.json["vout"]):
-            stealth_address = binascii.unhexlify(vout["target"]["key"])
+            #see if post hard fork json structure present:
+            try:
+                if vout["target"]["tagged_key"]:
+                    #post fork transaction
+                    stealth_address = binascii.unhexlify(vout["target"]["tagged_key"]["key"])
+                    on_chain_vt = binascii.unhexlify(vout["target"]["tagged_key"]["view_tag"])
+            except:
+                #pre fork transaction
+                stealth_address = binascii.unhexlify(vout["target"]["key"])
+                on_chain_vt = False
             encamount = None
             if self.version == 2 and not self.is_coinbase:
                 encamount = binascii.unhexlify(
@@ -217,7 +262,7 @@ class Transaction(object):
                 for addridx, addr in enumerate(addresses):
                     psk = binascii.unhexlify(addr.spend_key())
                     payment = _scan_pubkeys(
-                        svk, psk, stealth_address, amount, encamount
+                        svk, psk, stealth_address, amount, encamount, on_chain_vt
                     )
                     if payment:
                         break
