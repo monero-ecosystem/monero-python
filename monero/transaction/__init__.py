@@ -173,7 +173,7 @@ class Transaction(object):
                     psk,
                 )
                 if k != stealth_address:
-                    continue 
+                    continue
                 if not encamount:
                     # Tx ver 1
                     return Payment(
