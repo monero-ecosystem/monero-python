@@ -147,15 +147,15 @@ class Transaction(object):
                 svk_4 = ed25519.scalar_add(svk_2, svk_2)
                 svk_8 = ed25519.scalar_add(svk_4, svk_4)
                 #
+                shared_secret = ed25519.scalarmult(svk_8, tx_key)
                 if on_chain_vt:
-                    shared_secret = ed25519.scalarmult(svk_8, tx_key)
                     vt_hsdata = b"".join([
                                         b"view_tag",
                                         shared_secret,
                                         varint.encode(idx)
                     ])
                     vt_full = keccak_256(vt_hsdata).digest()
-                    vt = binascii.hexlify(vt_full)[0:2]
+                    vt = vt_full[0:1]
                     if vt != on_chain_vt:
                         #short-circuit so it doesn't have to do the rest of this for ~99.6% of outputs
                         #the view tag check yields false positives 1/256 times, because it's just 1 byte
@@ -163,7 +163,7 @@ class Transaction(object):
                         
                 hsdata = b"".join(
                 [
-                    ed25519.scalarmult(svk_8, tx_key),
+                    shared_secret,
                     varint.encode(idx),
                 ])
                 Hs_ur = keccak_256(hsdata).digest()
