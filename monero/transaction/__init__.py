@@ -151,14 +151,12 @@ class Transaction(object):
 
                 if on_chain_vt:
                     shared_secret = ed25519.scalarmult(svk_8, tx_key)
-                    vt_hsdata = b"".join([
-                                           "view_tag", # need to make sure to only take first 8 bytes of this string
-                                           shared_secret,
-                                           varint.encode(idx)
+                    vt_hsdata = b"view_tag" + b"".join([
+                                        shared_secret,
+                                        varint.encode(idx)
                     ])
                     vt_full = keccak_256(vt_hsdata).digest()
-                    vt = vt_full[0] # the view tag is the first byte of vt_full
-
+                    vt = binascii.hexlify(vt_full)[0:2]
                     if vt != on_chain_vt:
                         continue
                 else:
@@ -174,12 +172,7 @@ class Transaction(object):
                         psk,
                     )
                     if k != stealth_address:
-                        continue
-                hsdata = b"".join([
-                                     shared_secret,
-                                     varint.encode(idx),
-                ])
-                Hs_ur = keccak_256(hsdata).digest()    
+                        continue 
                 if not encamount:
                     # Tx ver 1
                     return Payment(
@@ -238,15 +231,17 @@ class Transaction(object):
         outs = []
         for idx, vout in enumerate(self.json["vout"]):
             #see if post hard fork json structure present:
-            try:
-                if vout["target"]["tagged_key"]:
-                    #post fork transaction
-                    stealth_address = binascii.unhexlify(vout["target"]["tagged_key"]["key"])
-                    on_chain_vt = binascii.unhexlify(vout["target"]["tagged_key"]["view_tag"])
-            except:
-                #pre fork transaction
-                stealth_address = binascii.unhexlify(vout["target"]["key"])
-                on_chain_vt = False
+                try:
+                    if vout["target"]["tagged_key"]:
+                        #post fork transaction
+                        stealth_address = binascii.unhexlify(vout["target"]["tagged_key"]["key"])
+                        on_chain_vt = binascii.unhexlify(vout["target"]["tagged_key"]["view_tag"])
+                except:
+                    #pre fork transaction
+                    stealth_address = binascii.unhexlify(vout["target"]["key"])
+                    on_chain_vt = False
+                    pass
+
             encamount = None
             if self.version == 2 and not self.is_coinbase:
                 encamount = binascii.unhexlify(
@@ -279,8 +274,7 @@ class Transaction(object):
 
     def __repr__(self):
         return self.hash
-
-
+   
 class Output(object):
     """
     A Monero one-time public output (A.K.A stealth address).
