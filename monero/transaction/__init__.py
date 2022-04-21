@@ -262,7 +262,7 @@ class Transaction(object):
                         break
             outs.append(
                 Output(
-                    stealth_address=vout["target"]["key"],
+                    stealth_address=stealth_address,
                     amount=payment.amount if payment else amount,
                     index=self.output_indices[idx] if self.output_indices else None,
                     transaction=self,
