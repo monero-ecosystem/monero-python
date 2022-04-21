@@ -157,21 +157,23 @@ class Transaction(object):
                     vt_full = keccak_256(vt_hsdata).digest()
                     vt = binascii.hexlify(vt_full)[0:2]
                     if vt != on_chain_vt:
+                        #short-circuit so it doesn't have to do the rest of this for ~99.6% of outputs
+                        #the view tag check yields false positives 1/256 times, because it's just 1 byte
                         continue
-                else:
-                    hsdata = b"".join(
-                    [
-                        ed25519.scalarmult(svk_8, tx_key),
-                        varint.encode(idx),
-                    ])
-                    Hs_ur = keccak_256(hsdata).digest()
-                    Hs = ed25519.scalar_reduce(Hs_ur)
-                    k = ed25519.edwards_add(
-                        ed25519.scalarmult_B(Hs),
-                        psk,
-                    )
-                    if k != stealth_address:
-                        continue 
+                        
+                hsdata = b"".join(
+                [
+                    ed25519.scalarmult(svk_8, tx_key),
+                    varint.encode(idx),
+                ])
+                Hs_ur = keccak_256(hsdata).digest()
+                Hs = ed25519.scalar_reduce(Hs_ur)
+                k = ed25519.edwards_add(
+                    ed25519.scalarmult_B(Hs),
+                    psk,
+                )
+                if k != stealth_address:
+                    continue 
                 if not encamount:
                     # Tx ver 1
                     return Payment(
