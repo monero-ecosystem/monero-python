@@ -147,11 +147,10 @@ class Transaction(object):
                 svk_4 = ed25519.scalar_add(svk_2, svk_2)
                 svk_8 = ed25519.scalar_add(svk_4, svk_4)
                 #
-                svk_8 = ed25519.scalar_add(svk_4, svk_4)
-
                 if on_chain_vt:
                     shared_secret = ed25519.scalarmult(svk_8, tx_key)
-                    vt_hsdata = b"view_tag" + b"".join([
+                    vt_hsdata = b"".join([
+                                        b"view_tag",
                                         shared_secret,
                                         varint.encode(idx)
                     ])
