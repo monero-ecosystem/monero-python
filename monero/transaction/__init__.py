@@ -236,10 +236,12 @@ class Transaction(object):
                 if vout["target"]["tagged_key"]:
                     #post fork transaction
                     stealth_address = binascii.unhexlify(vout["target"]["tagged_key"]["key"])
+                    orig_stealth_address = vout["target"]["tagged_key"]["key"]
                     on_chain_vt = binascii.unhexlify(vout["target"]["tagged_key"]["view_tag"])
             except:
                 #pre fork transaction
                 stealth_address = binascii.unhexlify(vout["target"]["key"])
+                orig_stealth_address = vout["target"]["key"]
                 on_chain_vt = False
                 pass
 
@@ -264,7 +266,7 @@ class Transaction(object):
                         break
             outs.append(
                 Output(
-                    stealth_address=stealth_address,
+                    stealth_address=orig_stealth_address,
                     amount=payment.amount if payment else amount,
                     index=self.output_indices[idx] if self.output_indices else None,
                     transaction=self,
