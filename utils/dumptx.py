@@ -6,6 +6,7 @@ import operator
 import re
 import sys
 
+from monero import exceptions
 from monero.backends.jsonrpc import JSONRPCDaemon
 from monero.daemon import Daemon
 
@@ -55,7 +56,10 @@ for tx in txs:
     print(
         "height: {:s}".format("None" if tx.height is None else "{:d}".format(tx.height))
     )
-    print("size: {:d}".format(tx.size))
+    try:
+        print("size: {:d}".format(tx.size))
+    except exceptions.TransactionWithoutBlob:
+        print("no blob, cannot check size")
     print("JSON:")
     print(json.dumps(tx.json, indent=2))
     print("-" * 79)
