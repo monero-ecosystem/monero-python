@@ -23,8 +23,45 @@ class OutputTestCase(JSONTestCase):
     wallet_jsonrpc_url = "http://127.0.0.1:38083/json_rpc"
 
     @responses.activate
-    def test_multiple_outputs(self):
+    def test_v2_single_output(self):
+        responses.add(
+            responses.POST,
+            self.wallet_jsonrpc_url,
+            json=self._read("test_v2_single_output-wallet-00-get_accounts.json"),
+            status=200,
+        )
+        responses.add(
+            responses.POST,
+            self.wallet_jsonrpc_url,
+            json=self._read("test_v2_single_output-wallet-01-query_key.json"),
+            status=200,
+        )
+        responses.add(
+            responses.POST,
+            self.wallet_jsonrpc_url,
+            json=self._read("test_v2_single_output-wallet-02-addresses-account-0.json"),
+            status=200,
+        )
+        responses.add(
+            responses.POST,
+            self.daemon_transactions_url,
+            json=self._read("test_v2_single_output-daemon-00-get_transactions.json"),
+            status=200,
+        )
+        wallet = Wallet(JSONRPCWallet(host="127.0.0.1", port=38083))
         daemon = Daemon(JSONRPCDaemon(host="127.0.0.1", port=38081))
+        tx = daemon.transactions(
+            "f5aff33df23c1410217f852a3740d1af89a44bdd0b95107e54e161f202f16d3c"
+        )[0]
+        outs = tx.outputs(wallet=wallet)
+        self.assertEqual(len(outs), 2)
+        self.assertIsNone(outs[0].payment)
+        self.assertIsNotNone(outs[1].payment)
+        self.assertEqual(outs[1].amount, Decimal("2.718281828459"))
+        self.assertEqual(outs[1].index, 4823653)
+
+    @responses.activate
+    def test_multiple_outputs(self):
         responses.add(
             responses.POST,
             self.wallet_jsonrpc_url,
@@ -56,6 +93,7 @@ class OutputTestCase(JSONTestCase):
             json=self._read("test_multiple_outputs-daemon-00-get_transactions.json"),
             status=200,
         )
+        daemon = Daemon(JSONRPCDaemon(host="127.0.0.1", port=38081))
         tx = daemon.transactions(
             "f79a10256859058b3961254a35a97a3d4d5d40e080c6275a3f9779acde73ca8d"
         )[0]

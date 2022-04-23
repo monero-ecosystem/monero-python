@@ -1598,6 +1598,7 @@ class JSONRPCDaemon(object):
                     timestamp=datetime.fromtimestamp(tx["block_timestamp"])
                     if "block_timestamp" in tx
                     else None,
+                    output_indices=tx["output_indices"],
                     blob=binascii.unhexlify(tx["as_hex"]) or None,
                     json=as_json,
                 )
