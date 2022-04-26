@@ -157,6 +157,108 @@ class OutputTestCase(JSONTestCase):
             "to [76Qt2x]",
         )
 
+    @responses.activate
+    def test_v2_single_output_with_fake_amount_to_master(self):
+        """
+        Tests a transaction with real amount of 5.0 XMR and faked amount of ~2^24 XMR
+        through a forged value of "ecdhInfo" field.
+        """
+        responses.add(
+            responses.POST,
+            self.wallet_jsonrpc_url,
+            json=self._read(
+                "test_v2_single_output_with_fake_amount_to_master-wallet-00-get_accounts.json"
+            ),
+            status=200,
+        )
+        responses.add(
+            responses.POST,
+            self.wallet_jsonrpc_url,
+            json=self._read(
+                "test_v2_single_output_with_fake_amount_to_master-wallet-01-query_key.json"
+            ),
+            status=200,
+        )
+        responses.add(
+            responses.POST,
+            self.wallet_jsonrpc_url,
+            json=self._read(
+                "test_v2_single_output_with_fake_amount_to_master-wallet-02-addresses-account-0.json"
+            ),
+            status=200,
+        )
+        responses.add(
+            responses.POST,
+            self.daemon_transactions_url,
+            json=self._read(
+                "test_v2_single_output_with_fake_amount_to_master-daemon-00-get_transactions.json"
+            ),
+            status=200,
+        )
+        wallet = Wallet(JSONRPCWallet(host="127.0.0.1", port=38083))
+        daemon = Daemon(JSONRPCDaemon(host="127.0.0.1", port=38081))
+        tx = daemon.transactions(
+            "f7e60d07c8e201b779871e3817edf8388e6ea775922def5758aef231d3ced36a"
+        )[0]
+        outs = tx.outputs(wallet=wallet)
+        self.assertEqual(len(outs), 2)
+        for n, out in enumerate(outs):
+            self.assertIsNone(
+                out.payment,
+                f"Output {n} contains a payment with incorrect ecdhInfo",
+            )
+
+    @responses.activate
+    def test_v2_single_output_with_fake_amount_to_subaddr(self):
+        """
+        Tests a transaction with real amount of 3.0 XMR and faked amount of ~2^24 XMR
+        through a forged value of "ecdhInfo" field.
+        """
+        responses.add(
+            responses.POST,
+            self.wallet_jsonrpc_url,
+            json=self._read(
+                "test_v2_single_output_with_fake_amount_to_subaddr-wallet-00-get_accounts.json"
+            ),
+            status=200,
+        )
+        responses.add(
+            responses.POST,
+            self.wallet_jsonrpc_url,
+            json=self._read(
+                "test_v2_single_output_with_fake_amount_to_subaddr-wallet-01-query_key.json"
+            ),
+            status=200,
+        )
+        responses.add(
+            responses.POST,
+            self.wallet_jsonrpc_url,
+            json=self._read(
+                "test_v2_single_output_with_fake_amount_to_subaddr-wallet-02-addresses-account-0.json"
+            ),
+            status=200,
+        )
+        responses.add(
+            responses.POST,
+            self.daemon_transactions_url,
+            json=self._read(
+                "test_v2_single_output_with_fake_amount_to_subaddr-daemon-00-get_transactions.json"
+            ),
+            status=200,
+        )
+        wallet = Wallet(JSONRPCWallet(host="127.0.0.1", port=38083))
+        daemon = Daemon(JSONRPCDaemon(host="127.0.0.1", port=38081))
+        tx = daemon.transactions(
+            "54731f9263e92c9e249d8eb677f7c8f1c7edb9812092479f026062139842e0e0"
+        )[0]
+        outs = tx.outputs(wallet=wallet)
+        self.assertEqual(len(outs), 2)
+        for n, out in enumerate(outs):
+            self.assertIsNone(
+                out.payment,
+                f"Output {n} contains a payment with incorrect ecdhInfo",
+            )
+
     def test_coinbase_no_own_output(self):
         txdata = self._read("test_coinbase_no_own_output-26dcb5.json")
         tx = Transaction(

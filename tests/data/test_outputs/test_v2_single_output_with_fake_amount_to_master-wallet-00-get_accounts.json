@@ -1,0 +1,18 @@
+{
+  "id": 0,
+  "jsonrpc": "2.0",
+  "result": {
+    "subaddress_accounts": [
+      {
+        "account_index": 0,
+        "balance": 11709717332048,
+        "base_address": "54LUsTyVL2haFdvkUVngGCiacaRYkjrUvfhvnF6JS2fXNL6twQUQf7PEPtf9MvRYXvhVmtzcV2MUefinDjjwVcH56xm3AHx",
+        "label": "Primary account",
+        "tag": "",
+        "unlocked_balance": 11709717332048
+      }
+    ],
+    "total_balance": 11709717332048,
+    "total_unlocked_balance": 11709717332048
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "credits": 0,
+  "status": "OK",
+  "top_hash": "",
+  "txs": [
+    {
+      "as_hex": "",
+      "as_json": "{\n  \"version\": 2, \n  \"unlock_time\": 0, \n  \"vin\": [ {\n      \"key\": {\n        \"amount\": 0, \n        \"key_offsets\": [ 4325102, 464564, 19546, 7828, 15534, 180, 1645, 763, 454, 2046, 9\n        ], \n        \"k_image\": \"235fa321338a6317a6064fc13b9917c5b9e36dc929b0d3f01d19a6ff9a1d9169\"\n      }\n    }\n  ], \n  \"vout\": [ {\n      \"amount\": 0, \n      \"target\": {\n        \"key\": \"4cd1c255c3247d2c2324fb580dd66f1158acc0ba352a4bddf9bb5d724f2b9d4a\"\n      }\n    }, {\n      \"amount\": 0, \n      \"target\": {\n        \"key\": \"72a976004da61eabbe7ef1f074ac1ad960347f18b63e79c0b4075c70c6faa71a\"\n      }\n    }\n  ], \n  \"extra\": [ 1, 147, 181, 21, 141, 147, 122, 16, 161, 230, 64, 52, 218, 173, 173, 125, 69, 35, 14, 168, 251, 151, 140, 33, 64, 2, 68, 15, 75, 31, 24, 59, 150, 2, 9, 1, 56, 181, 21, 158, 240, 73, 6, 247\n  ], \n  \"rct_signatures\": {\n    \"type\": 5, \n    \"txnFee\": 44760000, \n    \"ecdhInfo\": [ {\n        \"amount\": \"bb400d3177c30ab5\"\n      }, {\n        \"amount\": \"c284adb69f34912c\"\n      }], \n    \"outPk\": [ \"2b63045a7fc922e73eb74cf179ca1640f36ba97ce8f27137dc30ca8e407d99c1\", \"a25db81bcfaf13950d9a353c6c2a55f45e103fa91d3dadad19cb1087f425fa96\"]\n  }\n}",
+      "block_height": 1079424,
+      "block_timestamp": 1650936396,
+      "double_spend_seen": false,
+      "in_pool": false,
+      "output_indices": [
+        4837766,
+        4837767
+      ],
+      "prunable_as_hex": "",
+      "prunable_hash": "ab173d3c08a7251cfd9ca58c67345368828f6f5f1d92972b79d080489956c154",
+      "pruned_as_hex": "02000102000beefd8702b4ad1cda9801943dae79b401ed0cfb05c603fe0f09235fa321338a6317a6064fc13b9917c5b9e36dc929b0d3f01d19a6ff9a1d91690200024cd1c255c3247d2c2324fb580dd66f1158acc0ba352a4bddf9bb5d724f2b9d4a000272a976004da61eabbe7ef1f074ac1ad960347f18b63e79c0b4075c70c6faa71a2c0193b5158d937a10a1e64034daadad7d45230ea8fb978c214002440f4b1f183b9602090138b5159ef04906f705c0f7ab15bb400d3177c30ab5c284adb69f34912c2b63045a7fc922e73eb74cf179ca1640f36ba97ce8f27137dc30ca8e407d99c1a25db81bcfaf13950d9a353c6c2a55f45e103fa91d3dadad19cb1087f425fa96",
+      "tx_hash": "f7e60d07c8e201b779871e3817edf8388e6ea775922def5758aef231d3ced36a"
+    }
+  ],
+  "txs_as_hex": [
+    ""
+  ],
+  "txs_as_json": [
+    "{\n  \"version\": 2, \n  \"unlock_time\": 0, \n  \"vin\": [ {\n      \"key\": {\n        \"amount\": 0, \n        \"key_offsets\": [ 4325102, 464564, 19546, 7828, 15534, 180, 1645, 763, 454, 2046, 9\n        ], \n        \"k_image\": \"235fa321338a6317a6064fc13b9917c5b9e36dc929b0d3f01d19a6ff9a1d9169\"\n      }\n    }\n  ], \n  \"vout\": [ {\n      \"amount\": 0, \n      \"target\": {\n        \"key\": \"4cd1c255c3247d2c2324fb580dd66f1158acc0ba352a4bddf9bb5d724f2b9d4a\"\n      }\n    }, {\n      \"amount\": 0, \n      \"target\": {\n        \"key\": \"72a976004da61eabbe7ef1f074ac1ad960347f18b63e79c0b4075c70c6faa71a\"\n      }\n    }\n  ], \n  \"extra\": [ 1, 147, 181, 21, 141, 147, 122, 16, 161, 230, 64, 52, 218, 173, 173, 125, 69, 35, 14, 168, 251, 151, 140, 33, 64, 2, 68, 15, 75, 31, 24, 59, 150, 2, 9, 1, 56, 181, 21, 158, 240, 73, 6, 247\n  ], \n  \"rct_signatures\": {\n    \"type\": 5, \n    \"txnFee\": 44760000, \n    \"ecdhInfo\": [ {\n        \"amount\": \"bb400d3177c30ab5\"\n      }, {\n        \"amount\": \"c284adb69f34912c\"\n      }], \n    \"outPk\": [ \"2b63045a7fc922e73eb74cf179ca1640f36ba97ce8f27137dc30ca8e407d99c1\", \"a25db81bcfaf13950d9a353c6c2a55f45e103fa91d3dadad19cb1087f425fa96\"]\n  }\n}"
+  ],
+  "untrusted": false
+}

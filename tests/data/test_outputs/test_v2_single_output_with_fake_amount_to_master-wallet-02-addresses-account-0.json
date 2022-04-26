@@ -1,0 +1,69 @@
+{
+  "id": 0,
+  "jsonrpc": "2.0",
+  "result": {
+    "address": "54LUsTyVL2haFdvkUVngGCiacaRYkjrUvfhvnF6JS2fXNL6twQUQf7PEPtf9MvRYXvhVmtzcV2MUefinDjjwVcH56xm3AHx",
+    "addresses": [
+      {
+        "address": "54LUsTyVL2haFdvkUVngGCiacaRYkjrUvfhvnF6JS2fXNL6twQUQf7PEPtf9MvRYXvhVmtzcV2MUefinDjjwVcH56xm3AHx",
+        "address_index": 0,
+        "label": "Primary account",
+        "used": true
+      },
+      {
+        "address": "74fu2Uiveqg8XwxtLK4kdMPkCZNuW8gGC7nWgB8kJF1rACfbGvPKirrSaKFnxtUJePfnGTPRQ1Tp3jR2PKAavqQ7RNrsJbb",
+        "address_index": 1,
+        "label": "(Untitled address)",
+        "used": true
+      },
+      {
+        "address": "72KSFPEUK5MDvo716tgRrndsRgB3UtWczAXVBjqDZCvRitvUKKA8saNH9LCD1ExCM5VAKuZJTtnH495vEupxRn7EEYbUrGV",
+        "address_index": 2,
+        "label": "(Untitled address)",
+        "used": true
+      },
+      {
+        "address": "7As2Hf3RwGWSCJAPFFHXDyLg5qywN8MiqcmpWPiM3Mc7bmuoA1V78HWEf3GctXtveHSH35hk6NVGK7TAQoyXpy3ATvEYgPz",
+        "address_index": 3,
+        "label": "(Untitled address)",
+        "used": true
+      },
+      {
+        "address": "771dkwjPR1UDTMM7NVbJ6LDX2pQdBaHqDZKSzViPTDaxVjG7idfF9uP2i8xftcV1JfZYESDzvFvAUJ1ym89uPy7VQ9Nd9BA",
+        "address_index": 4,
+        "label": "(Untitled address)",
+        "used": true
+      },
+      {
+        "address": "798wHkYNUqc5UWYdeYiFmrYeXV7Rd23MqasV3YWAYLbeieYb3ogLEkB9TugZkP72qMMtnhxAuyr62P9GLk3Ai5EMS6mCTdu",
+        "address_index": 5,
+        "label": "(Untitled address)",
+        "used": true
+      },
+      {
+        "address": "7AVgqHzSLu227tv2HGvPAYcbVqTzbbNsAC99QpPZwZzudGsEypD4ZjrQQcansdaQGDLtUbdEhqHfeNjgEWPFAUoVGq1dnbE",
+        "address_index": 6,
+        "label": "(Untitled address)",
+        "used": true
+      },
+      {
+        "address": "77xBMPG3k5qEmQmreBbeqJYwcx9kkEz2y2abCFvRRrjKZVr2LVois3kGRM4kzXUqmj7PtTkiUza6rXnNZ5HM17pd2AbsVEA",
+        "address_index": 7,
+        "label": "(Untitled address)",
+        "used": true
+      },
+      {
+        "address": "72barfe7Sp9JZkyLCYLn3wfGhysUUQJqgJPp7DtjStjFdFUXR376ypzYKyxgMcXNE3AStjFmaSKAq6pv78jKPsbTTLq3uNb",
+        "address_index": 8,
+        "label": "(Untitled address)",
+        "used": true
+      },
+      {
+        "address": "77a1kZkpr9uZMD2kcunkE67JiNN6dZhXAUa6ACFtP8j4MqTipM1QW5FSLkeEJZ5jzaMYNauPcavyPMF2VCVr8i5XEFizNkv",
+        "address_index": 9,
+        "label": "(Untitled address)",
+        "used": false
+      }
+    ]
+  }
+}
