@@ -3,6 +3,13 @@
 Python module for Monero
 ========================
 
+.. warning:: **URGENT SECURITY UPDATE**
+   The version 1.0.2 contains an urgent security update in the output recognition code. If you're
+   using the module for scanning transactions and identifying outputs using the secret view key,
+   UPDATE THE SOFTWARE IMMEDIATELY.
+   Otherwise you're safe. Standard wallet operations like receiving payments, spending, address
+   generation etc. are NOT AFFECTED.
+
 Welcome to the documentation for the ``monero`` Python module.
 
 The aim of this project is to offer a set of tools for interacting with Monero

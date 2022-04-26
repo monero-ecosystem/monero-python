@@ -11,6 +11,12 @@ Python Monero module
 .. |coveralls| image:: https://coveralls.io/repos/github/monero-ecosystem/monero-python/badge.svg
 .. _coveralls: https://coveralls.io/github/monero-ecosystem/monero-python
 
+.. warning:: **URGENT SECURITY UPDATE**
+   The version 1.0.2 contains an urgent security update in the output recognition code. If you're
+   using the module for scanning transactions and identifying outputs using the secret view key,
+   UPDATE THE SOFTWARE IMMEDIATELY.
+   Otherwise you're safe. Standard wallet operations like receiving payments, spending, address
+   generation etc. are NOT AFFECTED.
 
 A comprehensive Python module for handling Monero cryptocurrency.
 
