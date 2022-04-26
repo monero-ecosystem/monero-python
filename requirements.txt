@@ -1,4 +1,4 @@
-pycryptodomex~=3.10
+pycryptodomex~=3.14
 pynacl~=1.4
 pysocks~=1.7
 requests
