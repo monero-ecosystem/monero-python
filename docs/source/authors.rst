@@ -4,7 +4,7 @@ Authors
 * Michał Sałaban <michal@salaban.info>
 * MoneroPy Developers (``monero/base58.py`` taken from `MoneroPy`_)
 * thomasv@gitorious (``monero/seed.py`` based on `Electrum`_)
-* and other Contributors: `lalanza808`_, `cryptochangements34`_, `atward`_, `rooterkyberian`_, `brucexiu`_, `lialsoftlab`_, `moneroexamples`_, `massanchik`_, `MrClottom`_, `jeffro256`_, `sometato`_.
+* and other Contributors: `lalanza808`_, `cryptochangements34`_, `atward`_, `rooterkyberian`_, `brucexiu`_, `lialsoftlab`_, `moneroexamples`_, `massanchik`_, `MrClottom`_, `jeffro256`_, `sometato`_, `kayabaNerve`_, `j-berman`_.
 
 
 .. _`LICENSE.txt`: LICENSE.txt
@@ -22,6 +22,8 @@ Authors
 .. _`MrClottom`: https://github.com/MrClottom
 .. _`jeffro256`: https://github.com/jeffro256
 .. _`sometato`: https://github.com/sometato
+.. _`kayabaNerve`: https://github.com/kayabaNerve
+.. _`j-berman`: https://github.com/j-berman
 
 Acknowledgements
 ----------------

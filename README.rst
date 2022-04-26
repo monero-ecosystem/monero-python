@@ -37,7 +37,7 @@ Released under the BSD 3-Clause License. See `LICENSE.txt`_.
 Copyright (c) 2017-2018 Michał Sałaban <michal@salaban.info> and Contributors:
 `lalanza808`_, `cryptochangements34`_, `atward`_, `rooterkyberian`_, `brucexiu`_,
 `lialsoftlab`_, `moneroexamples`_, `massanchik`_, `MrClottom`_, `jeffro256`_,
-`sometato`_.
+`sometato`_, `kayabaNerve`_, `j-berman`_.
 
 Copyright (c) 2016 The MoneroPy Developers (``monero/base58.py`` taken from `MoneroPy`_)
 
@@ -58,6 +58,8 @@ Copyright (c) 2011 thomasv@gitorious (``monero/seed.py`` based on `Electrum`_)
 .. _`MrClottom`: https://github.com/MrClottom
 .. _`jeffro256`: https://github.com/jeffro256
 .. _`sometato`: https://github.com/sometato
+.. _`kayabaNerve`: https://github.com/kayabaNerve
+.. _`j-berman`: https://github.com/j-berman
 
 Want to help?
 -------------
