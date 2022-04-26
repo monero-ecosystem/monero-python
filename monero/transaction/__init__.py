@@ -140,7 +140,7 @@ class Transaction(object):
         already generated.
         """
 
-        def _scan_pubkeys(svk, psk, stealth_address, amount, encamount):
+        def _scan_pubkeys(svk, psk, stealth_address, amount, encamount, commitment):
             for keyidx, tx_key in enumerate(self.pubkeys):
                 # precompute
                 svk_2 = ed25519.scalar_add(svk, svk)
@@ -174,14 +174,22 @@ class Transaction(object):
                 dec_amount = bytearray(
                     a ^ b for a, b in zip(*map(bytearray, (encamount, xormask)))
                 )
-                int_amount = struct.unpack("<Q", dec_amount)[0]
-                amount = from_atomic(int_amount)
-                return Payment(
-                    amount=amount,
-                    timestamp=self.timestamp,
-                    transaction=self,
-                    local_address=addr,
-                )
+                # verify that the commitment == yG + bH
+                # https://web.getmonero.org/library/Zero-to-Monero-2-0-0.pdf#section.5.3
+                y = ed25519.scalar_reduce(keccak_256(b"commitment_mask" + Hs).digest())
+                yG = ed25519.scalarmult_B(y)
+                b = ed25519.scalar_reduce(bytes(dec_amount))
+                bH = ed25519.scalarmult_H(b)
+                amount = 0
+                if commitment == ed25519.edwards_add(yG, bH):
+                    int_amount = struct.unpack("<Q", dec_amount)[0]
+                    amount = from_atomic(int_amount)
+                    return Payment(
+                        amount=amount,
+                        timestamp=self.timestamp,
+                        transaction=self,
+                        local_address=addr,
+                    )
 
         if not self.json:
             raise exceptions.TransactionWithoutJSON(
@@ -203,9 +211,13 @@ class Transaction(object):
         for idx, vout in enumerate(self.json["vout"]):
             stealth_address = binascii.unhexlify(vout["target"]["key"])
             encamount = None
+            commitment = None
             if self.version == 2 and not self.is_coinbase:
                 encamount = binascii.unhexlify(
                     self.json["rct_signatures"]["ecdhInfo"][idx]["amount"]
+                )
+                commitment = binascii.unhexlify(
+                    self.json["rct_signatures"]["outPk"][idx]
                 )
             payment = None
             amount = (
@@ -217,7 +229,7 @@ class Transaction(object):
                 for addridx, addr in enumerate(addresses):
                     psk = binascii.unhexlify(addr.spend_key())
                     payment = _scan_pubkeys(
-                        svk, psk, stealth_address, amount, encamount
+                        svk, psk, stealth_address, amount, encamount, commitment
                     )
                     if payment:
                         break
