@@ -140,16 +140,30 @@ class Transaction(object):
         already generated.
         """
 
-        def _scan_pubkeys(svk, psk, stealth_address, amount, encamount, commitment):
+        def _scan_pubkeys(
+            svk, psk, stealth_address, amount, encamount, commitment, on_chain_vt
+        ):
             for keyidx, tx_key in enumerate(self.pubkeys):
                 # precompute
                 svk_2 = ed25519.scalar_add(svk, svk)
                 svk_4 = ed25519.scalar_add(svk_2, svk_2)
                 svk_8 = ed25519.scalar_add(svk_4, svk_4)
                 #
+                shared_secret = ed25519.scalarmult(svk_8, tx_key)
+                if on_chain_vt:
+                    vt_hsdata = b"".join(
+                        [b"view_tag", shared_secret, varint.encode(idx)]
+                    )
+                    vt_full = keccak_256(vt_hsdata).digest()
+                    vt = vt_full[0:1]
+                    if vt != on_chain_vt:
+                        # short-circuit so it doesn't have to do the rest of this for ~99.6% of outputs
+                        # the view tag check yields false positives 1/256 times, because it's just 1 byte
+                        continue
+
                 hsdata = b"".join(
                     [
-                        ed25519.scalarmult(svk_8, tx_key),
+                        shared_secret,
                         varint.encode(idx),
                     ]
                 )
@@ -207,9 +221,43 @@ class Transaction(object):
                     *map(operator.methodcaller("addresses"), wallet.accounts)
                 )
             )
+        """
+        pre hard fork:
+        { 
+          "target": {
+            "key": "ea3f..."
+          }
+        }
+        post hard fork:
+        { 
+          "target": {
+            "tagged_key": {
+              "key": "ea3f...",
+              "view_tag": "a1"
+            }
+          }
+        }
+        """
         outs = []
         for idx, vout in enumerate(self.json["vout"]):
-            stealth_address = binascii.unhexlify(vout["target"]["key"])
+            # see if post hard fork json structure present:
+            try:
+                if vout["target"]["tagged_key"]:
+                    # post fork transaction
+                    stealth_address = binascii.unhexlify(
+                        vout["target"]["tagged_key"]["key"]
+                    )
+                    orig_stealth_address = vout["target"]["tagged_key"]["key"]
+                    on_chain_vt = binascii.unhexlify(
+                        vout["target"]["tagged_key"]["view_tag"]
+                    )
+            except:
+                # pre fork transaction
+                stealth_address = binascii.unhexlify(vout["target"]["key"])
+                orig_stealth_address = vout["target"]["key"]
+                on_chain_vt = False
+                pass
+
             encamount = None
             commitment = None
             if self.version == 2 and not self.is_coinbase:
@@ -229,13 +277,19 @@ class Transaction(object):
                 for addridx, addr in enumerate(addresses):
                     psk = binascii.unhexlify(addr.spend_key())
                     payment = _scan_pubkeys(
-                        svk, psk, stealth_address, amount, encamount, commitment
+                        svk,
+                        psk,
+                        stealth_address,
+                        amount,
+                        encamount,
+                        commitment,
+                        on_chain_vt,
                     )
                     if payment:
                         break
             outs.append(
                 Output(
-                    stealth_address=vout["target"]["key"],
+                    stealth_address=orig_stealth_address,
                     amount=payment.amount if payment else amount,
                     index=self.output_indices[idx] if self.output_indices else None,
                     transaction=self,
