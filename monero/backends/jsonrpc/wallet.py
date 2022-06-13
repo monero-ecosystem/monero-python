@@ -440,6 +440,6 @@ _err2exc = {
     -29: exceptions.WalletIsWatchOnly,
     -37: exceptions.NotEnoughUnlockedMoney,
     -38: exceptions.NoDaemonConnection,
-    -43: exceptions.WalletIsNotDeterministic,  # https://github.com/monero-project/monero/pull/4653
+    -43: exceptions.WalletIsNotDeterministic,
     -32601: MethodNotFound,
 }
