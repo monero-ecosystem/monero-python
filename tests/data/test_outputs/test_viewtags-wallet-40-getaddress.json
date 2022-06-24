@@ -1,0 +1,27 @@
+{
+  "id": 0,
+  "jsonrpc": "2.0",
+  "result": {
+    "address": "9sotHmY781cAChddb8JRC9Yjuiifgq381b5nepg5FKyF3EYcQfhWLfScnSoYepu2WiCriBW7oqPkc3r9DJ8M9BE5JQeKAAp",
+    "addresses": [
+      {
+        "address": "9sotHmY781cAChddb8JRC9Yjuiifgq381b5nepg5FKyF3EYcQfhWLfScnSoYepu2WiCriBW7oqPkc3r9DJ8M9BE5JQeKAAp",
+        "address_index": 0,
+        "label": "Primary account",
+        "used": false
+      },
+      {
+        "address": "BgnjGyQMqyz8DTRxaAat7oVWBoncUG3PmY5rwf4VBLWY6giSVbEaZec6Ae8w6GK1ZhgfFZnCL4EfXMjL1T5mkRdKKEVqSfC",
+        "address_index": 1,
+        "label": "",
+        "used": true
+      },
+      {
+        "address": "BhS5oGvXMGqJLtQFea7ip3fJiYN9s23qr3nubeHLwGrf7RDPb5qm6m75VY29TCkjKF4ENANPXmkPt3opjV27t7eyDj5PmY1",
+        "address_index": 2,
+        "label": "",
+        "used": true
+      }
+    ]
+  }
+}

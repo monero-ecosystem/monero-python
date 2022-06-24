@@ -10,18 +10,20 @@ import responses
 from monero.backends.jsonrpc import JSONRPCDaemon, JSONRPCWallet
 from monero.backends.offline import OfflineWallet
 from monero.daemon import Daemon
-from monero.transaction import Transaction
+from monero.transaction import Transaction, Payment
 from monero.transaction.extra import ExtraParser
 from monero.wallet import Wallet
 
 from .base import JSONTestCase
 
 
-class OutputTestCase(JSONTestCase):
+class OutputTestBase(JSONTestCase):
     data_subdir = "test_outputs"
     daemon_transactions_url = "http://127.0.0.1:38081/get_transactions"
     wallet_jsonrpc_url = "http://127.0.0.1:38083/json_rpc"
 
+
+class OutputTestCase(OutputTestBase):
     @responses.activate
     def test_v2_single_output(self):
         responses.add(
@@ -457,3 +459,87 @@ class OutputTestCase(JSONTestCase):
         )
         with self.assertRaises(ValueError):
             pdata = ep.parse()
+
+
+class ViewtagsTestCase(OutputTestBase):
+    @responses.activate
+    def test_viewtags(self):
+        responses.add(
+            responses.POST,
+            self.wallet_jsonrpc_url,
+            json=self._read("test_viewtags-wallet-00-get_accounts.json"),
+            status=200,
+        )
+        for _ in range(4):
+            responses.add(
+                responses.POST,
+                self.wallet_jsonrpc_url,
+                json=self._read("test_viewtags-wallet-20-query_key.json"),
+                status=200,
+            )
+            responses.add(
+                responses.POST,
+                self.wallet_jsonrpc_url,
+                json=self._read("test_viewtags-wallet-40-getaddress.json"),
+                status=200,
+            )
+        responses.add(
+            responses.POST,
+            self.daemon_transactions_url,
+            json=self._read("test_viewtags-daemon-00-get_transactions.json"),
+            status=200,
+        )
+        wallet = Wallet(JSONRPCWallet(host="127.0.0.1", port=38083))
+        daemon = Daemon(JSONRPCDaemon(host="127.0.0.1", port=38081))
+        txns = daemon.transactions(
+            [
+                "e59f9d72780d4b4df0b0b776cffa39f50daf9cc9607c77ad6fa47e564c937b73",
+                "ac30f84fcb0b96f38cf789de04fb643fa6be45856546f57b6eb15a099b0feea1",
+                "701a1dd65581ad964b7c603025b251223c6e8e00c6fd9b63d0f4796613fc4d49",
+                "27b6aa8380daaab5641e7318f9b7ba8e7a8097734e6e979fc0390056f6ec9546",
+            ]
+        )
+        # e59f9d72780d4b4df0b0b776cffa39f50daf9cc9607c77ad6fa47e564c937b73
+        tx = txns[0]
+        outputs = tx.outputs(wallet)
+        self.assertEqual(len(outputs), 2)
+        self.assertIsInstance(outputs[0].payment, Payment)
+        self.assertIsNone(outputs[1].payment)
+        self.assertEqual(outputs[0].payment.amount, Decimal("1.0"))
+        self.assertEqual(
+            outputs[0].payment.local_address,
+            "BgnjGyQMqyz8DTRxaAat7oVWBoncUG3PmY5rwf4VBLWY6giSVbEaZec6Ae8w6GK1ZhgfFZnCL4EfXMjL1T5mkRdKKEVqSfC",
+        )
+        # ac30f84fcb0b96f38cf789de04fb643fa6be45856546f57b6eb15a099b0feea1
+        tx = txns[1]
+        outputs = tx.outputs(wallet)
+        self.assertEqual(len(outputs), 2)
+        self.assertIsInstance(outputs[0].payment, Payment)
+        self.assertIsNone(outputs[1].payment)
+        self.assertEqual(outputs[0].payment.amount, Decimal("1.0"))
+        self.assertEqual(
+            outputs[0].payment.local_address,
+            "BgnjGyQMqyz8DTRxaAat7oVWBoncUG3PmY5rwf4VBLWY6giSVbEaZec6Ae8w6GK1ZhgfFZnCL4EfXMjL1T5mkRdKKEVqSfC",
+        )
+        # 701a1dd65581ad964b7c603025b251223c6e8e00c6fd9b63d0f4796613fc4d49
+        tx = txns[2]
+        outputs = tx.outputs(wallet)
+        self.assertEqual(len(outputs), 2)
+        self.assertIsInstance(outputs[0].payment, Payment)
+        self.assertIsNone(outputs[1].payment)
+        self.assertEqual(outputs[0].payment.amount, Decimal("1.0"))
+        self.assertEqual(
+            outputs[0].payment.local_address,
+            "BhS5oGvXMGqJLtQFea7ip3fJiYN9s23qr3nubeHLwGrf7RDPb5qm6m75VY29TCkjKF4ENANPXmkPt3opjV27t7eyDj5PmY1",
+        )
+        # 27b6aa8380daaab5641e7318f9b7ba8e7a8097734e6e979fc0390056f6ec9546
+        tx = txns[3]
+        outputs = tx.outputs(wallet)
+        self.assertEqual(len(outputs), 2)
+        self.assertIsInstance(outputs[0].payment, Payment)
+        self.assertIsNone(outputs[1].payment)
+        self.assertEqual(outputs[0].payment.amount, Decimal("1.0"))
+        self.assertEqual(
+            outputs[0].payment.local_address,
+            "BgnjGyQMqyz8DTRxaAat7oVWBoncUG3PmY5rwf4VBLWY6giSVbEaZec6Ae8w6GK1ZhgfFZnCL4EfXMjL1T5mkRdKKEVqSfC",
+        )
