@@ -1440,8 +1440,8 @@ class JSONRPCDaemon(object):
         """
 
         if out_peers_arg < 0:
-            out_peers_arg = 2 ** 32 - 1
-        elif out_peers_arg > 2 ** 32 - 1:
+            out_peers_arg = 2**32 - 1
+        elif out_peers_arg > 2**32 - 1:
             raise ValueError('out_peers_arg "{}" is too large'.format(out_peers_arg))
 
         return self.raw_request("/out_peers", data={"out_peers": int(out_peers_arg)})
@@ -1459,8 +1459,8 @@ class JSONRPCDaemon(object):
         """
 
         if in_peers_arg < 0:
-            in_peers_arg = 2 ** 32 - 1
-        elif in_peers_arg > 2 ** 32 - 1:
+            in_peers_arg = 2**32 - 1
+        elif in_peers_arg > 2**32 - 1:
             raise ValueError('in_peers_arg "{}" is too large'.format(in_peers_arg))
 
         return self.raw_request("/in_peers", data={"in_peers": int(in_peers_arg)})
@@ -1598,7 +1598,9 @@ class JSONRPCDaemon(object):
                     timestamp=datetime.fromtimestamp(tx["block_timestamp"])
                     if "block_timestamp" in tx
                     else None,
-                    output_indices=tx["output_indices"],
+                    output_indices=tx["output_indices"]
+                    if "output_indices" in tx
+                    else None,
                     blob=binascii.unhexlify(tx["as_hex"]) or None,
                     json=as_json,
                 )
