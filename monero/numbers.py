@@ -10,9 +10,9 @@ def to_atomic(amount):
     if not isinstance(amount, (Decimal, float) + six.integer_types):
         raise ValueError(
             "Amount '{}' doesn't have numeric type. Only Decimal, int, long and "
-            "float (not recommended) are accepted as amounts."
+            "float (not recommended) are accepted as amounts.".format(amount)
         )
-    return int(amount * 10 ** 12)
+    return int(amount * 10**12)
 
 
 def from_atomic(amount):
