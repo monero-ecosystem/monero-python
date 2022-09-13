@@ -1,6 +1,22 @@
 Release Notes
 =============
 
+1.1.0
+-----
+
+This version doesn't contain any major changes but drops support for Python 2 altogether.
+
+1.0.2
+-----
+
+**A release with critical security fix.** All since 0.99 (inclusively) are compromised and should
+be never used again.
+
+1.0
+---
+
+A release with no significant changes from 0.99
+
 0.99
 ----
 
