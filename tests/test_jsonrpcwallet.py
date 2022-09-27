@@ -2,11 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 import responses
 import requests
-
-try:
-    from unittest.mock import patch, Mock
-except ImportError:
-    from mock import patch, Mock
+from unittest.mock import patch
 
 from monero.wallet import Wallet
 from monero.address import BaseAddress, Address, SubAddress
@@ -219,6 +215,146 @@ class JSONRPCWalletTestCase(JSONTestCase):
         subaddr, index = w.accounts[1].new_address()
         self.assertIsInstance(subaddr, SubAddress)
         self.assertIsInstance(index, int)
+
+    @responses.activate
+    def test_address_balance(self):
+        responses.add(
+            responses.POST,
+            self.jsonrpc_url,
+            json=self._read("test_address_balance-00-get_accounts.json"),
+            status=200,
+        )
+        responses.add(
+            responses.POST,
+            self.jsonrpc_url,
+            json=self._read("test_address_balance-10-get_address.json"),
+            status=200,
+        )
+        responses.add(
+            responses.POST,
+            self.jsonrpc_url,
+            json=self._read("test_address_balance-20-get_balance-noargs.json"),
+            status=200,
+        )
+        responses.add(
+            responses.POST,
+            self.jsonrpc_url,
+            json=self._read("test_address_balance-10-get_address.json"),
+            status=200,
+        )
+        responses.add(
+            responses.POST,
+            self.jsonrpc_url,
+            json=self._read("test_address_balance-30-get_balance-0-2.json"),
+            status=200,
+        )
+        responses.add(
+            responses.POST,
+            self.jsonrpc_url,
+            json=self._read("test_address_balance-10-get_address.json"),
+            status=200,
+        )
+        responses.add(
+            responses.POST,
+            self.jsonrpc_url,
+            json=self._read("test_address_balance-30-get_balance-0-2.json"),
+            status=200,
+        )
+        responses.add(
+            responses.POST,
+            self.jsonrpc_url,
+            json=self._read("test_address_balance-10-get_address.json"),
+            status=200,
+        )
+        responses.add(
+            responses.POST,
+            self.jsonrpc_url,
+            json=self._read("test_address_balance-30-get_balance-0-2.json"),
+            status=200,
+        )
+        responses.add(
+            responses.POST,
+            self.jsonrpc_url,
+            json=self._read("test_address_balance-10-get_address.json"),
+            status=200,
+        )
+        responses.add(
+            responses.POST,
+            self.jsonrpc_url,
+            json=self._read("test_address_balance-30-get_balance-0-2.json"),
+            status=200,
+        )
+        w = Wallet(JSONRPCWallet())
+        addrbal_noparams = w.address_balance()
+        addrbal_a0_a2 = w.address_balance(
+            addresses=(
+                "55LTR8KniP4LQGJSPtbYDacR7dz8RBFnsfAKMaMuwUNYX6aQbBcovzDPyrQF9KXF9tVU6Xk3K8no1BywnJX6GvZX8yJsXvt",
+                "75sNpRwUtekcJGejMuLSGA71QFuK1qcCVLZnYRTfQLgFU5nJ7xiAHtR5ihioS53KMe8pBhH61moraZHyLoG4G7fMER8xkNv",
+            )
+        )
+        addrbal_i0_a2 = w.address_balance(
+            addresses=[
+                0,
+                "75sNpRwUtekcJGejMuLSGA71QFuK1qcCVLZnYRTfQLgFU5nJ7xiAHtR5ihioS53KMe8pBhH61moraZHyLoG4G7fMER8xkNv",
+            ]
+        )
+        addrbal_a0_i2 = w.address_balance(
+            addresses={
+                "55LTR8KniP4LQGJSPtbYDacR7dz8RBFnsfAKMaMuwUNYX6aQbBcovzDPyrQF9KXF9tVU6Xk3K8no1BywnJX6GvZX8yJsXvt",
+                2,
+            }
+        )
+        addrbal_i0_i2 = w.address_balance(
+            addresses=(
+                0,
+                2,
+            )
+        )
+        # make sure all parametrized sequences are equal
+        self.assertSequenceEqual(addrbal_a0_a2, addrbal_i0_i2)
+        self.assertSequenceEqual(addrbal_i0_a2, addrbal_a0_i2)
+        self.assertSequenceEqual(addrbal_i0_a2, addrbal_i0_i2)
+        # check the final results
+        self.assertSequenceEqual(
+            addrbal_noparams,
+            [
+                (
+                    0,
+                    "55LTR8KniP4LQGJSPtbYDacR7dz8RBFnsfAKMaMuwUNYX6aQbBcovzDPyrQF9KXF9tVU6Xk3K8no1BywnJX6GvZX8yJsXvt",
+                    Decimal("12943.277373064573"),
+                    1291,
+                ),
+                (
+                    1,
+                    "7BnERTpvL5MbCLtj5n9No7J5oE5hHiB3tVCK5cjSvCsYWD2WRJLFuWeKTLiXo5QJqt2ZwUaLy2Vh1Ad51K7FNgqcHgjW85o",
+                    Decimal("38.051052264381"),
+                    75,
+                ),
+                (
+                    2,
+                    "75sNpRwUtekcJGejMuLSGA71QFuK1qcCVLZnYRTfQLgFU5nJ7xiAHtR5ihioS53KMe8pBhH61moraZHyLoG4G7fMER8xkNv",
+                    Decimal("0.800200000000"),
+                    5,
+                ),
+            ],
+        )
+        self.assertSequenceEqual(
+            addrbal_a0_a2,
+            [
+                (
+                    0,
+                    "55LTR8KniP4LQGJSPtbYDacR7dz8RBFnsfAKMaMuwUNYX6aQbBcovzDPyrQF9KXF9tVU6Xk3K8no1BywnJX6GvZX8yJsXvt",
+                    Decimal("12943.277373064573"),
+                    1291,
+                ),
+                (
+                    2,
+                    "75sNpRwUtekcJGejMuLSGA71QFuK1qcCVLZnYRTfQLgFU5nJ7xiAHtR5ihioS53KMe8pBhH61moraZHyLoG4G7fMER8xkNv",
+                    Decimal("0.800200000000"),
+                    5,
+                ),
+            ],
+        )
 
     @patch.object(requests.Session, "post")
     def test_incoming_confirmed(self, mock_post):
@@ -1603,9 +1739,9 @@ class JSONRPCWalletTestCase(JSONTestCase):
         }
         outs_hex = self.wallet.export_outputs()
         mock_post.return_value.json.return_value = {
-            u"id": 0,
-            u"jsonrpc": u"2.0",
-            u"result": {u"num_imported": 9},
+            "id": 0,
+            "jsonrpc": "2.0",
+            "result": {"num_imported": 9},
         }
         self.assertEqual(self.wallet.import_outputs(outs_hex), 9)
 
@@ -1616,54 +1752,54 @@ class JSONRPCWalletTestCase(JSONTestCase):
         self.wallet = Wallet(JSONRPCWallet())
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = {
-            u"id": 0,
-            u"jsonrpc": u"2.0",
-            u"result": {
-                u"signed_key_images": [
+            "id": 0,
+            "jsonrpc": "2.0",
+            "result": {
+                "signed_key_images": [
                     {
-                        u"key_image": u"0100000000000000000000000000000000000000000000000000000000000000",
-                        u"signature": u"ffe0d3216dc7a9f44dd997e7412ecb4a5e03641bba27119bbc0d5b6a145955048f4a8f301826c0d5999264cbc67817a6643143c49195a56fd135936667db0e08",
+                        "key_image": "0100000000000000000000000000000000000000000000000000000000000000",
+                        "signature": "ffe0d3216dc7a9f44dd997e7412ecb4a5e03641bba27119bbc0d5b6a145955048f4a8f301826c0d5999264cbc67817a6643143c49195a56fd135936667db0e08",
                     },
                     {
-                        u"key_image": u"0100000000000000000000000000000000000000000000000000000000000000",
-                        u"signature": u"0ed0b9752eb5d2466985174c50453f3fc9bd271b1f95bfd50d484b958976c40e8e1a7584cde52a85d40edc4a1bf9684003436492364af0ad9e1d4add1e158108",
+                        "key_image": "0100000000000000000000000000000000000000000000000000000000000000",
+                        "signature": "0ed0b9752eb5d2466985174c50453f3fc9bd271b1f95bfd50d484b958976c40e8e1a7584cde52a85d40edc4a1bf9684003436492364af0ad9e1d4add1e158108",
                     },
                     {
-                        u"key_image": u"0100000000000000000000000000000000000000000000000000000000000000",
-                        u"signature": u"b54632f4e95f70eb1af6459c94694c65ff1b8c822b40a62e6ef7cc1c6a055b0bb4b3832d48330c863993bf46bf87e1ed2971bf6a5d94a9a333a59017fb83630e",
+                        "key_image": "0100000000000000000000000000000000000000000000000000000000000000",
+                        "signature": "b54632f4e95f70eb1af6459c94694c65ff1b8c822b40a62e6ef7cc1c6a055b0bb4b3832d48330c863993bf46bf87e1ed2971bf6a5d94a9a333a59017fb83630e",
                     },
                     {
-                        u"key_image": u"0100000000000000000000000000000000000000000000000000000000000000",
-                        u"signature": u"57f85fd761ecb780a877034cef57449df7c3ad492d803711d1b2a47bf192d00af2f2341388120364dba0d7496c0a5d041032602812995c11268253618713040a",
+                        "key_image": "0100000000000000000000000000000000000000000000000000000000000000",
+                        "signature": "57f85fd761ecb780a877034cef57449df7c3ad492d803711d1b2a47bf192d00af2f2341388120364dba0d7496c0a5d041032602812995c11268253618713040a",
                     },
                     {
-                        u"key_image": u"0100000000000000000000000000000000000000000000000000000000000000",
-                        u"signature": u"9d22b52da3b835afbf29de7ba2dd86fb805435492691799debd7d37dd932dc0e4b07e9b4744da38e2b38fac63475522112804627227756bc37dbc57ea7e59701",
+                        "key_image": "0100000000000000000000000000000000000000000000000000000000000000",
+                        "signature": "9d22b52da3b835afbf29de7ba2dd86fb805435492691799debd7d37dd932dc0e4b07e9b4744da38e2b38fac63475522112804627227756bc37dbc57ea7e59701",
                     },
                     {
-                        u"key_image": u"0100000000000000000000000000000000000000000000000000000000000000",
-                        u"signature": u"664c7ac1c1f4c86e56ebc5298ef4acf46c2c154263c5dbc69b5d4d08b9f31a001db8845dbe37a81e7289e33f24ab5b0f17bbfe00612e4624c7b27ca0c27e5c0c",
+                        "key_image": "0100000000000000000000000000000000000000000000000000000000000000",
+                        "signature": "664c7ac1c1f4c86e56ebc5298ef4acf46c2c154263c5dbc69b5d4d08b9f31a001db8845dbe37a81e7289e33f24ab5b0f17bbfe00612e4624c7b27ca0c27e5c0c",
                     },
                     {
-                        u"key_image": u"0100000000000000000000000000000000000000000000000000000000000000",
-                        u"signature": u"a6bf6c5248b00f946ced5d21d03311fa6335b0ddf37f8e46d89d4b0a73de7b040d7ceee31da144693a8f86b1e61908014783e139061c0a4015b0ef13a967060c",
+                        "key_image": "0100000000000000000000000000000000000000000000000000000000000000",
+                        "signature": "a6bf6c5248b00f946ced5d21d03311fa6335b0ddf37f8e46d89d4b0a73de7b040d7ceee31da144693a8f86b1e61908014783e139061c0a4015b0ef13a967060c",
                     },
                     {
-                        u"key_image": u"0100000000000000000000000000000000000000000000000000000000000000",
-                        u"signature": u"2d6792c9c438657a5a2d7068f16fe80ca7995144ec1f12f1a37c091690cf260323bbe866e88d725dc791344e6af29b0f22d0792b9f60a5020c6e54bad7fe1404",
+                        "key_image": "0100000000000000000000000000000000000000000000000000000000000000",
+                        "signature": "2d6792c9c438657a5a2d7068f16fe80ca7995144ec1f12f1a37c091690cf260323bbe866e88d725dc791344e6af29b0f22d0792b9f60a5020c6e54bad7fe1404",
                     },
                     {
-                        u"key_image": u"0100000000000000000000000000000000000000000000000000000000000000",
-                        u"signature": u"a5fe1c57e83442856b1e3cefc67814c908f2485269adbe808c013c7ddb489c0592278fec3c7cc32b2d16135e627fe7bf42ab896e0c7a17333f176ff8bf267f04",
+                        "key_image": "0100000000000000000000000000000000000000000000000000000000000000",
+                        "signature": "a5fe1c57e83442856b1e3cefc67814c908f2485269adbe808c013c7ddb489c0592278fec3c7cc32b2d16135e627fe7bf42ab896e0c7a17333f176ff8bf267f04",
                     },
                 ]
             },
         }
         kimgs = self.wallet.export_key_images()
         mock_post.return_value.json.return_value = {
-            u"id": 0,
-            u"jsonrpc": u"2.0",
-            u"result": {u"height": 125578, u"spent": 322437994530000, u"unspent": 0},
+            "id": 0,
+            "jsonrpc": "2.0",
+            "result": {"height": 125578, "spent": 322437994530000, "unspent": 0},
         }
         self.assertEqual(
             self.wallet.import_key_images(kimgs),

@@ -70,6 +70,26 @@ class Account(object):
         """
         return self._backend.new_address(account=self.index, label=label)
 
+    def address_balance(self, addresses=None):
+        """
+        Returns balances of given addresses, or all addresses if none given.
+
+        :param addresses: a sequence of address as :class:`Address <monero.address.Addresss>`
+                    or their indexes within the account as `int`s
+        :rtype: list of index, subaddress, balance, num_UTXOs:
+                    (`int`, :class:`Address <monero.address.Address>`, `Decimal`, `int`)
+        """
+        indices = None
+        _addresses = self.addresses()
+        if addresses is not None:
+            indices = []
+            for addr in addresses:
+                if isinstance(addr, int):
+                    indices.append(addr)
+                else:
+                    indices.append(_addresses.index(addr))
+        return self._backend.address_balance(account=self.index, indices=indices)
+
     def transfer(
         self,
         address,

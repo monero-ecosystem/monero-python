@@ -122,6 +122,25 @@ class JSONRPCWallet(object):
             from_atomic(_balance["unlocked_balance"]),
         )
 
+    def address_balance(self, account=0, indices=None):
+        indices = [] if indices is None else indices
+        _balances = self.raw_request(
+            "getbalance",
+            {
+                "account_index": account,
+                "address_indices": indices,
+            },
+        )
+        return [
+            (
+                bal["address_index"],
+                address(bal["address"]),
+                from_atomic(bal["balance"]),
+                bal["num_unspent_outputs"],
+            )
+            for bal in _balances["per_subaddress"]
+        ]
+
     def transfers_in(self, account, pmtfilter):
         params = {"account_index": account, "pending": False}
         method = "get_transfers"

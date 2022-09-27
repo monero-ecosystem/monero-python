@@ -1,0 +1,35 @@
+{
+  "id": 0,
+  "jsonrpc": "2.0",
+  "result": {
+    "balance": 12982128625328954,
+    "blocks_to_unlock": 0,
+    "multisig_import_needed": false,
+    "per_subaddress": [
+      {
+        "account_index": 0,
+        "address": "55LTR8KniP4LQGJSPtbYDacR7dz8RBFnsfAKMaMuwUNYX6aQbBcovzDPyrQF9KXF9tVU6Xk3K8no1BywnJX6GvZX8yJsXvt",
+        "address_index": 0,
+        "balance": 12943277373064573,
+        "blocks_to_unlock": 0,
+        "label": "Primary account",
+        "num_unspent_outputs": 1291,
+        "time_to_unlock": 0,
+        "unlocked_balance": 12943277373064573
+      },
+      {
+        "account_index": 0,
+        "address": "75sNpRwUtekcJGejMuLSGA71QFuK1qcCVLZnYRTfQLgFU5nJ7xiAHtR5ihioS53KMe8pBhH61moraZHyLoG4G7fMER8xkNv",
+        "address_index": 2,
+        "balance": 800200000000,
+        "blocks_to_unlock": 0,
+        "label": "",
+        "num_unspent_outputs": 5,
+        "time_to_unlock": 0,
+        "unlocked_balance": 800200000000
+      }
+    ],
+    "time_to_unlock": 0,
+    "unlocked_balance": 12982128625328954
+  }
+}

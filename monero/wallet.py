@@ -211,9 +211,9 @@ class Wallet(object):
         :rtype: :class:`BaseAddress <monero.address.BaseAddress>`
         """
         # ensure indexes are within uint32
-        if major < 0 or major >= 2 ** 32:
+        if major < 0 or major >= 2**32:
             raise ValueError("major index {} is outside uint32 range".format(major))
-        if minor < 0 or minor >= 2 ** 32:
+        if minor < 0 or minor >= 2**32:
             raise ValueError("minor index {} is outside uint32 range".format(minor))
         master_address = self.address()
         if major == minor == 0:
@@ -242,6 +242,18 @@ class Wallet(object):
         data = netbyte + D + C
         checksum = keccak_256(data).digest()[:4]
         return address.SubAddress(base58.encode(hexlify(data + checksum)))
+
+    def address_balance(self, addresses=None):
+        """
+        Returns balances of given addresses, or all addresses if none given. Operates on the
+        default account.
+
+        :param addresses: a sequence of address as :class:`Address <monero.address.Addresss>`
+                    or their indexes within the account as `int`s
+        :rtype: list of index, subaddress, balance, num_UTXOs:
+                    (`int`, :class:`Address <monero.address.Address>`, `Decimal`, `int`)
+        """
+        return self.accounts[0].address_balance(addresses=addresses)
 
     def transfer(
         self,

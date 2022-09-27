@@ -1,0 +1,66 @@
+{
+  "id": 0,
+  "jsonrpc": "2.0",
+  "result": {
+    "subaddress_accounts": [
+      {
+        "account_index": 0,
+        "balance": 12982128625328954,
+        "base_address": "55LTR8KniP4LQGJSPtbYDacR7dz8RBFnsfAKMaMuwUNYX6aQbBcovzDPyrQF9KXF9tVU6Xk3K8no1BywnJX6GvZX8yJsXvt",
+        "label": "Primary account",
+        "tag": "",
+        "unlocked_balance": 12982128625328954
+      },
+      {
+        "account_index": 1,
+        "balance": 12000000000000,
+        "base_address": "77Vx9cs1VPicFndSVgYUvTdLCJEZw9h81hXLMYsjBCXSJfUehLa9TDW3Ffh45SQa7xb6dUs18mpNxfUhQGqfwXPSMrvKhVp",
+        "label": "Untitled account",
+        "tag": "",
+        "unlocked_balance": 12000000000000
+      },
+      {
+        "account_index": 2,
+        "balance": 11222000000000,
+        "base_address": "78P16M3XmFRGcWFCcsgt1WcTntA1jzcq31seQX1Eg92j8VQ99NPivmdKam4J5CKNAD7KuNWcq5xUPgoWczChzdba5WLwQ4j",
+        "label": "Untitled account",
+        "tag": "",
+        "unlocked_balance": 11222000000000
+      },
+      {
+        "account_index": 3,
+        "balance": 2000000000000,
+        "base_address": "76FWbfaWr3igfJhf2B5zBMjCWKZpaiGHbfE7vqgDGDSGWs2mfTBNHqTTMAqkYsxg6XEojV4Pax8wV9Fqvu1Ghy7nQiSzcXQ",
+        "label": "Untitled account",
+        "tag": "",
+        "unlocked_balance": 2000000000000
+      },
+      {
+        "account_index": 4,
+        "balance": 1000000000000,
+        "base_address": "77ETXXSc6PkAF7WkJPFoL43ivyoBq9kpC38GbCa7Z6T72VpWXWBKpK6QQgL47VF196h7EFExy43knMYscAyCYz9F44nEDd5",
+        "label": "Untitled account",
+        "tag": "",
+        "unlocked_balance": 1000000000000
+      },
+      {
+        "account_index": 5,
+        "balance": 200000000000000,
+        "base_address": "73mFYjLVDF9HSaNfAnGpqTBvNaCyBDGqx9NAPaKBhCYWRMxUERWDkk6hgzh4dEuwKTPy3UMdLL91zF5BxrwzBtQNAKfqf5W",
+        "label": "Untitled account",
+        "tag": "",
+        "unlocked_balance": 200000000000000
+      },
+      {
+        "account_index": 6,
+        "balance": 50000000000,
+        "base_address": "78jehncLRUCKiNHQ1DBqwDBREs32X9Ec1ebU2EFM2cDLah6qDxM4d1RQ9uRymEa71r4qKPxY2KpVv9ueMJEbAHL7RELQqqA",
+        "label": "Untitled account",
+        "tag": "",
+        "unlocked_balance": 50000000000
+      }
+    ],
+    "total_balance": 13208400625328954,
+    "total_unlocked_balance": 13208400625328954
+  }
+}
