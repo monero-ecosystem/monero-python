@@ -1,4 +1,3 @@
-import pytest
 import unittest
 
 from monero.backends.offline import OfflineWallet, WalletIsOffline
@@ -14,17 +13,19 @@ class OfflineTest(unittest.TestCase):
         self.wallet = Wallet(OfflineWallet(self.addr, view_key=self.svk))
 
     def test_offline_exception(self):
+        self.assertRaises(WalletIsOffline, self.wallet.address_balance)
+        self.assertRaises(WalletIsOffline, self.wallet.balance)
+        self.assertRaises(WalletIsOffline, self.wallet.balances)
+        self.assertRaises(WalletIsOffline, self.wallet.export_key_images)
+        self.assertRaises(WalletIsOffline, self.wallet.export_outputs)
         self.assertRaises(WalletIsOffline, self.wallet.height)
+        self.assertRaises(WalletIsOffline, self.wallet.import_key_images, "")
+        self.assertRaises(WalletIsOffline, self.wallet.import_outputs, "")
+        self.assertRaises(WalletIsOffline, self.wallet.incoming)
         self.assertRaises(WalletIsOffline, self.wallet.new_account)
         self.assertRaises(WalletIsOffline, self.wallet.new_address)
-        self.assertRaises(WalletIsOffline, self.wallet.export_outputs)
-        self.assertRaises(WalletIsOffline, self.wallet.import_outputs, "")
-        self.assertRaises(WalletIsOffline, self.wallet.export_key_images)
-        self.assertRaises(WalletIsOffline, self.wallet.import_key_images, "")
-        self.assertRaises(WalletIsOffline, self.wallet.balances)
-        self.assertRaises(WalletIsOffline, self.wallet.balance)
-        self.assertRaises(WalletIsOffline, self.wallet.incoming)
         self.assertRaises(WalletIsOffline, self.wallet.outgoing)
+        self.assertRaises(WalletIsOffline, self.wallet.sweep_all, "")
         self.assertRaises(
             WalletIsOffline, self.wallet.transfer, self.wallet.get_address(1, 0), 1
         )
@@ -71,8 +72,8 @@ class AddressTestCase(SubaddrTest, JSONTestCase):
     def test_subaddress_out_of_range(self):
         self.assertRaises(ValueError, self.wallet.get_address, 0, -1)
         self.assertRaises(ValueError, self.wallet.get_address, -1, 0)
-        self.assertRaises(ValueError, self.wallet.get_address, 1, 2 ** 32)
-        self.assertRaises(ValueError, self.wallet.get_address, 2 ** 32, 1)
+        self.assertRaises(ValueError, self.wallet.get_address, 1, 2**32)
+        self.assertRaises(ValueError, self.wallet.get_address, 2**32, 1)
 
 
 class TestnetAddressTestCase(SubaddrTest, JSONTestCase):

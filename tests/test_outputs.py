@@ -1,10 +1,5 @@
 from decimal import Decimal
 import json
-
-try:
-    from unittest.mock import patch, Mock
-except ImportError:
-    from mock import patch, Mock
 import responses
 
 from monero.backends.jsonrpc import JSONRPCDaemon, JSONRPCWallet

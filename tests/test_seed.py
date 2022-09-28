@@ -1,7 +1,5 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 import unittest
+
 from monero.address import Address
 from monero.seed import Seed
 from monero.wordlists import list_wordlists
@@ -145,7 +143,7 @@ class SeedTestCase(unittest.TestCase):
 
     def test_chinese_simplified(self):
         seed = Seed(
-            u"遭 牲 本 点 司 司 仲 吉 虎 只 绝 生 指 纯 伟 破 夫 惊 群 楚 祥 旋 暗 骨 伟", "Chinese (simplified)"
+            "遭 牲 本 点 司 司 仲 吉 虎 只 绝 生 指 纯 伟 破 夫 惊 群 楚 祥 旋 暗 骨 伟", "Chinese (simplified)"
         )
         self.assertEqual(
             seed.secret_spend_key(),
@@ -170,7 +168,7 @@ class SeedTestCase(unittest.TestCase):
 
     def test_dutch(self):
         seed = Seed(
-            u"ralf tolvrij copier roon ossuarium wedstrijd splijt debbie bomtapijt occlusie oester noren hiaat scenario geshockt veeteler rotten symboliek jarig bock yoghurt plegen weert zeeblauw wedstrijd",
+            "ralf tolvrij copier roon ossuarium wedstrijd splijt debbie bomtapijt occlusie oester noren hiaat scenario geshockt veeteler rotten symboliek jarig bock yoghurt plegen weert zeeblauw wedstrijd",
             "Dutch",
         )
         self.assertEqual(
@@ -196,7 +194,7 @@ class SeedTestCase(unittest.TestCase):
 
     def test_esperanto(self):
         seed = Seed(
-            u"knedi aspekti boli asbesto pterido aparta muro sandalo hufumo porcelana degeli utopia ebono lifto dutaga hundo vejno ebono higieno nikotino orkestro arlekeno insekto jaguaro hundo",
+            "knedi aspekti boli asbesto pterido aparta muro sandalo hufumo porcelana degeli utopia ebono lifto dutaga hundo vejno ebono higieno nikotino orkestro arlekeno insekto jaguaro hundo",
             "Esperanto",
         )
         self.assertEqual(
@@ -222,7 +220,7 @@ class SeedTestCase(unittest.TestCase):
 
     def test_french(self):
         seed = Seed(
-            u"sauce exprimer chasse asile larve tacler digestion muguet rondeur sept clore narrer fluor arme torse dans glace tant salon sanguin globe quiche ficher flaque clore",
+            "sauce exprimer chasse asile larve tacler digestion muguet rondeur sept clore narrer fluor arme torse dans glace tant salon sanguin globe quiche ficher flaque clore",
             "French",
         )
         self.assertEqual(
@@ -248,7 +246,7 @@ class SeedTestCase(unittest.TestCase):
 
     def test_german(self):
         seed = Seed(
-            u"Erdgas Gesuch beeilen Chiffon Abendrot Alter Helium Salz Almweide Ampel Dichter Rotglut Dialekt Akkord Rampe Gesöff Ziege Boykott keuchen Krach Anbau Labor Esel Ferien Ampel",
+            "Erdgas Gesuch beeilen Chiffon Abendrot Alter Helium Salz Almweide Ampel Dichter Rotglut Dialekt Akkord Rampe Gesöff Ziege Boykott keuchen Krach Anbau Labor Esel Ferien Ampel",
             "German",
         )
         self.assertEqual(
@@ -274,7 +272,7 @@ class SeedTestCase(unittest.TestCase):
 
     def test_italian(self):
         seed = Seed(
-            u"tramonto spuntare ruota afrodite binocolo riferire moneta assalire tuta firmare malattia flagello paradiso tacere sindrome spuntare sogliola volare follia versare insulto diagnosi lapide meteo malattia",
+            "tramonto spuntare ruota afrodite binocolo riferire moneta assalire tuta firmare malattia flagello paradiso tacere sindrome spuntare sogliola volare follia versare insulto diagnosi lapide meteo malattia",
             "Italian",
         )
         self.assertEqual(
@@ -300,7 +298,7 @@ class SeedTestCase(unittest.TestCase):
 
     def test_japanese(self):
         seed = Seed(
-            u"いもり すあな いきる しちょう うったえる ちひょう けなみ たいちょう うぶごえ しかい しなぎれ いっせい つかれる しなん ばあさん たいまつばな しひょう おいかける あんがい ていへん せんもん きこく せんく そそぐ つかれる",
+            "いもり すあな いきる しちょう うったえる ちひょう けなみ たいちょう うぶごえ しかい しなぎれ いっせい つかれる しなん ばあさん たいまつばな しひょう おいかける あんがい ていへん せんもん きこく せんく そそぐ つかれる",
             "Japanese",
         )
         self.assertFalse(seed.is_mymonero())
@@ -327,7 +325,7 @@ class SeedTestCase(unittest.TestCase):
 
     def test_portuguese(self):
         seed = Seed(
-            u"rebuscar mefistofelico luto isca vulva ontologico autuar epiteto jarro invulneravel inquisitorial vietnamita voile potro mamute giroscopio scherzo cheroqui gueto loquaz fissurar fazer violoncelo viquingue vulva",
+            "rebuscar mefistofelico luto isca vulva ontologico autuar epiteto jarro invulneravel inquisitorial vietnamita voile potro mamute giroscopio scherzo cheroqui gueto loquaz fissurar fazer violoncelo viquingue vulva",
             "Portuguese",
         )
         self.assertFalse(seed.is_mymonero())
@@ -354,7 +352,7 @@ class SeedTestCase(unittest.TestCase):
 
     def test_russian(self):
         seed = Seed(
-            u"дощатый ателье мыло паек азот ружье домашний уныние уплата торговля шкаф кекс газета тревога улица армия лазерный иголка друг хищник пашня дневник кричать лыжный иголка",
+            "дощатый ателье мыло паек азот ружье домашний уныние уплата торговля шкаф кекс газета тревога улица армия лазерный иголка друг хищник пашня дневник кричать лыжный иголка",
             "Russian",
         )
         self.assertEqual(
@@ -380,7 +378,7 @@ class SeedTestCase(unittest.TestCase):
 
     def test_spanish(self):
         seed = Seed(
-            u"riesgo lápiz martes fuerza dinero pupila pago mensaje guion libro órgano juntar imperio puñal historia pasión nación posible paso límite don afirmar receta reposo fuerza",
+            "riesgo lápiz martes fuerza dinero pupila pago mensaje guion libro órgano juntar imperio puñal historia pasión nación posible paso límite don afirmar receta reposo fuerza",
             "Spanish",
         )
         self.assertFalse(seed.is_mymonero())

@@ -75,7 +75,6 @@ class ExtraParser(object):
                 raise ValueError(
                     "offset {:d}: extra nonce exceeds field size".format(self.offset)
                 )
-                return []
             nonce = bytearray(extra[:noncelen])
             if "nonces" in self.data:
                 self.data["nonces"].append(nonce)

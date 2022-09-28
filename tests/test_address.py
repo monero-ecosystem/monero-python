@@ -1,4 +1,3 @@
-import pytest
 import unittest
 
 from monero import const
@@ -132,8 +131,8 @@ class Tests(object):
         self.assertRaises(ValueError, Address, self.addr_invalid)
         self.assertRaises(ValueError, Address, self.iaddr_invalid)
         a = Address(self.addr)
-        self.assertRaises(TypeError, a.with_payment_id, 2 ** 64 + 1)
-        self.assertRaises(TypeError, a.with_payment_id, "%x" % (2 ** 64 + 1))
+        self.assertRaises(TypeError, a.with_payment_id, 2**64 + 1)
+        self.assertRaises(TypeError, a.with_payment_id, "%x" % (2**64 + 1))
         s = SubAddress(self.subaddr)
         self.assertRaises(TypeError, s.with_payment_id, 0)
         self.assertRaises(ValueError, address, "whatever")
