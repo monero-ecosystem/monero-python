@@ -316,22 +316,35 @@ class JSONRPCWallet(object):
         if payment_id is not None:
             data["payment_id"] = str(PaymentID(payment_id))
         _transfers = self.raw_request("transfer_split", data)
-        _pertx = [
-            dict(_tx)
-            for _tx in map(
-                lambda vs: zip(
-                    ("txid", "amount", "fee", "key", "blob", "payment_id"), vs
-                ),
-                zip(
-                    *[
-                        _transfers[k]
-                        for k in (
+        if relay:
+            single_keys = ("txid", "amount", "fee", "key", "blob", "payment_id")
+            single_keys_list = (
                             "tx_hash_list",
                             "amount_list",
                             "fee_list",
                             "tx_key_list",
                             "tx_blob_list",
                         )
+        else:
+            single_keys = ("txid", "amount", "fee", "key", "blob", "payment_id", "tx_metadata")
+            single_keys_list = (
+                "tx_hash_list",
+                "amount_list",
+                "fee_list",
+                "tx_key_list",
+                "tx_blob_list",
+                "tx_metadata_list"
+            )
+        _pertx = [
+            dict(_tx)
+            for _tx in map(
+                lambda vs: zip(
+                    single_keys, vs
+                ),
+                zip(
+                    *[
+                        _transfers[k]
+                        for k in single_keys_list
                     ]
                 ),
             )
