@@ -16,6 +16,29 @@ from .exceptions import RPCError, Unauthorized, MethodNotFound
 _log = logging.getLogger(__name__)
 
 
+def _extract_keys(relay):
+    if relay:
+        single_keys = ("txid", "amount", "fee", "key", "blob", "payment_id")
+        single_keys_list = (
+            "tx_hash_list",
+            "amount_list",
+            "fee_list",
+            "tx_key_list",
+            "tx_blob_list",
+        )
+    else:
+        single_keys = ("txid", "amount", "fee", "key", "blob", "tx_metadata", "payment_id")
+        single_keys_list = (
+            "tx_hash_list",
+            "amount_list",
+            "fee_list",
+            "tx_key_list",
+            "tx_blob_list",
+            "tx_metadata_list"
+        )
+    return single_keys, single_keys_list
+
+
 class JSONRPCWallet(object):
     """
     JSON RPC backend for Monero wallet (``monero-wallet-rpc``)
@@ -263,6 +286,7 @@ class JSONRPCWallet(object):
                 else None,
                 "blob": binascii.unhexlify(data.get("blob", "")),
                 "confirmations": data.get("confirmations", None),
+                "metadata": data.get("tx_metadata", None)
             }
         )
 
@@ -306,31 +330,27 @@ class JSONRPCWallet(object):
                 )
             ),
             "priority": priority,
-            "unlock_time": 0,
+            "unlock_time": unlock_time,
             "get_tx_keys": True,
             "get_tx_hex": True,
             "new_algorithm": True,
             "do_not_relay": not relay,
+            "get_tx_metadata": not relay
         }
         if payment_id is not None:
             data["payment_id"] = str(PaymentID(payment_id))
         _transfers = self.raw_request("transfer_split", data)
+        extract_keys, extract_keys_list = _extract_keys(relay)
         _pertx = [
             dict(_tx)
             for _tx in map(
                 lambda vs: zip(
-                    ("txid", "amount", "fee", "key", "blob", "payment_id"), vs
+                    extract_keys, vs
                 ),
                 zip(
                     *[
                         _transfers[k]
-                        for k in (
-                            "tx_hash_list",
-                            "amount_list",
-                            "fee_list",
-                            "tx_key_list",
-                            "tx_blob_list",
-                        )
+                        for k in extract_keys_list
                     ]
                 ),
             )
@@ -361,30 +381,26 @@ class JSONRPCWallet(object):
             "address": str(address(destination)),
             "subaddr_indices": list(subaddr_indices),
             "priority": priority,
-            "unlock_time": 0,
+            "unlock_time": unlock_time,
             "get_tx_keys": True,
             "get_tx_hex": True,
             "do_not_relay": not relay,
+            "get_tx_metadata": not relay
         }
         if payment_id is not None:
             data["payment_id"] = str(PaymentID(payment_id))
         _transfers = self.raw_request("sweep_all", data)
+        extract_keys, extract_keys_list = _extract_keys(relay)
         _pertx = [
             dict(_tx)
             for _tx in map(
                 lambda vs: zip(
-                    ("txid", "amount", "fee", "key", "blob", "payment_id"), vs
+                    extract_keys, vs
                 ),
                 zip(
                     *[
                         _transfers[k]
-                        for k in (
-                            "tx_hash_list",
-                            "amount_list",
-                            "fee_list",
-                            "tx_key_list",
-                            "tx_blob_list",
-                        )
+                        for k in extract_keys_list
                     ]
                 ),
             )
