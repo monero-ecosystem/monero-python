@@ -306,11 +306,12 @@ class JSONRPCWallet(object):
                 )
             ),
             "priority": priority,
-            "unlock_time": 0,
+            "unlock_time": unlock_time,
             "get_tx_keys": True,
             "get_tx_hex": True,
             "new_algorithm": True,
             "do_not_relay": not relay,
+            "get_tx_metadata": not relay
         }
         if payment_id is not None:
             data["payment_id"] = str(PaymentID(payment_id))
