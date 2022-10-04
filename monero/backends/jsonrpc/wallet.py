@@ -326,7 +326,7 @@ class JSONRPCWallet(object):
                             "tx_blob_list",
                         )
         else:
-            single_keys = ("txid", "amount", "fee", "key", "blob", "payment_id", "tx_metadata")
+            single_keys = ("txid", "amount", "fee", "key", "blob", "tx_metadata", "payment_id")
             single_keys_list = (
                 "tx_hash_list",
                 "amount_list",
