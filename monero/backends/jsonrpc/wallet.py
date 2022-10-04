@@ -263,6 +263,7 @@ class JSONRPCWallet(object):
                 else None,
                 "blob": binascii.unhexlify(data.get("blob", "")),
                 "confirmations": data.get("confirmations", None),
+                "metadata": data.get("tx_metadata", None)
             }
         )
 

@@ -96,6 +96,7 @@ class Transaction(object):
     json = None
     version = None
     pubkeys = None
+    metadata = None
 
     @property
     def is_coinbase(self):
@@ -124,6 +125,7 @@ class Transaction(object):
         self.blob = kwargs.get("blob", self.blob)
         self.confirmations = kwargs.get("confirmations", self.confirmations)
         self.output_indices = kwargs.get("output_indices", self.output_indices)
+        self.metadata = kwargs.get("metadata", self.metadata)
         self.json = kwargs.get("json", self.json)
         self.pubkeys = self.pubkeys or []
         if self.json:
@@ -222,13 +224,13 @@ class Transaction(object):
             )
         """
         pre hard fork:
-        { 
+        {
           "target": {
             "key": "ea3f..."
           }
         }
         post hard fork:
-        { 
+        {
           "target": {
             "tagged_key": {
               "key": "ea3f...",
