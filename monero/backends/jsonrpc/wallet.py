@@ -237,6 +237,7 @@ class JSONRPCWallet(object):
             "note": data.get("note", None),
             "transaction": self._tx(data),
             "local_address": laddr,
+	    "unlock_time": data["unlock_time"]
         }
         if "destinations" in data:
             result["destinations"] = [

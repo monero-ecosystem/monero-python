@@ -28,8 +28,9 @@ class Payment(object):
     transaction = None
     local_address = None
     note = ""
+    unlock_time = None
 
-    _reprstr = "{} @ {} {:.12f} id={}"
+    _reprstr = "{} @ {} {:.12f} id={} {}"
 
     def __init__(self, **kwargs):
         self.amount = kwargs.pop("amount", self.amount)
@@ -37,6 +38,7 @@ class Payment(object):
         self.payment_id = kwargs.pop("payment_id", self.payment_id)
         self.transaction = kwargs.pop("transaction", self.transaction)
         self.local_address = kwargs.pop("local_address", self.local_address)
+        self.unlock_time = kwargs.pop("unlock_time", self.local_address)
         self.note = kwargs.pop("note", self.note)
         if len(kwargs):
             raise ValueError(
@@ -49,6 +51,7 @@ class Payment(object):
             self.transaction.height or "pool",
             self.amount,
             self.payment_id,
+            self.unlock_time,
         )
 
 
@@ -58,7 +61,7 @@ class IncomingPayment(Payment):
     :class:`Account <monero.account.Account>`)
     """
 
-    _reprstr = "in: {} @ {} {:.12f} id={}"
+    _reprstr = "in: {} @ {} {:.12f} id={} {}"
 
 
 class OutgoingPayment(Payment):
