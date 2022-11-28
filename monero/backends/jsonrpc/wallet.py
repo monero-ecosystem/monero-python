@@ -1,5 +1,5 @@
 import binascii
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 import logging
 import operator
@@ -231,7 +231,7 @@ class JSONRPCWallet(object):
         result = {
             "payment_id": None if pid is None else PaymentID(pid),
             "amount": from_atomic(data["amount"]),
-            "timestamp": datetime.fromtimestamp(data["timestamp"])
+            "timestamp": datetime.fromtimestamp(data["timestamp"], timezone.utc)
             if "timestamp" in data
             else None,
             "note": data.get("note", None),
@@ -258,7 +258,7 @@ class JSONRPCWallet(object):
                 "fee": from_atomic(data["fee"]) if "fee" in data else None,
                 "key": data.get("key"),
                 "height": data.get("height", data.get("block_height")) or None,
-                "timestamp": datetime.fromtimestamp(data["timestamp"])
+                "timestamp": datetime.fromtimestamp(data["timestamp"], timezone.utc)
                 if "timestamp" in data
                 else None,
                 "blob": binascii.unhexlify(data.get("blob", "")),

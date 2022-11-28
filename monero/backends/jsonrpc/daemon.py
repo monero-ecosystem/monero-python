@@ -1,5 +1,5 @@
 import binascii
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 import ipaddress
 import json
@@ -150,7 +150,7 @@ class JSONRPCDaemon(object):
                 Transaction(
                     hash=tx["id_hash"],
                     fee=from_atomic(tx["fee"]),
-                    timestamp=datetime.fromtimestamp(tx["receive_time"]),
+                    timestamp=datetime.fromtimestamp(tx["receive_time"], timezone.utc),
                     blob=binascii.unhexlify(tx["tx_blob"]),
                     json=json.loads(tx["tx_json"]),
                     confirmations=0,
@@ -182,7 +182,7 @@ class JSONRPCDaemon(object):
                 "blob": res["blob"],
                 "hash": bhdr["hash"],
                 "height": bhdr["height"],
-                "timestamp": datetime.fromtimestamp(bhdr["timestamp"]),
+                "timestamp": datetime.fromtimestamp(bhdr["timestamp"], timezone.utc),
                 "version": (bhdr["major_version"], bhdr["minor_version"]),
                 "difficulty": bhdr["difficulty"],
                 "nonce": bhdr["nonce"],
@@ -1577,7 +1577,9 @@ class JSONRPCDaemon(object):
                     hash=tx["tx_hash"],
                     fee=from_atomic(fee) if fee else None,
                     height=None if tx["in_pool"] else tx["block_height"],
-                    timestamp=datetime.fromtimestamp(tx["block_timestamp"])
+                    timestamp=datetime.fromtimestamp(
+                        tx["block_timestamp"], timezone.utc
+                    )
                     if "block_timestamp" in tx
                     else None,
                     output_indices=tx["output_indices"]
