@@ -1585,6 +1585,7 @@ class JSONRPCDaemon(object):
                     else None,
                     blob=binascii.unhexlify(tx["as_hex"]) or None,
                     json=as_json,
+                    confirmations=tx["confirmations"],
                 )
             )
 
