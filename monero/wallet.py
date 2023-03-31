@@ -60,6 +60,12 @@ class Wallet(object):
                 pass
             self.accounts.append(_acc)
             idx += 1
+    
+    def store(self):
+        """
+        Saves the wallet to retain generated sub-addresses or other settings.
+        """
+        return self._backend.store()
 
     def height(self):
         """
