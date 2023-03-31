@@ -284,6 +284,9 @@ class JSONRPCWallet(object):
             from_atomic(_data["spent"]),
             from_atomic(_data["unspent"]),
         )
+    
+    def store(self):
+        return self.raw_request("store")
 
     def transfer(
         self,
