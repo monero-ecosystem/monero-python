@@ -45,8 +45,8 @@ class JSONRPCWallet(object):
         verify_ssl_certs=True,
         proxy_url=None,
     ):
-        self.url = "{protocol}://{host}:{port}/json_rpc".format(
-            protocol=protocol, host=host, port=port
+        self.url = "{protocol}://{host}:{port}/{path}".format(
+            protocol=protocol, host=host, port=port, path=path
         )
         _log.debug("JSONRPC wallet backend URL: {url}".format(url=self.url))
         self.auth = requests.auth.HTTPDigestAuth(user, password)
